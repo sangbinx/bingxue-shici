@@ -9,7 +9,7 @@ REPORT_FILE = '冰雪诗词全集_分析评价报告.txt'
 IMAGE_DIR = '冰雪诗词_全部图片'
 RECITE_VIDEO_DIR = '诗词朗诵视频'
 FITNESS_VIDEO_DIR = '健身锻炼视频'
-OUTPUT_HTML = '冰雪诗词数字图书馆.html'
+OUTPUT_HTML = 'index.html'
 # -------------------------
 
 # ========== 友情链接配置 ==========
@@ -131,7 +131,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（菜单联动优化版）...")
+    print("   正在生成冰雪诗词数字图书馆（最终版）...")
     print("=" * 60)
 
     print("[1/5] 正在读取诗词库...")
@@ -166,11 +166,13 @@ def main():
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>冰雪诗词 · 数字图书馆</title>
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0e3; color: #2c2c2c; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }}
+
+/* ========== 桌面版样式（保持不变） ========== */
+body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0e3; color: #2c2c2c; display: flex; flex-direction: column; min-height: 100vh; }}
 
 .header {{ background: linear-gradient(135deg, #2e7d32, #1b5e20); color: #f0f7e6; padding: 12px 30px; display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }}
 .header h1 {{ font-size: 1.8em; letter-spacing: 8px; font-weight: normal; text-align: center; }}
@@ -179,7 +181,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .header-info .detail-link {{ color: #fdd835; cursor: pointer; text-decoration: none; font-weight: bold; white-space: nowrap; }}
 .header-info .detail-link:hover {{ color: #ffeb3b; text-decoration: underline; }}
 
-.main {{ display: flex; flex: 1; overflow: hidden; }}
+.main {{ display: flex; flex: 1; }}
 
 .panel-title {{ text-align: center; font-size: 0.85em; font-weight: bold; letter-spacing: 2px; padding: 8px 0; margin-bottom: 4px; flex-shrink: 0; }}
 .left-panel {{ width: 200px; background: #fce4e4; display: flex; flex-direction: column; flex-shrink: 0; border-right: 2px solid #f0c0c0; }}
@@ -210,7 +212,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .center-buttons button {{ width: 150px; padding: 8px 6px; background: #4caf50; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.82em; letter-spacing: 1px; transition: 0.2s; }}
 .center-buttons button:hover {{ background: #388e3c; }}
 
-/* ====== 友情链接下拉菜单（撑开式） ====== */
 .links-wrapper {{ width: 150px; }}
 .links-wrapper > button {{ width: 100%; }}
 .links-submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #e8f5e9; border-radius: 0 0 4px 4px; }}
@@ -277,30 +278,120 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 
 .footer {{ background: #1b5e20; color: #c8e6c9; text-align: center; padding: 8px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; }}
 
-/* ========== 手机端适配 ========== */
-@media screen and (max-width: 768px) {{
-    .main {{ flex-direction: column; }}
-    .left-panel, .center-panel, .right-panel {{ width: 100%; max-height: none; border: none; border-bottom: 2px solid #e0d5c1; }}
-    .left-menu, .right-menu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }}
-    .left-menu.open, .right-menu.open {{ max-height: 400px; }}
-    .left-panel .panel-title, .right-panel .panel-title {{ cursor: pointer; }}
-    .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; }}
-    .center-buttons button {{ width: auto; padding: 8px 12px; font-size: 0.78em; }}
+/* ========== 手机端完全重写（断点提高到1024px，覆盖Mate 20X等大屏手机） ========== */
+@media screen and (max-width: 1024px) {{
+    body {{ 
+        min-height: 100vh; 
+        height: auto; 
+        overflow-x: hidden; 
+        overflow-y: auto; 
+        -webkit-overflow-scrolling: touch; 
+    }}
+
+    .header {{ padding: 10px 15px; gap: 6px; }}
+    .header h1 {{ font-size: 1.3em; letter-spacing: 4px; }}
+    .header-info {{ font-size: 0.75em; flex-wrap: wrap; justify-content: center; text-align: center; }}
+
+    .main {{ 
+        flex-direction: column; 
+        flex: none; 
+        width: 100%; 
+    }}
+
+    /* 三栏全部纵向排列，宽度占满 */
+    .left-panel, .center-panel, .right-panel {{ 
+        width: 100%; 
+        max-height: none; 
+        border: none; 
+        flex-shrink: 0; 
+        flex: none; 
+    }}
+    .left-panel {{ border-bottom: 2px solid #f0c0c0; }}
+    .right-panel {{ border-bottom: 2px solid #c0c8f0; }}
+    .center-panel {{ border-bottom: 2px solid #f0e0a0; }}
+
+    /* 左右菜单默认折叠，点击标题展开 */
+    .left-menu, .right-menu {{ 
+        max-height: 0; 
+        overflow: hidden; 
+        transition: max-height 0.3s ease; 
+    }}
+    .left-menu.open, .right-menu.open {{ max-height: 600px; }}
+    .left-panel .panel-title, .right-panel .panel-title {{ 
+        cursor: pointer; 
+        user-select: none; 
+        padding: 12px 0; 
+        font-size: 1em; 
+    }}
+    .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.7em; }}
+    .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.7em; }}
+    .left-panel .panel-title.open::after {{ content: ' ▲'; }}
+    .right-panel .panel-title.open::after {{ content: ' ▲'; }}
+
+    /* 中间按钮区横向排列 */
+    .center-buttons {{ 
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        justify-content: center; 
+        gap: 8px; 
+        padding: 10px 8px; 
+    }}
+    .center-buttons button {{ 
+        width: auto; 
+        padding: 10px 14px; 
+        font-size: 0.85em; 
+        min-width: 120px; 
+    }}
     .links-wrapper {{ width: auto; }}
-    .content {{ padding: 10px 12px; }}
-    .poem-card {{ padding: 14px 16px; }}
-    .poem-title {{ font-size: 1.05em; }}
-    .poem-body {{ font-size: 1em; line-height: 1.9; }}
-    .poem-img-float {{ float: none; width: 100%; max-width: 100%; margin: 10px 0; max-height: 360px; }}
-    .poem-img-float img {{ max-height: 180px; }}
-    .poem-img-float.single-img img {{ max-height: none; }}
-    .search-modal-content {{ width: 90%; left: 5%; min-width: auto; }}
+
+    /* 手机端隐藏视频按钮 */
+    .center-buttons button[onclick*="openVideoModal"] {{ display: none !important; }}
+
+    /* 内容区独占宽度 */
+    .content {{ 
+        flex: none; 
+        width: 100%; 
+        padding: 10px 12px; 
+        overflow-y: visible; 
+    }}
+    .poem-card {{ padding: 14px 16px; margin-bottom: 14px; }}
+    .poem-title {{ font-size: 1.1em; }}
+    .poem-body {{ font-size: 1em; line-height: 2.0; }}
+    .poem-img-float {{ 
+        float: none !important; 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        margin: 10px 0 !important; 
+        max-height: none !important; 
+    }}
+    .poem-img-float img {{ max-height: 250px !important; }}
+
+    .search-modal-content {{ 
+        width: 90%; 
+        left: 5%; 
+        min-width: auto; 
+        position: fixed; 
+        top: 60px; 
+    }}
     .video-modal-content {{ width: 95%; height: 90vh; padding: 12px; }}
     .video-body {{ flex-direction: column; }}
-    .video-list-side {{ width: 100%; border-right: none; border-bottom: 1px solid #e0d5c1; padding-right: 0; padding-bottom: 8px; max-height: 150px; }}
+    .video-list-side {{ 
+        width: 100%; 
+        border-right: none; 
+        border-bottom: 1px solid #e0d5c1; 
+        padding-right: 0; 
+        padding-bottom: 8px; 
+        max-height: 150px; 
+    }}
     .video-player-area {{ min-height: 280px; }}
-    .guestbook-modal-content, .report-modal-content {{ width: 95%; min-width: auto; padding: 12px; }}
+    .guestbook-modal-content, .report-modal-content {{ 
+        width: 95%; 
+        min-width: auto; 
+        padding: 16px; 
+        margin: 20px auto; 
+    }}
     .history-intro p {{ font-size: 0.9em; }}
+    .footer {{ font-size: 0.75em; padding: 10px; }}
 }}
 </style>
 </head>
@@ -316,7 +407,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="main">
 
 <div class="left-panel">
-  <div class="panel-title">诗词按体裁搜索</div>
+  <div class="panel-title" id="leftPanelTitle">诗词按体裁搜索</div>
   <div class="left-menu" id="leftSidebar"></div>
 </div>
 
@@ -337,7 +428,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 </div>
 
 <div class="right-panel">
-  <div class="panel-title">诗词按内容搜索</div>
+  <div class="panel-title" id="rightPanelTitle">诗词按内容搜索</div>
   <div class="right-menu" id="rightSidebar"></div>
 </div>
 
@@ -416,13 +507,9 @@ const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
 
-// ====== 全局菜单联动：关闭所有展开的菜单 ======
 function closeAllMenus() {{
-    // 左侧所有二级菜单
     document.querySelectorAll('.left-panel .submenu').forEach(sub => sub.classList.remove('open'));
-    // 右侧所有二级菜单
     document.querySelectorAll('.right-panel .submenu').forEach(sub => sub.classList.remove('open'));
-    // 功能区友情链接菜单
     document.getElementById('linksSubmenu').classList.remove('open');
 }}
 
@@ -432,31 +519,42 @@ function init() {{
     buildLinksSubmenu();
     initDrag();
     initMenuAutoClose();
+    initMobileMenuToggle();
     showTodayPoems();
-    document.querySelectorAll('.left-panel .panel-title').forEach(title => {{
-        title.addEventListener('click', function() {{ this.nextElementSibling.classList.toggle('open'); }});
-    }});
-    document.querySelectorAll('.right-panel .panel-title').forEach(title => {{
-        title.addEventListener('click', function() {{ this.nextElementSibling.classList.toggle('open'); }});
-    }});
+}}
+
+function initMobileMenuToggle() {{
+    const leftTitle = document.getElementById('leftPanelTitle');
+    const rightTitle = document.getElementById('rightPanelTitle');
+    const leftMenu = document.getElementById('leftSidebar');
+    const rightMenu = document.getElementById('rightSidebar');
+    if (leftTitle && leftMenu) {{
+        leftTitle.addEventListener('click', function() {{
+            leftMenu.classList.toggle('open');
+            leftTitle.classList.toggle('open');
+        }});
+    }}
+    if (rightTitle && rightMenu) {{
+        rightTitle.addEventListener('click', function() {{
+            rightMenu.classList.toggle('open');
+            rightTitle.classList.toggle('open');
+        }});
+    }}
 }}
 
 function initMenuAutoClose() {{
-    // 左侧菜单：点击展开时，关闭所有其他菜单
     document.querySelectorAll('.left-panel .menu-title').forEach(title => {{
         title.addEventListener('click', function() {{
             closeAllMenus();
             this.nextElementSibling.classList.toggle('open');
         }});
     }});
-    // 右侧菜单：同理
     document.querySelectorAll('.right-panel .menu-title').forEach(title => {{
         title.addEventListener('click', function() {{
             closeAllMenus();
             this.nextElementSibling.classList.toggle('open');
         }});
     }});
-    // 功能区按钮（除友情链接外）：点击时关闭所有菜单
     document.querySelectorAll('.center-buttons > button:not(.links-wrapper button)').forEach(btn => {{
         btn.addEventListener('click', function() {{
             closeAllMenus();
@@ -559,7 +657,6 @@ function render(title, poems) {{
         h += '</div>';
     }});
     c.innerHTML = h;
-    // ====== 内容区自动回顶 ======
     c.scrollTop = 0;
 }}
 
@@ -736,7 +833,7 @@ window.onload = init;
         f.write(html)
 
     print(f"\n{'=' * 60}")
-    print(f"🎉 菜单联动优化版网站生成完毕！")
+    print(f"🎉 网站生成完毕！")
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     os.system("pause")

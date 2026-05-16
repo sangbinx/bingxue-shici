@@ -12,13 +12,11 @@ FITNESS_VIDEO_DIR = '健身锻炼视频'
 OUTPUT_HTML = 'index.html'
 # -------------------------
 
-# ========== 友情链接配置 ==========
 FRIENDLY_LINKS = [
     {'name': '搜韵', 'url': 'https://sou-yun.cn/'},
     {'name': '诗词吾爱', 'url': 'https://www.52shici.com/'},
     {'name': '古诗词网', 'url': 'https://www.gushiwen.cn/'},
 ]
-# =================================
 
 def parse_poems_with_theme(filepath):
     poems = []
@@ -116,10 +114,7 @@ def scan_videos(folder_path):
         return videos
     for file_name in sorted(os.listdir(folder_path)):
         if file_name.lower().endswith(('.mp4', '.webm', '.mov', '.avi', '.mkv')):
-            videos.append({
-                'name': file_name,
-                'path': folder_path + '/' + file_name
-            })
+            videos.append({'name': file_name, 'path': folder_path + '/' + file_name})
     return videos
 
 def load_report(filepath):
@@ -131,29 +126,22 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（最终版）...")
+    print("   正在生成冰雪诗词数字图书馆（电脑版修复版）...")
     print("=" * 60)
-
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
     print(f"  ✅ 已读取 {len(poems)} 首诗词")
-
     print("[2/5] 正在查找图片关联...")
     for poem in poems:
         poem['images'] = find_images(poem['id'], IMAGE_DIR)
-    matched = sum(1 for p in poems if p['images'])
-    print(f"  ✅ {matched} 首诗词有配图")
-
+    print(f"  ✅ {sum(1 for p in poems if p['images'])} 首诗词有配图")
     print("[3/5] 正在加载分析报告...")
     report_text = load_report(REPORT_FILE)
-    print(f"  ✅ 报告加载完成")
-
+    print("  ✅ 报告加载完成")
     print("[4/5] 正在扫描视频文件夹...")
     recite_videos = scan_videos(RECITE_VIDEO_DIR)
     fitness_videos = scan_videos(FITNESS_VIDEO_DIR)
-    print(f"  ✅ 朗诵视频：{len(recite_videos)} 个")
-    print(f"  ✅ 健身视频：{len(fitness_videos)} 个")
-
+    print(f"  ✅ 朗诵视频：{len(recite_videos)} 个，健身视频：{len(fitness_videos)} 个")
     print("[5/5] 正在生成网页文件...")
 
     poems_json = json.dumps(poems, ensure_ascii=False)
@@ -170,65 +158,52 @@ def main():
 <title>冰雪诗词 · 数字图书馆</title>
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-
-/* ========== 桌面版样式（保持不变） ========== */
 body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0e3; color: #2c2c2c; display: flex; flex-direction: column; min-height: 100vh; }}
-
-.header {{ background: linear-gradient(135deg, #2e7d32, #1b5e20); color: #f0f7e6; padding: 12px 30px; display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }}
-.header h1 {{ font-size: 1.8em; letter-spacing: 8px; font-weight: normal; text-align: center; }}
-.header-info {{ display: flex; align-items: center; gap: 8px; font-size: 0.85em; opacity: 0.95; }}
+.header {{ background: linear-gradient(135deg, #2e7d32, #1b5e20); color: #f0f7e6; padding: 10px 20px; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }}
+.header h1 {{ font-size: 1.6em; letter-spacing: 6px; font-weight: normal; text-align: center; }}
+.header-info {{ display: flex; align-items: center; gap: 8px; font-size: 0.8em; opacity: 0.95; }}
 .header-info p {{ margin: 0; line-height: 1.4; }}
 .header-info .detail-link {{ color: #fdd835; cursor: pointer; text-decoration: none; font-weight: bold; white-space: nowrap; }}
 .header-info .detail-link:hover {{ color: #ffeb3b; text-decoration: underline; }}
-
 .main {{ display: flex; flex: 1; }}
-
-.panel-title {{ text-align: center; font-size: 0.85em; font-weight: bold; letter-spacing: 2px; padding: 8px 0; margin-bottom: 4px; flex-shrink: 0; }}
-.left-panel {{ width: 200px; background: #fce4e4; display: flex; flex-direction: column; flex-shrink: 0; border-right: 2px solid #f0c0c0; }}
-.left-panel .panel-title {{ background: #f8d0d0; color: #a33; }}
-.left-menu {{ flex: 1; overflow-y: auto; padding: 0; }}
-
-.right-panel {{ width: 200px; background: #e4ecfc; display: flex; flex-direction: column; flex-shrink: 0; border-left: 2px solid #c0c8f0; }}
-.right-panel .panel-title {{ background: #d0d8f8; color: #36c; }}
-.right-menu {{ flex: 1; overflow-y: auto; padding: 0; }}
-
-.center-panel {{ width: 180px; display: flex; flex-direction: column; flex-shrink: 0; border-left: 2px solid #f0e0a0; border-right: 2px solid #f0e0a0; background: #fef9e7; }}
-.center-panel .panel-title {{ background: #fef0c0; color: #a80; }}
-.center-buttons {{ flex: 1; display: flex; flex-direction: column; gap: 8px; align-items: center; padding: 10px; overflow-y: auto; }}
-
-.menu-item {{ margin-bottom: 2px; }}
-.menu-title {{ padding: 9px 14px; cursor: pointer; font-size: 0.88em; letter-spacing: 1px; transition: 0.2s; border-radius: 4px; margin: 0 6px; background: #f8d0d0; color: #a33; text-align: center; font-weight: bold; }}
+.left-panel {{ width: 120px; background: #fce4e4; display: flex; flex-direction: column; flex-shrink: 0; border-right: 2px solid #f0c0c0; }}
+.left-panel .panel-title {{ background: #f8d0d0; color: #a33; font-size: 0.75em; padding: 6px 0; letter-spacing: 1px; }}
+.right-panel {{ width: 120px; background: #e4ecfc; display: flex; flex-direction: column; flex-shrink: 0; border-left: 2px solid #c0c8f0; }}
+.right-panel .panel-title {{ background: #d0d8f8; color: #36c; font-size: 0.75em; padding: 6px 0; letter-spacing: 1px; }}
+.center-panel {{ width: 120px; display: flex; flex-direction: column; flex-shrink: 0; border-left: 2px solid #f0e0a0; border-right: 2px solid #f0e0a0; background: #fef9e7; }}
+.center-panel .panel-title {{ background: #fef0c0; color: #a80; font-size: 0.75em; padding: 6px 0; letter-spacing: 1px; }}
+.panel-title {{ text-align: center; font-weight: bold; flex-shrink: 0; }}
+.left-menu, .right-menu {{ flex: 1; overflow-y: auto; padding: 0; }}
+.center-buttons {{ flex: 1; display: flex; flex-direction: column; gap: 5px; align-items: center; padding: 8px; overflow-y: auto; }}
+.menu-item {{ margin-bottom: 1px; }}
+.menu-title {{ padding: 6px 8px; cursor: pointer; font-size: 0.78em; letter-spacing: 1px; transition: 0.2s; border-radius: 3px; margin: 0 4px; background: #f8d0d0; color: #a33; text-align: center; font-weight: bold; }}
 .menu-title:hover {{ background: #f0b0b0; }}
 .right-panel .menu-title {{ background: #d0d8f8; color: #36c; }}
 .right-panel .menu-title:hover {{ background: #b8c8f0; }}
-.submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #fdf0f0; margin: 0 6px; border-radius: 0 0 4px 4px; }}
+.submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #fdf0f0; margin: 0 4px; border-radius: 0 0 3px 3px; }}
 .right-panel .submenu {{ background: #f0f4fd; }}
 .submenu.open {{ max-height: 500px; }}
-.submenu a {{ display: block; padding: 7px 22px; color: #6b5050; text-decoration: none; font-size: 0.8em; letter-spacing: 1px; cursor: pointer; border-radius: 3px; margin: 1px 4px; background: #fef6f6; }}
+.submenu a {{ display: block; padding: 5px 12px; color: #6b5050; text-decoration: none; font-size: 0.72em; letter-spacing: 1px; cursor: pointer; border-radius: 2px; margin: 1px 2px; background: #fef6f6; }}
 .right-panel .submenu a {{ color: #505a6b; background: #f8fafe; }}
 .submenu a:hover {{ background: #f8d0d0; }}
 .right-panel .submenu a:hover {{ background: #d0d8f8; }}
-
-.center-buttons button {{ width: 150px; padding: 8px 6px; background: #4caf50; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.82em; letter-spacing: 1px; transition: 0.2s; }}
+.center-buttons button {{ width: 105px; padding: 6px 4px; background: #4caf50; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75em; letter-spacing: 1px; transition: 0.2s; }}
 .center-buttons button:hover {{ background: #388e3c; }}
-
-.links-wrapper {{ width: 150px; }}
+.links-wrapper {{ width: 105px; }}
 .links-wrapper > button {{ width: 100%; }}
 .links-submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #e8f5e9; border-radius: 0 0 4px 4px; }}
 .links-submenu.open {{ max-height: 300px; }}
-.links-submenu a {{ display: block; padding: 8px 16px; color: #2c3e50; text-decoration: none; font-size: 0.82em; letter-spacing: 1px; border-bottom: 1px solid #c8e6c9; }}
+.links-submenu a {{ display: block; padding: 6px 12px; color: #2c3e50; text-decoration: none; font-size: 0.75em; letter-spacing: 1px; border-bottom: 1px solid #c8e6c9; }}
 .links-submenu a:hover {{ background: #c8e6c9; }}
-
 .content {{ flex: 1; padding: 15px 25px; overflow-y: auto; background: #f5fbe8; }}
 .poem-card {{ background: #fffef9; border-radius: 8px; padding: 20px 24px; margin-bottom: 22px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); border-left: 3px solid #8bc34a; overflow: auto; }}
 .poem-title {{ color: #2e7d32; font-size: 1.15em; margin-bottom: 6px; font-weight: normal; letter-spacing: 2px; text-align: left; }}
 .poem-author {{ font-size: 0.95em; color: #4a5568; margin-bottom: 2px; letter-spacing: 2px; text-align: left; }}
 .poem-date {{ font-size: 0.85em; color: #6b7b8d; margin-bottom: 10px; letter-spacing: 1px; text-align: left; }}
 .poem-body {{ font-size: 1.1em; line-height: 2.1; white-space: pre-wrap; font-family: "楷体", KaiTi, serif; margin-top: 0; }}
-
 .history-intro {{ background: linear-gradient(135deg, #fef9e7, #fefce8); padding: 14px 20px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #d4a853; text-align: center; }}
 .history-intro p {{ color: #a08030; font-size: 1em; letter-spacing: 2px; }}
-
+/* 电脑版：图片右浮动，与标题上沿齐平 */
 .poem-img-float {{ display: none; float: right; width: 280px; max-height: 420px; overflow-y: auto; margin-left: 16px; margin-bottom: 8px; padding: 4px; background: #fafaf5; border-radius: 6px; border: 1px solid #e8e0d0; }}
 .poem-img-float.open {{ display: block; }}
 .poem-img-float img {{ width: 100%; max-height: 200px; object-fit: scale-down; border-radius: 4px; margin-bottom: 6px; border: 1px solid #e0d5c1; cursor: pointer; display: block; }}
@@ -237,10 +212,11 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .poem-img-float.single-img {{ max-height: none; overflow-y: visible; }}
 .img-toggle-btn {{ display: inline-block; margin-top: 4px; padding: 5px 14px; background: #8bc34a; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; letter-spacing: 1px; }}
 .img-toggle-btn:hover {{ background: #689f38; }}
-
+/* 返回顶部按钮 */
+.back-to-top {{ display: none; position: fixed; bottom: 30px; right: 30px; width: 44px; height: 44px; background: #4caf50; color: #fff; border: none; border-radius: 50%; font-size: 1.2em; cursor: pointer; z-index: 998; box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: 0.3s; }}
+.back-to-top:hover {{ background: #388e3c; }}
 .modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.15); z-index: 999; }}
 .report-modal-content {{ background: #fefefe; margin: 30px auto; padding: 30px; width: 50%; min-width: 500px; max-height: 80vh; overflow-y: auto; border-radius: 8px; white-space: pre-wrap; font-size: 0.9em; line-height: 1.8; }}
-
 .search-modal-content {{ background: #fefefe; position: absolute; top: 40px; left: 3%; width: 15%; min-width: 300px; max-height: 85vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); cursor: default; }}
 .search-modal-header {{ cursor: move; background: #4caf50; color: #fff; padding: 10px 16px; margin: 0 0 14px 0; border-radius: 8px 8px 0 0; font-size: 1em; letter-spacing: 2px; user-select: none; }}
 .search-modal-header .modal-close {{ float: right; cursor: pointer; color: #fff; font-size: 22px; }}
@@ -251,7 +227,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .search-row .between {{ margin: 0 3%; }}
 .search-btn {{ padding: 8px 24px; background: #4caf50; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.95em; letter-spacing: 2px; margin-left: 10px; }}
 .search-btn:hover {{ background: #388e3c; }}
-
 .video-modal-content {{ background: #fefefe; margin: 20px auto; padding: 20px; width: 85%; max-width: 1200px; height: 85vh; overflow-y: auto; border-radius: 8px; display: flex; flex-direction: column; }}
 .video-modal-header {{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-shrink: 0; }}
 .video-modal-header h3 {{ color: #2e7d32; letter-spacing: 2px; font-size: 1.1em; }}
@@ -263,7 +238,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .video-player-area {{ flex: 1; display: flex; align-items: center; justify-content: center; min-height: 500px; background: #fafafa; border-radius: 6px; }}
 .video-player-area p {{ color: #888; font-size: 1.1em; }}
 .video-player-area video {{ width: 100%; max-height: 100%; border-radius: 4px; }}
-
 .guestbook-modal-content {{ background: #fefefe; margin: 30px auto; padding: 24px; width: 50%; max-width: 600px; max-height: 80vh; overflow-y: auto; border-radius: 8px; }}
 .guestbook-modal-content h3 {{ color: #2e7d32; margin-bottom: 16px; letter-spacing: 2px; }}
 .guestbook-msg {{ background: #fdf6ec; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #d4a853; }}
@@ -275,123 +249,58 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .guestbook-form textarea {{ height: 80px; resize: vertical; }}
 .guestbook-form button {{ width: 100px; padding: 8px; background: #4caf50; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; letter-spacing: 1px; align-self: flex-end; }}
 .guestbook-form button:hover {{ background: #388e3c; }}
-
 .footer {{ background: #1b5e20; color: #c8e6c9; text-align: center; padding: 8px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; }}
 
-/* ========== 手机端完全重写（断点提高到1024px，覆盖Mate 20X等大屏手机） ========== */
+/* ========== 手机端样式 ========== */
 @media screen and (max-width: 1024px) {{
-    body {{ 
-        min-height: 100vh; 
-        height: auto; 
-        overflow-x: hidden; 
-        overflow-y: auto; 
-        -webkit-overflow-scrolling: touch; 
-    }}
-
-    .header {{ padding: 10px 15px; gap: 6px; }}
-    .header h1 {{ font-size: 1.3em; letter-spacing: 4px; }}
-    .header-info {{ font-size: 0.75em; flex-wrap: wrap; justify-content: center; text-align: center; }}
-
-    .main {{ 
-        flex-direction: column; 
-        flex: none; 
-        width: 100%; 
-    }}
-
-    /* 三栏全部纵向排列，宽度占满 */
-    .left-panel, .center-panel, .right-panel {{ 
-        width: 100%; 
-        max-height: none; 
-        border: none; 
-        flex-shrink: 0; 
-        flex: none; 
-    }}
-    .left-panel {{ border-bottom: 2px solid #f0c0c0; }}
-    .right-panel {{ border-bottom: 2px solid #c0c8f0; }}
-    .center-panel {{ border-bottom: 2px solid #f0e0a0; }}
-
-    /* 左右菜单默认折叠，点击标题展开 */
-    .left-menu, .right-menu {{ 
-        max-height: 0; 
-        overflow: hidden; 
-        transition: max-height 0.3s ease; 
-    }}
-    .left-menu.open, .right-menu.open {{ max-height: 600px; }}
-    .left-panel .panel-title, .right-panel .panel-title {{ 
-        cursor: pointer; 
-        user-select: none; 
-        padding: 12px 0; 
-        font-size: 1em; 
-    }}
-    .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.7em; }}
-    .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.7em; }}
-    .left-panel .panel-title.open::after {{ content: ' ▲'; }}
-    .right-panel .panel-title.open::after {{ content: ' ▲'; }}
-
-    /* 中间按钮区横向排列 */
-    .center-buttons {{ 
-        flex-direction: row; 
-        flex-wrap: wrap; 
-        justify-content: center; 
-        gap: 8px; 
-        padding: 10px 8px; 
-    }}
-    .center-buttons button {{ 
-        width: auto; 
-        padding: 10px 14px; 
-        font-size: 0.85em; 
-        min-width: 120px; 
-    }}
+    body {{ min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }}
+    .header {{ padding: 8px 12px; gap: 4px; }}
+    .header h1 {{ font-size: 1.2em; letter-spacing: 3px; }}
+    .header-info {{ font-size: 0.7em; flex-wrap: wrap; justify-content: center; text-align: center; }}
+    .main {{ flex-direction: column; flex: none; width: 100%; }}
+    .left-panel, .center-panel, .right-panel {{ width: 100%; max-height: none; border: none; flex-shrink: 0; flex: none; padding: 4px 0; }}
+    .left-panel {{ border-bottom: 1px solid #f0c0c0; }}
+    .right-panel {{ border-bottom: 1px solid #c0c8f0; }}
+    .center-panel {{ border-bottom: 1px solid #f0e0a0; }}
+    .left-panel .panel-title, .right-panel .panel-title, .center-panel .panel-title {{ font-size: 0.85em; padding: 8px 0; cursor: pointer; user-select: none; }}
+    .left-menu, .right-menu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }}
+    .left-menu.open, .right-menu.open {{ max-height: 800px; }}
+    .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
+    .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
+    .genre-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
+    .genre-row .menu-title {{ font-size: 0.78em; padding: 6px 8px; margin: 0; border-radius: 4px; min-width: 40px; text-align: center; }}
+    .theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
+    .theme-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(33.33% - 6px); min-width: 80px; text-align: center; }}
+    .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
+    .center-buttons button {{ width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }}
     .links-wrapper {{ width: auto; }}
-
-    /* 手机端隐藏视频按钮 */
-    .center-buttons button[onclick*="openVideoModal"] {{ display: none !important; }}
-
-    /* 内容区独占宽度 */
-    .content {{ 
-        flex: none; 
-        width: 100%; 
-        padding: 10px 12px; 
-        overflow-y: visible; 
-    }}
-    .poem-card {{ padding: 14px 16px; margin-bottom: 14px; }}
-    .poem-title {{ font-size: 1.1em; }}
-    .poem-body {{ font-size: 1em; line-height: 2.0; }}
-    .poem-img-float {{ 
-        float: none !important; 
-        width: 100% !important; 
-        max-width: 100% !important; 
-        margin: 10px 0 !important; 
-        max-height: none !important; 
-    }}
-    .poem-img-float img {{ max-height: 250px !important; }}
-
-    .search-modal-content {{ 
-        width: 90%; 
-        left: 5%; 
-        min-width: auto; 
-        position: fixed; 
-        top: 60px; 
-    }}
-    .video-modal-content {{ width: 95%; height: 90vh; padding: 12px; }}
+    .center-buttons button[onclick*="openVideoModal"],
+    .center-buttons button[onclick*="coze.com"] {{ display: none !important; }}
+    .submenu {{ display: flex; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; }}
+    .submenu a {{ font-size: 0.72em; padding: 5px 8px; margin: 0; white-space: nowrap; }}
+    .content {{ flex: none; width: 100%; padding: 8px 10px; overflow-y: visible; }}
+    .poem-card {{ padding: 12px 14px; margin-bottom: 12px; }}
+    .poem-title {{ font-size: 1em; }}
+    .poem-body {{ font-size: 0.95em; line-height: 1.9; }}
+    /* 手机版图片在诗词下方 */
+    .poem-img-float {{ float: none !important; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
+    .poem-img-float img {{ max-height: 200px !important; }}
+    .search-modal-content {{ width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }}
+    .video-modal-content {{ width: 95%; height: 90vh; padding: 10px; }}
     .video-body {{ flex-direction: column; }}
-    .video-list-side {{ 
-        width: 100%; 
-        border-right: none; 
-        border-bottom: 1px solid #e0d5c1; 
-        padding-right: 0; 
-        padding-bottom: 8px; 
-        max-height: 150px; 
-    }}
-    .video-player-area {{ min-height: 280px; }}
-    .guestbook-modal-content, .report-modal-content {{ 
-        width: 95%; 
-        min-width: auto; 
-        padding: 16px; 
-        margin: 20px auto; 
-    }}
-    .history-intro p {{ font-size: 0.9em; }}
-    .footer {{ font-size: 0.75em; padding: 10px; }}
+    .video-list-side {{ width: 100%; border-right: none; border-bottom: 1px solid #e0d5c1; padding-right: 0; padding-bottom: 6px; max-height: 130px; }}
+    .video-player-area {{ min-height: 250px; }}
+    .guestbook-modal-content, .report-modal-content {{ width: 95%; min-width: auto; padding: 14px; margin: 15px auto; }}
+    .history-intro p {{ font-size: 0.85em; }}
+    .footer {{ font-size: 0.7em; padding: 8px; }}
+    .back-to-top {{ bottom: 20px; right: 20px; width: 38px; height: 38px; font-size: 1em; }}
+}}
+@media screen and (max-width: 480px) {{
+    .header h1 {{ font-size: 1.1em; letter-spacing: 2px; }}
+    .genre-row .menu-title {{ font-size: 0.72em; padding: 5px 6px; min-width: 35px; }}
+    .theme-row .menu-title {{ font-size: 0.7em; width: calc(33.33% - 4px); min-width: 70px; }}
+    .center-buttons button {{ font-size: 0.72em; padding: 6px 8px; }}
+    .poem-body {{ font-size: 0.9em; }}
 }}
 </style>
 </head>
@@ -407,28 +316,28 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="main">
 
 <div class="left-panel">
-  <div class="panel-title" id="leftPanelTitle">诗词按体裁搜索</div>
+  <div class="panel-title">按体裁搜索</div>
   <div class="left-menu" id="leftSidebar"></div>
 </div>
 
 <div class="center-panel">
   <div class="panel-title">综合功能区</div>
   <div class="center-buttons" id="centerButtons">
-    <button onclick="openSearch()">🔍 三重综合检索</button>
-    <button onclick="openVideoModal('recite')">🎤 孙女诗词朗诵</button>
-    <button onclick="window.open('https://www.coze.com/', '_blank')">🤖 诗词创作智能体</button>
+    <button onclick="openSearch()">三重检索</button>
+    <button onclick="openVideoModal('recite')">诗词朗诵</button>
+    <button onclick="window.open('https://www.coze.com/', '_blank')">诗词创作</button>
     <div class="links-wrapper">
-      <button onclick="toggleLinks()">🔗 诗词相关链接</button>
+      <button onclick="toggleLinks()">相关链接</button>
       <div class="links-submenu" id="linksSubmenu"></div>
     </div>
-    <button onclick="openVideoModal('fitness')">💪 健身锻炼视频</button>
-    <button onclick="openGuestbook()">📝 访客留言</button>
-    <button onclick="showTodayPoems()">📅 每日一首诗</button>
+    <button onclick="openVideoModal('fitness')">健身视频</button>
+    <button onclick="openGuestbook()">访客留言</button>
+    <button onclick="showTodayPoems()">每日一诗</button>
   </div>
 </div>
 
 <div class="right-panel">
-  <div class="panel-title" id="rightPanelTitle">诗词按内容搜索</div>
+  <div class="panel-title">按内容搜索</div>
   <div class="right-menu" id="rightSidebar"></div>
 </div>
 
@@ -436,6 +345,8 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <p style="text-align:center; color:#888; margin-top:100px; font-size:1.1em;">🌸 正在为您准备今日诗词...</p>
 </div>
 </div>
+
+<button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="返回顶部">⬆</button>
 
 <div class="footer">冰雪诗词数字图书馆 © 2026 | 共收录 {len(poems)} 首诗词</div>
 
@@ -449,39 +360,20 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="modal" id="searchModal">
 <div class="search-modal-content" id="searchModalContent">
 <div class="search-modal-header" id="searchModalHeader">
-🔍 三重综合检索
+🔍 三重检索
 <span class="modal-close" onclick="closeSearch()">&times;</span>
 </div>
-<div class="search-row">
-<div class="hint">体裁（多个用空格隔开）</div>
-<input type="text" id="searchGenre" placeholder="如：七绝 浣溪沙">
-</div>
-<div class="search-row">
-<div class="hint">时间范围（月 日）</div>
-<input type="text" id="searchStart" class="short" placeholder="起始 如 03 15">
-<span class="between">至</span>
-<input type="text" id="searchEnd" class="short" placeholder="截止 如 05 20">
-</div>
-<div class="search-row">
-<div class="hint">关键词（多个用空格隔开）</div>
-<input type="text" id="searchKeywords" placeholder="如：人间 山川">
-</div>
+<div class="search-row"><div class="hint">体裁（多个用空格隔开）</div><input type="text" id="searchGenre" placeholder="如：七绝 浣溪沙"></div>
+<div class="search-row"><div class="hint">时间范围（月 日）</div><input type="text" id="searchStart" class="short" placeholder="起始 如 03 15"><span class="between">至</span><input type="text" id="searchEnd" class="short" placeholder="截止 如 05 20"></div>
+<div class="search-row"><div class="hint">关键词（多个用空格隔开）</div><input type="text" id="searchKeywords" placeholder="如：人间 山川"></div>
 <button class="search-btn" onclick="doSearch()">开始检索</button>
 </div>
 </div>
 
 <div class="modal" id="videoModal">
 <div class="video-modal-content">
-<div class="video-modal-header">
-  <h3 id="videoModalTitle"></h3>
-  <span class="modal-close" onclick="closeVideoModal()">&times;</span>
-</div>
-<div class="video-body">
-  <div class="video-list-side" id="videoList"></div>
-  <div class="video-player-area" id="videoPlayer">
-    <p>👈 请从左侧列表选择视频播放</p>
-  </div>
-</div>
+<div class="video-modal-header"><h3 id="videoModalTitle"></h3><span class="modal-close" onclick="closeVideoModal()">&times;</span></div>
+<div class="video-body"><div class="video-list-side" id="videoList"></div><div class="video-player-area" id="videoPlayer"><p>👈 请从左侧列表选择视频播放</p></div></div>
 </div>
 </div>
 
@@ -511,14 +403,34 @@ function closeAllMenus() {{
     document.querySelectorAll('.left-panel .submenu').forEach(sub => sub.classList.remove('open'));
     document.querySelectorAll('.right-panel .submenu').forEach(sub => sub.classList.remove('open'));
     document.getElementById('linksSubmenu').classList.remove('open');
+    document.querySelectorAll('.left-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.right-menu').forEach(m => m.classList.remove('open'));
 }}
+
+function scrollToContent() {{
+    const content = document.getElementById('content');
+    if (content && window.innerWidth <= 1024) {{
+        setTimeout(() => {{ content.scrollIntoView({{ behavior: 'smooth', block: 'start' }}); }}, 150);
+    }}
+}}
+
+function scrollToTop() {{
+    document.querySelector('.main').scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+    window.scrollTo({{ top: 0, behavior: 'smooth' }});
+}}
+
+// 返回顶部按钮显示/隐藏
+window.addEventListener('scroll', function() {{
+    const btn = document.getElementById('backToTop');
+    if (window.scrollY > 300) {{ btn.style.display = 'block'; }}
+    else {{ btn.style.display = 'none'; }}
+}});
 
 function init() {{
     buildLeftSidebar();
     buildRightSidebar();
     buildLinksSubmenu();
     initDrag();
-    initMenuAutoClose();
     initMobileMenuToggle();
     showTodayPoems();
 }}
@@ -531,69 +443,55 @@ function initMobileMenuToggle() {{
     if (leftTitle && leftMenu) {{
         leftTitle.addEventListener('click', function() {{
             leftMenu.classList.toggle('open');
-            leftTitle.classList.toggle('open');
+            if (rightMenu) rightMenu.classList.remove('open');
+            document.getElementById('linksSubmenu').classList.remove('open');
         }});
     }}
     if (rightTitle && rightMenu) {{
         rightTitle.addEventListener('click', function() {{
             rightMenu.classList.toggle('open');
-            rightTitle.classList.toggle('open');
+            if (leftMenu) leftMenu.classList.remove('open');
+            document.getElementById('linksSubmenu').classList.remove('open');
         }});
     }}
 }}
 
-function initMenuAutoClose() {{
-    document.querySelectorAll('.left-panel .menu-title').forEach(title => {{
-        title.addEventListener('click', function() {{
-            closeAllMenus();
-            this.nextElementSibling.classList.toggle('open');
-        }});
-    }});
-    document.querySelectorAll('.right-panel .menu-title').forEach(title => {{
-        title.addEventListener('click', function() {{
-            closeAllMenus();
-            this.nextElementSibling.classList.toggle('open');
-        }});
-    }});
-    document.querySelectorAll('.center-buttons > button:not(.links-wrapper button)').forEach(btn => {{
-        btn.addEventListener('click', function() {{
-            closeAllMenus();
-        }});
-    }});
-}}
-
+// ===== 电脑版侧边栏（带下拉子菜单）=====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
+    let html = '';
     GENRES.forEach(g => {{
-        const d = document.createElement('div'); d.className = 'menu-item';
-        const t = document.createElement('div'); t.className = 'menu-title'; t.textContent = g;
-        t.onclick = function(){{ this.nextElementSibling.classList.toggle('open'); }};
-        const s = document.createElement('div'); s.className = 'submenu';
-        const aAll = document.createElement('a'); aAll.textContent = '全部' + g;
-        aAll.onclick = function(){{ showByGenre(g); }}; s.appendChild(aAll);
+        html += '<div class="menu-item">';
+        html += '<div class="menu-title" onclick="toggleSubmenu(this)">' + g + '</div>';
+        html += '<div class="submenu">';
+        html += '<a onclick="showByGenre(\\'' + g + '\\')">全部' + g + '</a>';
         THEMES.forEach(th => {{
-            const a = document.createElement('a'); a.textContent = th.split('与')[0];
-            a.onclick = function(){{ showFilteredByGenre(g, th); }}; s.appendChild(a);
+            html += '<a onclick="showFilteredByGenre(\\'' + g + '\\', \\'' + th + '\\')">' + th.split('与')[0] + '</a>';
         }});
-        d.appendChild(t); d.appendChild(s); sb.appendChild(d);
+        html += '</div></div>';
     }});
+    sb.innerHTML = html;
 }}
 
 function buildRightSidebar() {{
     const sb = document.getElementById('rightSidebar');
+    let html = '';
     THEMES.forEach(th => {{
-        const d = document.createElement('div'); d.className = 'menu-item';
-        const t = document.createElement('div'); t.className = 'menu-title'; t.textContent = th.split('与')[0];
-        t.onclick = function(){{ this.nextElementSibling.classList.toggle('open'); }};
-        const s = document.createElement('div'); s.className = 'submenu';
-        const aAll = document.createElement('a'); aAll.textContent = '全部';
-        aAll.onclick = function(){{ showByTheme(th); }}; s.appendChild(aAll);
+        html += '<div class="menu-item">';
+        html += '<div class="menu-title" onclick="toggleSubmenu(this)">' + th.split('与')[0] + '</div>';
+        html += '<div class="submenu">';
+        html += '<a onclick="showByTheme(\\'' + th + '\\')">全部</a>';
         GENRES.forEach(g => {{
-            const a = document.createElement('a'); a.textContent = g;
-            a.onclick = function(){{ showFilteredByTheme(g, th); }}; s.appendChild(a);
+            html += '<a onclick="showFilteredByTheme(\\'' + g + '\\', \\'' + th + '\\')">' + g + '</a>';
         }});
-        d.appendChild(t); d.appendChild(s); sb.appendChild(d);
+        html += '</div></div>';
     }});
+    sb.innerHTML = html;
+}}
+
+function toggleSubmenu(titleEl) {{
+    closeAllMenus();
+    titleEl.nextElementSibling.classList.toggle('open');
 }}
 
 function buildLinksSubmenu() {{
@@ -611,40 +509,46 @@ function toggleLinks() {{
 }}
 
 function showByGenre(genre) {{
+    closeAllMenus();
     let f = genre==='词牌诗词' ? POEMS.filter(p=>!['五绝','五律','七绝','七律'].includes(p.genre)) : POEMS.filter(p=>p.genre===genre);
     render(genre+' · 全部', f);
+    scrollToContent();
 }}
 
 function showByTheme(theme) {{
+    closeAllMenus();
     let f = POEMS.filter(p => p.themes && p.themes.includes(theme));
     render(theme, f);
+    scrollToContent();
 }}
 
 function showFilteredByGenre(genre, theme) {{
+    closeAllMenus();
     let f1 = genre==='词牌诗词' ? POEMS.filter(p=>!['五绝','五律','七绝','七律'].includes(p.genre)) : POEMS.filter(p=>p.genre===genre);
     let f = f1.filter(p => p.themes && p.themes.includes(theme));
     render(genre+' · '+theme.split('与')[0], f);
+    scrollToContent();
 }}
 
 function showFilteredByTheme(genre, theme) {{
+    closeAllMenus();
     let f1 = POEMS.filter(p => p.themes && p.themes.includes(theme));
     let f = genre==='词牌诗词' ? f1.filter(p=>!['五绝','五律','七绝','七律'].includes(p.genre)) : f1.filter(p=>p.genre===genre);
     render(theme.split('与')[0]+' · '+genre, f);
+    scrollToContent();
 }}
 
 function render(title, poems) {{
     const c = document.getElementById('content');
-    if(poems.length===0){{ c.innerHTML='<p style="text-align:center;color:#888;margin-top:100px;">该分类下暂无诗词。</p>'; return; }}
+    if(poems.length===0){{ c.innerHTML='<p style="text-align:center;color:#888;margin-top:60px;">该分类下暂无诗词。</p>'; return; }}
     let h = '<h3 style="margin-bottom:15px;color:#2e7d32;">'+title+'（共'+poems.length+'首）</h3>';
     poems.forEach(p=>{{
         h += '<div class="poem-card">';
         const imgCount = p.images ? p.images.length : 0;
         if(imgCount > 0){{
             const isSingle = imgCount === 1;
-            h += '<div class="poem-img-float' + (isSingle ? ' single-img' : '') + '" id="imgs-'+p.id+'">';
-            p.images.forEach((img,idx)=>{{ 
-                h += '<img src="'+img+'" loading="lazy" onerror="this.style.display=\\'none\\'" alt="配图'+(idx+1)+'" onclick="window.open(this.src)">'; 
-            }});
+            h += '<div class="poem-img-float' + (isSingle ? ' single-img' : '') + '" id="imgs-'+p.id+'" style="display:none;">';
+            p.images.forEach((img,idx)=>{{ h += '<img src="'+img+'" loading="lazy" onerror="this.style.display=\\'none\\'" alt="配图'+(idx+1)+'" onclick="window.open(this.src)">'; }});
             h += '</div>';
         }}
         h += '<div class="poem-title">'+p.title+'</div>';
@@ -663,13 +567,13 @@ function render(title, poems) {{
 function toggleImgs(btn, poemId) {{
     const container = document.getElementById('imgs-'+poemId);
     if(container) {{
-        const isOpen = container.classList.contains('open');
+        const isOpen = container.style.display === 'block';
         if(isOpen) {{
-            container.classList.remove('open');
+            container.style.display = 'none';
             const count = container.querySelectorAll('img').length;
             btn.textContent = '🖼️ 查看配图（'+count+'张）';
         }} else {{
-            container.classList.add('open');
+            container.style.display = 'block';
             btn.textContent = '🖼️ 收起配图';
         }}
     }}
@@ -681,23 +585,16 @@ function showTodayPoems() {{
     const day = String(today.getDate()).padStart(2,'0');
     const weekDays = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
     const weekDay = weekDays[today.getDay()];
-    const matched = POEMS.filter(p => {{
-        if(!p.date) return false;
-        const parts = p.date.split('.');
-        return parts[1] === month && parts[2] === day;
-    }});
+    const matched = POEMS.filter(p => {{ if(!p.date) return false; const parts = p.date.split('.'); return parts[1] === month && parts[2] === day; }});
     const c = document.getElementById('content');
-    if(matched.length === 0) {{
-        c.innerHTML = '<p style="text-align:center;color:#888;margin-top:100px;">今日暂无历史诗词，请从左侧或右侧菜单选择浏览。</p>';
-        return;
-    }}
+    if(matched.length === 0) {{ c.innerHTML = '<p style="text-align:center;color:#888;margin-top:60px;">今日暂无历史诗词，请从体裁或内容菜单中选择浏览。</p>'; return; }}
     let h = '<div class="history-intro"><p>'+today.getFullYear()+'年'+month+'月'+day+'日 '+weekDay+' · 请欣赏</p></div>';
     h += '<h3 style="margin-bottom:15px;color:#2e7d32;">历史上的今天（共'+matched.length+'首）</h3>';
     matched.forEach(p=>{{
         h += '<div class="poem-card">';
         const imgCount = p.images ? p.images.length : 0;
         if(imgCount > 0){{
-            h += '<div class="poem-img-float open" id="imgs-'+p.id+'">';
+            h += '<div class="poem-img-float open" id="imgs-'+p.id+'" style="display:block;">';
             p.images.forEach((img,idx)=>{{ h += '<img src="'+img+'" loading="lazy" onerror="this.style.display=\\'none\\'" alt="配图'+(idx+1)+'" onclick="window.open(this.src)">'; }});
             h += '</div>';
         }}
@@ -705,9 +602,7 @@ function showTodayPoems() {{
         h += '<div class="poem-author">冰雪</div>';
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
         h += '<div class="poem-body">'+p.body+'</div>';
-        if(imgCount > 0){{
-            h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 收起配图（'+imgCount+'张）</button>';
-        }}
+        if(imgCount > 0){{ h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 收起配图（'+imgCount+'张）</button>'; }}
         h += '</div>';
     }});
     c.innerHTML = h;
@@ -734,6 +629,7 @@ function doSearch() {{
     closeSearch();
     closeAllMenus();
     render('综合检索结果', r);
+    scrollToContent();
 }}
 
 function openVideoModal(type) {{
@@ -743,15 +639,13 @@ function openVideoModal(type) {{
     const list = document.getElementById('videoList');
     const player = document.getElementById('videoPlayer');
     let videos = [];
-    if (type === 'recite') {{ videos = RECITE_VIDEOS; title.textContent = '🎤 孙女诗词朗诵'; }}
-    else {{ videos = FITNESS_VIDEOS; title.textContent = '💪 健身锻炼视频'; }}
+    if (type === 'recite') {{ videos = RECITE_VIDEOS; title.textContent = '🎤 诗词朗诵'; }}
+    else {{ videos = FITNESS_VIDEOS; title.textContent = '💪 健身视频'; }}
     player.innerHTML = '<p>👈 请从左侧列表选择视频播放</p>';
     if (videos.length === 0) {{ list.innerHTML = '<p style="color:#888; padding:10px;">暂无视频</p>'; }}
     else {{
         let html = '';
-        videos.forEach((v, idx) => {{
-            html += '<div class="video-item" id="vid-item-'+idx+'" onclick="playVideo(\\'' + v.path + '\\', \\'' + v.name + '\\', '+idx+')"><span class="video-name">' + (idx+1) + '. ' + v.name + '</span></div>';
-        }});
+        videos.forEach((v, idx) => {{ html += '<div class="video-item" id="vid-item-'+idx+'" onclick="playVideo(\\'' + v.path + '\\', \\'' + v.name + '\\', '+idx+')"><span class="video-name">' + (idx+1) + '. ' + v.name + '</span></div>'; }});
         list.innerHTML = html;
     }}
     modal.style.display = 'block';
@@ -761,33 +655,21 @@ function playVideo(path, name, idx) {{
     document.querySelectorAll('.video-item').forEach(el => el.classList.remove('active'));
     const item = document.getElementById('vid-item-'+idx);
     if(item) item.classList.add('active');
-    const player = document.getElementById('videoPlayer');
-    player.innerHTML = '<video controls autoplay style="width:100%; height:100%; border-radius:4px;"><source src="' + path + '" type="video/mp4">您的浏览器不支持视频播放。</video>';
+    document.getElementById('videoPlayer').innerHTML = '<video controls autoplay style="width:100%; height:100%; border-radius:4px;"><source src="' + path + '" type="video/mp4">您的浏览器不支持视频播放。</video>';
 }}
 
-function closeVideoModal() {{
-    document.getElementById('videoModal').style.display = 'none';
-    document.getElementById('videoPlayer').innerHTML = '<p>👈 请从左侧列表选择视频播放</p>';
-}}
+function closeVideoModal() {{ document.getElementById('videoModal').style.display = 'none'; document.getElementById('videoPlayer').innerHTML = '<p>👈 请从左侧列表选择视频播放</p>'; }}
 
-function openGuestbook() {{
-    closeAllMenus();
-    document.getElementById('guestbookModal').style.display = 'block';
-    loadGuestbook();
-}}
-
+function openGuestbook() {{ closeAllMenus(); document.getElementById('guestbookModal').style.display = 'block'; loadGuestbook(); }}
 function closeGuestbook() {{ document.getElementById('guestbookModal').style.display = 'none'; }}
 
 function loadGuestbook() {{
     const msgs = JSON.parse(localStorage.getItem('ice_guestbook') || '[]');
     const container = document.getElementById('guestbookMessages');
-    if(msgs.length === 0) {{
-        container.innerHTML = '<p style="color:#888;text-align:center;padding:16px;">暂无留言，欢迎留下您的足迹！</p>';
-    }} else {{
+    if(msgs.length === 0) {{ container.innerHTML = '<p style="color:#888;text-align:center;padding:16px;">暂无留言，欢迎留下您的足迹！</p>'; }}
+    else {{
         let html = '';
-        msgs.slice(-20).reverse().forEach(m => {{
-            html += '<div class="guestbook-msg"><span class="msg-author">'+m.name+'</span><span class="msg-time">'+m.time+'</span><div class="msg-text">'+m.msg+'</div></div>';
-        }});
+        msgs.slice(-20).reverse().forEach(m => {{ html += '<div class="guestbook-msg"><span class="msg-author">'+m.name+'</span><span class="msg-time">'+m.time+'</span><div class="msg-text">'+m.msg+'</div></div>'; }});
         container.innerHTML = html;
     }}
 }}
@@ -815,11 +697,7 @@ function initDrag() {{
         initialLeft = rect.left; initialTop = rect.top;
         modal.style.transition = 'none'; e.preventDefault();
     }};
-    document.onmousemove = function(e) {{
-        if(!isDragging) return;
-        modal.style.left = (initialLeft + e.clientX - startX) + 'px';
-        modal.style.top = (initialTop + e.clientY - startY) + 'px';
-    }};
+    document.onmousemove = function(e) {{ if(!isDragging) return; modal.style.left = (initialLeft + e.clientX - startX) + 'px'; modal.style.top = (initialTop + e.clientY - startY) + 'px'; }};
     document.onmouseup = function() {{ isDragging = false; modal.style.transition = ''; }};
 }}
 
@@ -831,13 +709,11 @@ window.onload = init;
 
     with open(OUTPUT_HTML, 'w', encoding='utf-8') as f:
         f.write(html)
-
     print(f"\n{'=' * 60}")
     print(f"🎉 网站生成完毕！")
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     os.system("pause")
-
 
 if __name__ == '__main__':
     main()

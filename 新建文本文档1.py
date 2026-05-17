@@ -126,7 +126,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（电脑版修复版）...")
+    print("   正在生成冰雪诗词数字图书馆（修复版）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -203,7 +203,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .poem-body {{ font-size: 1.1em; line-height: 2.1; white-space: pre-wrap; font-family: "楷体", KaiTi, serif; margin-top: 0; }}
 .history-intro {{ background: linear-gradient(135deg, #fef9e7, #fefce8); padding: 14px 20px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #d4a853; text-align: center; }}
 .history-intro p {{ color: #a08030; font-size: 1em; letter-spacing: 2px; }}
-/* 电脑版：图片右浮动，与标题上沿齐平 */
 .poem-img-float {{ display: none; float: right; width: 280px; max-height: 420px; overflow-y: auto; margin-left: 16px; margin-bottom: 8px; padding: 4px; background: #fafaf5; border-radius: 6px; border: 1px solid #e8e0d0; }}
 .poem-img-float.open {{ display: block; }}
 .poem-img-float img {{ width: 100%; max-height: 200px; object-fit: scale-down; border-radius: 4px; margin-bottom: 6px; border: 1px solid #e0d5c1; cursor: pointer; display: block; }}
@@ -212,7 +211,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .poem-img-float.single-img {{ max-height: none; overflow-y: visible; }}
 .img-toggle-btn {{ display: inline-block; margin-top: 4px; padding: 5px 14px; background: #8bc34a; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; letter-spacing: 1px; }}
 .img-toggle-btn:hover {{ background: #689f38; }}
-/* 返回顶部按钮 */
 .back-to-top {{ display: none; position: fixed; bottom: 30px; right: 30px; width: 44px; height: 44px; background: #4caf50; color: #fff; border: none; border-radius: 50%; font-size: 1.2em; cursor: pointer; z-index: 998; box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: 0.3s; }}
 .back-to-top:hover {{ background: #388e3c; }}
 .modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.15); z-index: 999; }}
@@ -267,8 +265,10 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .left-menu.open, .right-menu.open {{ max-height: 800px; }}
     .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
     .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
+    /* 体裁横向按钮行 */
     .genre-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
     .genre-row .menu-title {{ font-size: 0.78em; padding: 6px 8px; margin: 0; border-radius: 4px; min-width: 40px; text-align: center; }}
+    /* 内容横向按钮行：每行3个 */
     .theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
     .theme-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(33.33% - 6px); min-width: 80px; text-align: center; }}
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
@@ -359,10 +359,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 
 <div class="modal" id="searchModal">
 <div class="search-modal-content" id="searchModalContent">
-<div class="search-modal-header" id="searchModalHeader">
-🔍 三重检索
-<span class="modal-close" onclick="closeSearch()">&times;</span>
-</div>
+<div class="search-modal-header" id="searchModalHeader">🔍 三重检索<span class="modal-close" onclick="closeSearch()">&times;</span></div>
 <div class="search-row"><div class="hint">体裁（多个用空格隔开）</div><input type="text" id="searchGenre" placeholder="如：七绝 浣溪沙"></div>
 <div class="search-row"><div class="hint">时间范围（月 日）</div><input type="text" id="searchStart" class="short" placeholder="起始 如 03 15"><span class="between">至</span><input type="text" id="searchEnd" class="short" placeholder="截止 如 05 20"></div>
 <div class="search-row"><div class="hint">关键词（多个用空格隔开）</div><input type="text" id="searchKeywords" placeholder="如：人间 山川"></div>
@@ -400,8 +397,7 @@ const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲
 const FRIENDLY_LINKS = {links_json};
 
 function closeAllMenus() {{
-    document.querySelectorAll('.left-panel .submenu').forEach(sub => sub.classList.remove('open'));
-    document.querySelectorAll('.right-panel .submenu').forEach(sub => sub.classList.remove('open'));
+    document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('open'));
     document.getElementById('linksSubmenu').classList.remove('open');
     document.querySelectorAll('.left-menu').forEach(m => m.classList.remove('open'));
     document.querySelectorAll('.right-menu').forEach(m => m.classList.remove('open'));
@@ -419,7 +415,6 @@ function scrollToTop() {{
     window.scrollTo({{ top: 0, behavior: 'smooth' }});
 }}
 
-// 返回顶部按钮显示/隐藏
 window.addEventListener('scroll', function() {{
     const btn = document.getElementById('backToTop');
     if (window.scrollY > 300) {{ btn.style.display = 'block'; }}
@@ -456,13 +451,13 @@ function initMobileMenuToggle() {{
     }}
 }}
 
-// ===== 电脑版侧边栏（带下拉子菜单）=====
+// ===== 电脑版侧边栏（带下拉子菜单，点击子项不关闭父菜单）=====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
     let html = '';
     GENRES.forEach(g => {{
         html += '<div class="menu-item">';
-        html += '<div class="menu-title" onclick="toggleSubmenu(this)">' + g + '</div>';
+        html += '<div class="menu-title" onclick="toggleThisSubmenu(this)">' + g + '</div>';
         html += '<div class="submenu">';
         html += '<a onclick="showByGenre(\\'' + g + '\\')">全部' + g + '</a>';
         THEMES.forEach(th => {{
@@ -478,7 +473,7 @@ function buildRightSidebar() {{
     let html = '';
     THEMES.forEach(th => {{
         html += '<div class="menu-item">';
-        html += '<div class="menu-title" onclick="toggleSubmenu(this)">' + th.split('与')[0] + '</div>';
+        html += '<div class="menu-title" onclick="toggleThisSubmenu(this)">' + th.split('与')[0] + '</div>';
         html += '<div class="submenu">';
         html += '<a onclick="showByTheme(\\'' + th + '\\')">全部</a>';
         GENRES.forEach(g => {{
@@ -489,8 +484,8 @@ function buildRightSidebar() {{
     sb.innerHTML = html;
 }}
 
-function toggleSubmenu(titleEl) {{
-    closeAllMenus();
+// 只切换当前子菜单，不关闭其他
+function toggleThisSubmenu(titleEl) {{
     titleEl.nextElementSibling.classList.toggle('open');
 }}
 
@@ -504,26 +499,22 @@ function buildLinksSubmenu() {{
 }}
 
 function toggleLinks() {{
-    closeAllMenus();
     document.getElementById('linksSubmenu').classList.toggle('open');
 }}
 
 function showByGenre(genre) {{
-    closeAllMenus();
     let f = genre==='词牌诗词' ? POEMS.filter(p=>!['五绝','五律','七绝','七律'].includes(p.genre)) : POEMS.filter(p=>p.genre===genre);
     render(genre+' · 全部', f);
     scrollToContent();
 }}
 
 function showByTheme(theme) {{
-    closeAllMenus();
     let f = POEMS.filter(p => p.themes && p.themes.includes(theme));
     render(theme, f);
     scrollToContent();
 }}
 
 function showFilteredByGenre(genre, theme) {{
-    closeAllMenus();
     let f1 = genre==='词牌诗词' ? POEMS.filter(p=>!['五绝','五律','七绝','七律'].includes(p.genre)) : POEMS.filter(p=>p.genre===genre);
     let f = f1.filter(p => p.themes && p.themes.includes(theme));
     render(genre+' · '+theme.split('与')[0], f);
@@ -531,7 +522,6 @@ function showFilteredByGenre(genre, theme) {{
 }}
 
 function showFilteredByTheme(genre, theme) {{
-    closeAllMenus();
     let f1 = POEMS.filter(p => p.themes && p.themes.includes(theme));
     let f = genre==='词牌诗词' ? f1.filter(p=>!['五绝','五律','七绝','七律'].includes(p.genre)) : f1.filter(p=>p.genre===genre);
     render(theme.split('与')[0]+' · '+genre, f);
@@ -611,7 +601,7 @@ function showTodayPoems() {{
 
 function openReport() {{ document.getElementById('reportText').textContent = REPORT_TEXT; document.getElementById('reportModal').style.display='block'; }}
 function closeReport() {{ document.getElementById('reportModal').style.display='none'; }}
-function openSearch() {{ closeAllMenus(); document.getElementById('searchModal').style.display='block'; }}
+function openSearch() {{ document.getElementById('searchModal').style.display='block'; }}
 function closeSearch() {{ document.getElementById('searchModal').style.display='none'; }}
 
 function doSearch() {{
@@ -627,13 +617,11 @@ function doSearch() {{
     if(sm||em){{ r = r.filter(p=>{{ if(!p.date) return false; const pts=p.date.split('.'); const m=parseInt(pts[1]),d=parseInt(pts[2]); if(sm&&(m<sm[0]||(m===sm[0]&&d<sm[1]))) return false; if(em&&(m>em[0]||(m===em[0]&&d>em[1]))) return false; return true; }}); }}
     if(kStr){{ const ks = kStr.split(/\\s+/); r = r.filter(p => ks.some(k => (p.title + ' ' + p.body).includes(k))); }}
     closeSearch();
-    closeAllMenus();
     render('综合检索结果', r);
     scrollToContent();
 }}
 
 function openVideoModal(type) {{
-    closeAllMenus();
     const modal = document.getElementById('videoModal');
     const title = document.getElementById('videoModalTitle');
     const list = document.getElementById('videoList');
@@ -660,7 +648,7 @@ function playVideo(path, name, idx) {{
 
 function closeVideoModal() {{ document.getElementById('videoModal').style.display = 'none'; document.getElementById('videoPlayer').innerHTML = '<p>👈 请从左侧列表选择视频播放</p>'; }}
 
-function openGuestbook() {{ closeAllMenus(); document.getElementById('guestbookModal').style.display = 'block'; loadGuestbook(); }}
+function openGuestbook() {{ document.getElementById('guestbookModal').style.display = 'block'; loadGuestbook(); }}
 function closeGuestbook() {{ document.getElementById('guestbookModal').style.display = 'none'; }}
 
 function loadGuestbook() {{

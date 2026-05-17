@@ -126,7 +126,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（电脑版修复）...")
+    print("   正在生成冰雪诗词数字图书馆（全面修复版）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -203,7 +203,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .poem-body {{ font-size: 1.1em; line-height: 2.1; white-space: pre-wrap; font-family: "楷体", KaiTi, serif; margin-top: 0; }}
 .history-intro {{ background: linear-gradient(135deg, #fef9e7, #fefce8); padding: 14px 20px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #d4a853; text-align: center; }}
 .history-intro p {{ color: #a08030; font-size: 1em; letter-spacing: 2px; }}
-/* 桌面版：图片右浮动，与标题上沿齐平 */
+/* 桌面版：图片右浮动 */
 .poem-img-float {{ display: none; float: right; width: 280px; max-height: 420px; overflow-y: auto; margin-left: 16px; margin-bottom: 8px; padding: 4px; background: #fafaf5; border-radius: 6px; border: 1px solid #e8e0d0; }}
 .poem-img-float.open {{ display: block; }}
 .poem-img-float img {{ width: 100%; max-height: 200px; object-fit: scale-down; border-radius: 4px; margin-bottom: 6px; border: 1px solid #e0d5c1; cursor: pointer; display: block; }}
@@ -266,9 +266,13 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .left-menu.open, .right-menu.open {{ max-height: 800px; }}
     .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
     .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
-    /* 手机端menu-title横向排列 */
-    .left-menu .menu-title, .right-menu .menu-title {{ display: inline-block; margin: 2px; font-size: 0.75em; padding: 6px 8px; }}
-    .left-menu .menu-item, .right-menu .menu-item {{ display: inline; }}
+    /* 手机端体裁按钮横向排列 */
+    .mobile-genre-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
+    .mobile-genre-row .menu-title {{ font-size: 0.78em; padding: 6px 8px; margin: 0; border-radius: 4px; min-width: 40px; text-align: center; display: inline-block; }}
+    /* 手机端内容按钮横向排列：每行3个 */
+    .mobile-theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
+    .mobile-theme-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(33.33% - 6px); min-width: 80px; text-align: center; display: inline-block; }}
+    /* 手机端子菜单 */
     .submenu {{ display: flex; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; }}
     .submenu a {{ font-size: 0.72em; padding: 5px 8px; margin: 0; white-space: nowrap; }}
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
@@ -280,6 +284,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .poem-card {{ padding: 12px 14px; margin-bottom: 12px; }}
     .poem-title {{ font-size: 1em; }}
     .poem-body {{ font-size: 0.95em; line-height: 1.9; }}
+    /* 手机版：图片不浮动，在按钮下方 */
     .poem-img-float {{ float: none !important; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
     .poem-img-float img {{ max-height: 200px !important; }}
     .search-modal-content {{ width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }}
@@ -311,7 +316,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="main">
 
 <div class="left-panel">
-  <div class="panel-title">按体裁搜索</div>
+  <div class="panel-title" id="leftPanelTitle">按体裁搜索</div>
   <div class="left-menu" id="leftSidebar"></div>
 </div>
 
@@ -332,7 +337,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 </div>
 
 <div class="right-panel">
-  <div class="panel-title">按内容搜索</div>
+  <div class="panel-title" id="rightPanelTitle">按内容搜索</div>
   <div class="right-menu" id="rightSidebar"></div>
 </div>
 
@@ -437,19 +442,24 @@ function initMobileMenuToggle() {{
     }}
 }}
 
-// ===== 侧边栏构建 =====
+// ===== 侧边栏构建（电脑版+手机版通用结构） =====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
     let html = '';
+    // 手机端：横向体裁按钮行
+    html += '<div class="mobile-genre-row">';
     GENRES.forEach(g => {{
-        html += '<div class="menu-item">';
-        html += '<div class="menu-title" onclick="toggleThisSubmenu(this)">' + g + '</div>';
-        html += '<div class="submenu">';
+        html += '<div class="menu-title" onclick="toggleGenreSubmenu(this,\\'' + g + '\\')">' + g + '</div>';
+    }});
+    html += '</div>';
+    // 电脑端+手机端：每个体裁下的子菜单
+    GENRES.forEach(g => {{
+        html += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         html += '<a onclick="showByGenre(\\'' + g + '\\')">全部' + g + '</a>';
         THEMES.forEach(th => {{
             html += '<a onclick="showFilteredByGenre(\\'' + g + '\\', \\'' + th + '\\')">' + th.split('与')[0] + '</a>';
         }});
-        html += '</div></div>';
+        html += '</div>';
     }});
     sb.innerHTML = html;
 }}
@@ -457,23 +467,56 @@ function buildLeftSidebar() {{
 function buildRightSidebar() {{
     const sb = document.getElementById('rightSidebar');
     let html = '';
+    // 手机端：横向内容按钮行，每行3个
+    html += '<div class="mobile-theme-row">';
     THEMES.forEach(th => {{
-        html += '<div class="menu-item">';
-        html += '<div class="menu-title" onclick="toggleThisSubmenu(this)">' + th.split('与')[0] + '</div>';
-        html += '<div class="submenu">';
+        html += '<div class="menu-title" onclick="toggleThemeSubmenu(this,\\'' + th + '\\')">' + th.split('与')[0] + '</div>';
+    }});
+    html += '</div>';
+    // 电脑端+手机端：每个内容下的子菜单
+    THEMES.forEach(th => {{
+        html += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         html += '<a onclick="showByTheme(\\'' + th + '\\')">全部</a>';
         GENRES.forEach(g => {{
             html += '<a onclick="showFilteredByTheme(\\'' + g + '\\', \\'' + th + '\\')">' + g + '</a>';
         }});
-        html += '</div></div>';
+        html += '</div>';
     }});
     sb.innerHTML = html;
 }}
 
-function toggleThisSubmenu(titleEl) {{
-    const submenu = titleEl.nextElementSibling;
+// 体裁子菜单切换（关闭其他体裁子菜单，切换当前）
+function toggleGenreSubmenu(el, genre) {{
+    // 关闭所有体裁子菜单
+    document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
+    // 打开当前体裁子菜单
+    const submenu = document.getElementById('submenu-genre-' + genre.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, ''));
     if (submenu) submenu.classList.toggle('open');
+    scrollToContent();
 }}
+
+// 内容子菜单切换（关闭其他内容子菜单，切换当前）
+function toggleThemeSubmenu(el, theme) {{
+    // 关闭所有内容子菜单
+    document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => s.classList.remove('open'));
+    // 打开当前内容子菜单
+    const submenu = document.getElementById('submenu-theme-' + theme.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, ''));
+    if (submenu) submenu.classList.toggle('open');
+    scrollToContent();
+}}
+
+// 电脑版：点击menu-title切换子菜单（关闭其他子菜单再打开当前）
+document.addEventListener('click', function(e) {{
+    if (e.target.classList.contains('menu-title') && !e.target.closest('.mobile-genre-row') && !e.target.closest('.mobile-theme-row')) {{
+        // 关闭所有子菜单
+        document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+        // 打开当前
+        const submenu = e.target.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {{
+            submenu.classList.add('open');
+        }}
+    }}
+}});
 
 function buildLinksSubmenu() {{
     const container = document.getElementById('linksSubmenu');
@@ -521,7 +564,7 @@ function render(title, poems) {{
     poems.forEach(p=>{{
         h += '<div class="poem-card">';
         const imgCount = p.images ? p.images.length : 0;
-        // 图片区在标题之后、作者之前（右浮动与标题上沿齐平）
+        // 图片区在标题之后（桌面版右浮动与标题上沿齐平）
         if(imgCount > 0){{
             const isSingle = imgCount === 1;
             h += '<div class="poem-img-float' + (isSingle ? ' single-img' : '') + '" id="imgs-'+p.id+'" style="display:none;">';
@@ -532,6 +575,7 @@ function render(title, poems) {{
         h += '<div class="poem-author">冰雪</div>';
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
         h += '<div class="poem-body">'+p.body+'</div>';
+        // 查看配图按钮在正文下方
         if(imgCount > 0){{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 查看配图（'+imgCount+'张）</button>';
         }}

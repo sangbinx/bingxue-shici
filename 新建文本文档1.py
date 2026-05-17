@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 # ---------- 配置 ----------
-POEM_FILE = '冰雪诗词_规范格式.txt'
+POEM_FILE = '冰雪诗词_规范格式_.txt'
 REPORT_FILE = '冰雪诗词全集_分析评价报告.txt'
 IMAGE_DIR = '冰雪诗词_全部图片'
 RECITE_VIDEO_DIR = '诗词朗诵视频'
@@ -126,7 +126,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（修复版）...")
+    print("   正在生成冰雪诗词数字图书馆（手机彻底修复版）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -158,6 +158,8 @@ def main():
 <title>冰雪诗词 · 数字图书馆</title>
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+
+/* ========== 桌面版样式 ========== */
 body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0e3; color: #2c2c2c; display: flex; flex-direction: column; min-height: 100vh; }}
 .header {{ background: linear-gradient(135deg, #2e7d32, #1b5e20); color: #f0f7e6; padding: 10px 20px; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }}
 .header h1 {{ font-size: 1.6em; letter-spacing: 6px; font-weight: normal; text-align: center; }}
@@ -203,6 +205,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .poem-body {{ font-size: 1.1em; line-height: 2.1; white-space: pre-wrap; font-family: "楷体", KaiTi, serif; margin-top: 0; }}
 .history-intro {{ background: linear-gradient(135deg, #fef9e7, #fefce8); padding: 14px 20px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #d4a853; text-align: center; }}
 .history-intro p {{ color: #a08030; font-size: 1em; letter-spacing: 2px; }}
+/* 桌面版：图片右浮动 */
 .poem-img-float {{ display: none; float: right; width: 280px; max-height: 420px; overflow-y: auto; margin-left: 16px; margin-bottom: 8px; padding: 4px; background: #fafaf5; border-radius: 6px; border: 1px solid #e8e0d0; }}
 .poem-img-float.open {{ display: block; }}
 .poem-img-float img {{ width: 100%; max-height: 200px; object-fit: scale-down; border-radius: 4px; margin-bottom: 6px; border: 1px solid #e0d5c1; cursor: pointer; display: block; }}
@@ -249,7 +252,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .guestbook-form button:hover {{ background: #388e3c; }}
 .footer {{ background: #1b5e20; color: #c8e6c9; text-align: center; padding: 8px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; }}
 
-/* ========== 手机端样式 ========== */
+/* ========== 手机端样式 (max-width: 1024px) ========== */
 @media screen and (max-width: 1024px) {{
     body {{ min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }}
     .header {{ padding: 8px 12px; gap: 4px; }}
@@ -261,6 +264,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .right-panel {{ border-bottom: 1px solid #c0c8f0; }}
     .center-panel {{ border-bottom: 1px solid #f0e0a0; }}
     .left-panel .panel-title, .right-panel .panel-title, .center-panel .panel-title {{ font-size: 0.85em; padding: 8px 0; cursor: pointer; user-select: none; }}
+    /* 左右菜单默认折叠 */
     .left-menu, .right-menu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }}
     .left-menu.open, .right-menu.open {{ max-height: 800px; }}
     .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
@@ -271,18 +275,22 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     /* 内容横向按钮行：每行3个 */
     .theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
     .theme-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(33.33% - 6px); min-width: 80px; text-align: center; }}
+    /* 中间功能区按钮 */
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
     .center-buttons button {{ width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }}
     .links-wrapper {{ width: auto; }}
+    /* 手机端隐藏视频和智能体按钮 */
     .center-buttons button[onclick*="openVideoModal"],
     .center-buttons button[onclick*="coze.com"] {{ display: none !important; }}
+    /* 子菜单横向排列 */
     .submenu {{ display: flex; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; }}
     .submenu a {{ font-size: 0.72em; padding: 5px 8px; margin: 0; white-space: nowrap; }}
+    /* 内容区 */
     .content {{ flex: none; width: 100%; padding: 8px 10px; overflow-y: visible; }}
     .poem-card {{ padding: 12px 14px; margin-bottom: 12px; }}
     .poem-title {{ font-size: 1em; }}
     .poem-body {{ font-size: 0.95em; line-height: 1.9; }}
-    /* 手机版图片在诗词下方 */
+    /* 手机版：图片在诗词下方，不浮动 */
     .poem-img-float {{ float: none !important; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
     .poem-img-float img {{ max-height: 200px !important; }}
     .search-modal-content {{ width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }}
@@ -316,7 +324,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="main">
 
 <div class="left-panel">
-  <div class="panel-title">按体裁搜索</div>
+  <div class="panel-title" id="leftPanelTitle">按体裁搜索</div>
   <div class="left-menu" id="leftSidebar"></div>
 </div>
 
@@ -332,12 +340,12 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     </div>
     <button onclick="openVideoModal('fitness')">健身视频</button>
     <button onclick="openGuestbook()">访客留言</button>
-    <button onclick="showTodayPoems()">每日一诗</button>
+    <button onclick="showTodayPoems()">今日诗词</button>
   </div>
 </div>
 
 <div class="right-panel">
-  <div class="panel-title">按内容搜索</div>
+  <div class="panel-title" id="rightPanelTitle">按内容搜索</div>
   <div class="right-menu" id="rightSidebar"></div>
 </div>
 
@@ -451,19 +459,24 @@ function initMobileMenuToggle() {{
     }}
 }}
 
-// ===== 电脑版侧边栏（带下拉子菜单，点击子项不关闭父菜单）=====
+// ===== 桌面版侧边栏 =====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
     let html = '';
+    // 体裁横向排列行（手机用）
+    html += '<div class="genre-row">';
     GENRES.forEach(g => {{
-        html += '<div class="menu-item">';
-        html += '<div class="menu-title" onclick="toggleThisSubmenu(this)">' + g + '</div>';
-        html += '<div class="submenu">';
+        html += '<div class="menu-title" onclick="showByGenre(\\'' + g + '\\')">' + g + '</div>';
+    }});
+    html += '</div>';
+    // 体裁下的子菜单（电脑版下拉）
+    GENRES.forEach(g => {{
+        html += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         html += '<a onclick="showByGenre(\\'' + g + '\\')">全部' + g + '</a>';
         THEMES.forEach(th => {{
             html += '<a onclick="showFilteredByGenre(\\'' + g + '\\', \\'' + th + '\\')">' + th.split('与')[0] + '</a>';
         }});
-        html += '</div></div>';
+        html += '</div>';
     }});
     sb.innerHTML = html;
 }}
@@ -471,23 +484,33 @@ function buildLeftSidebar() {{
 function buildRightSidebar() {{
     const sb = document.getElementById('rightSidebar');
     let html = '';
+    // 内容检索横向排列行（手机用）：每行3个
+    html += '<div class="theme-row">';
     THEMES.forEach(th => {{
-        html += '<div class="menu-item">';
-        html += '<div class="menu-title" onclick="toggleThisSubmenu(this)">' + th.split('与')[0] + '</div>';
-        html += '<div class="submenu">';
+        html += '<div class="menu-title" onclick="showByTheme(\\'' + th + '\\')">' + th.split('与')[0] + '</div>';
+    }});
+    html += '</div>';
+    // 内容下的子菜单（电脑版下拉）
+    THEMES.forEach(th => {{
+        html += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         html += '<a onclick="showByTheme(\\'' + th + '\\')">全部</a>';
         GENRES.forEach(g => {{
             html += '<a onclick="showFilteredByTheme(\\'' + g + '\\', \\'' + th + '\\')">' + g + '</a>';
         }});
-        html += '</div></div>';
+        html += '</div>';
     }});
     sb.innerHTML = html;
 }}
 
-// 只切换当前子菜单，不关闭其他
-function toggleThisSubmenu(titleEl) {{
-    titleEl.nextElementSibling.classList.toggle('open');
-}}
+// 电脑版：点击体裁标题展开/折叠子菜单
+document.addEventListener('click', function(e) {{
+    if (e.target.classList.contains('menu-title') && window.innerWidth > 1024) {{
+        const submenu = e.target.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {{
+            submenu.classList.toggle('open');
+        }}
+    }}
+}});
 
 function buildLinksSubmenu() {{
     const container = document.getElementById('linksSubmenu');
@@ -534,18 +557,17 @@ function render(title, poems) {{
     let h = '<h3 style="margin-bottom:15px;color:#2e7d32;">'+title+'（共'+poems.length+'首）</h3>';
     poems.forEach(p=>{{
         h += '<div class="poem-card">';
-        const imgCount = p.images ? p.images.length : 0;
-        if(imgCount > 0){{
-            const isSingle = imgCount === 1;
-            h += '<div class="poem-img-float' + (isSingle ? ' single-img' : '') + '" id="imgs-'+p.id+'" style="display:none;">';
-            p.images.forEach((img,idx)=>{{ h += '<img src="'+img+'" loading="lazy" onerror="this.style.display=\\'none\\'" alt="配图'+(idx+1)+'" onclick="window.open(this.src)">'; }});
-            h += '</div>';
-        }}
         h += '<div class="poem-title">'+p.title+'</div>';
         h += '<div class="poem-author">冰雪</div>';
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
         h += '<div class="poem-body">'+p.body+'</div>';
+        const imgCount = p.images ? p.images.length : 0;
         if(imgCount > 0){{
+            const isSingle = imgCount === 1;
+            // 图片区在诗词正文下方
+            h += '<div class="poem-img-float' + (isSingle ? ' single-img' : '') + '" id="imgs-'+p.id+'" style="display:none;">';
+            p.images.forEach((img,idx)=>{{ h += '<img src="'+img+'" loading="lazy" onerror="this.style.display=\\'none\\'" alt="配图'+(idx+1)+'" onclick="window.open(this.src)">'; }});
+            h += '</div>';
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 查看配图（'+imgCount+'张）</button>';
         }}
         h += '</div>';
@@ -582,17 +604,17 @@ function showTodayPoems() {{
     h += '<h3 style="margin-bottom:15px;color:#2e7d32;">历史上的今天（共'+matched.length+'首）</h3>';
     matched.forEach(p=>{{
         h += '<div class="poem-card">';
+        h += '<div class="poem-title">'+p.title+'</div>';
+        h += '<div class="poem-author">冰雪</div>';
+        if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
+        h += '<div class="poem-body">'+p.body+'</div>';
         const imgCount = p.images ? p.images.length : 0;
         if(imgCount > 0){{
             h += '<div class="poem-img-float open" id="imgs-'+p.id+'" style="display:block;">';
             p.images.forEach((img,idx)=>{{ h += '<img src="'+img+'" loading="lazy" onerror="this.style.display=\\'none\\'" alt="配图'+(idx+1)+'" onclick="window.open(this.src)">'; }});
             h += '</div>';
+            h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 收起配图（'+imgCount+'张）</button>';
         }}
-        h += '<div class="poem-title">'+p.title+'</div>';
-        h += '<div class="poem-author">冰雪</div>';
-        if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
-        h += '<div class="poem-body">'+p.body+'</div>';
-        if(imgCount > 0){{ h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 收起配图（'+imgCount+'张）</button>'; }}
         h += '</div>';
     }});
     c.innerHTML = h;

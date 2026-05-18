@@ -126,7 +126,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（全面修复版）...")
+    print("   正在生成冰雪诗词数字图书馆（手机菜单交互修正）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -266,13 +266,12 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .left-menu.open, .right-menu.open {{ max-height: 800px; }}
     .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
     .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
-    /* 手机端体裁按钮横向排列 */
-    .mobile-genre-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
-    .mobile-genre-row .menu-title {{ font-size: 0.78em; padding: 6px 8px; margin: 0; border-radius: 4px; min-width: 40px; text-align: center; display: inline-block; }}
-    /* 手机端内容按钮横向排列：每行3个 */
+    /* 手机版二级菜单按钮行 */
+    .mobile-second-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
+    .mobile-second-row .menu-title {{ font-size: 0.78em; padding: 6px 8px; margin: 0; border-radius: 4px; min-width: 40px; text-align: center; display: inline-block; }}
+    /* 内容分类每行3个 */
     .mobile-theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
     .mobile-theme-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(33.33% - 6px); min-width: 80px; text-align: center; display: inline-block; }}
-    /* 手机端子菜单 */
     .submenu {{ display: flex; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; }}
     .submenu a {{ font-size: 0.72em; padding: 5px 8px; margin: 0; white-space: nowrap; }}
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
@@ -284,7 +283,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .poem-card {{ padding: 12px 14px; margin-bottom: 12px; }}
     .poem-title {{ font-size: 1em; }}
     .poem-body {{ font-size: 0.95em; line-height: 1.9; }}
-    /* 手机版：图片不浮动，在按钮下方 */
+    /* 手机版：图片不浮动 */
     .poem-img-float {{ float: none !important; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
     .poem-img-float img {{ max-height: 200px !important; }}
     .search-modal-content {{ width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }}
@@ -432,27 +431,30 @@ function initMobileMenuToggle() {{
         leftTitle.addEventListener('click', function() {{
             leftMenu.classList.toggle('open');
             if (rightMenu) rightMenu.classList.remove('open');
+            // 关闭已展开的三级菜单
+            document.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
         }});
     }}
     if (rightTitle && rightMenu) {{
         rightTitle.addEventListener('click', function() {{
             rightMenu.classList.toggle('open');
             if (leftMenu) leftMenu.classList.remove('open');
+            document.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
         }});
     }}
 }}
 
-// ===== 侧边栏构建（电脑版+手机版通用结构） =====
+// ===== 构建左侧边栏（体裁） =====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
     let html = '';
-    // 手机端：横向体裁按钮行
-    html += '<div class="mobile-genre-row">';
+    // 二级菜单：体裁按钮行
+    html += '<div class="mobile-second-row">';
     GENRES.forEach(g => {{
-        html += '<div class="menu-title" onclick="toggleGenreSubmenu(this,\\'' + g + '\\')">' + g + '</div>';
+        html += '<div class="menu-title" onclick="toggleGenreThirdMenu(this,\\'' + g + '\\')">' + g + '</div>';
     }});
     html += '</div>';
-    // 电脑端+手机端：每个体裁下的子菜单
+    // 三级菜单：每个体裁下的内容分类
     GENRES.forEach(g => {{
         html += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         html += '<a onclick="showByGenre(\\'' + g + '\\')">全部' + g + '</a>';
@@ -464,16 +466,17 @@ function buildLeftSidebar() {{
     sb.innerHTML = html;
 }}
 
+// ===== 构建右侧边栏（内容） =====
 function buildRightSidebar() {{
     const sb = document.getElementById('rightSidebar');
     let html = '';
-    // 手机端：横向内容按钮行，每行3个
+    // 二级菜单：内容分类行，每行3个
     html += '<div class="mobile-theme-row">';
     THEMES.forEach(th => {{
-        html += '<div class="menu-title" onclick="toggleThemeSubmenu(this,\\'' + th + '\\')">' + th.split('与')[0] + '</div>';
+        html += '<div class="menu-title" onclick="toggleThemeThirdMenu(this,\\'' + th + '\\')">' + th.split('与')[0] + '</div>';
     }});
     html += '</div>';
-    // 电脑端+手机端：每个内容下的子菜单
+    // 三级菜单：每个内容下的体裁分类
     THEMES.forEach(th => {{
         html += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         html += '<a onclick="showByTheme(\\'' + th + '\\')">全部</a>';
@@ -485,32 +488,39 @@ function buildRightSidebar() {{
     sb.innerHTML = html;
 }}
 
-// 体裁子菜单切换（关闭其他体裁子菜单，切换当前）
-function toggleGenreSubmenu(el, genre) {{
-    // 关闭所有体裁子菜单
-    document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
-    // 打开当前体裁子菜单
-    const submenu = document.getElementById('submenu-genre-' + genre.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, ''));
-    if (submenu) submenu.classList.toggle('open');
-    scrollToContent();
+// 体裁二级点击：展开/收起对应的三级菜单，关闭其他三级
+function toggleGenreThirdMenu(el, genre) {{
+    const targetId = 'submenu-genre-' + genre.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    // 关闭所有体裁三级菜单
+    document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => {{
+        if (s.id !== targetId) s.classList.remove('open');
+    }});
+    // 切换当前
+    target.classList.toggle('open');
 }}
 
-// 内容子菜单切换（关闭其他内容子菜单，切换当前）
-function toggleThemeSubmenu(el, theme) {{
-    // 关闭所有内容子菜单
-    document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => s.classList.remove('open'));
-    // 打开当前内容子菜单
-    const submenu = document.getElementById('submenu-theme-' + theme.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, ''));
-    if (submenu) submenu.classList.toggle('open');
-    scrollToContent();
+// 内容二级点击：展开/收起对应的三级菜单，关闭其他三级
+function toggleThemeThirdMenu(el, theme) {{
+    const targetId = 'submenu-theme-' + theme.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    // 关闭所有内容三级菜单
+    document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => {{
+        if (s.id !== targetId) s.classList.remove('open');
+    }});
+    // 切换当前
+    target.classList.toggle('open');
 }}
 
-// 电脑版：点击menu-title切换子菜单（关闭其他子菜单再打开当前）
+// 电脑版保留原有menu-title点击逻辑（不属于mobile-second-row / mobile-theme-row）
 document.addEventListener('click', function(e) {{
-    if (e.target.classList.contains('menu-title') && !e.target.closest('.mobile-genre-row') && !e.target.closest('.mobile-theme-row')) {{
+    if (e.target.classList.contains('menu-title') && 
+        !e.target.closest('.mobile-second-row') && 
+        !e.target.closest('.mobile-theme-row')) {{
         // 关闭所有子菜单
         document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
-        // 打开当前
         const submenu = e.target.nextElementSibling;
         if (submenu && submenu.classList.contains('submenu')) {{
             submenu.classList.add('open');
@@ -564,7 +574,6 @@ function render(title, poems) {{
     poems.forEach(p=>{{
         h += '<div class="poem-card">';
         const imgCount = p.images ? p.images.length : 0;
-        // 图片区在标题之后（桌面版右浮动与标题上沿齐平）
         if(imgCount > 0){{
             const isSingle = imgCount === 1;
             h += '<div class="poem-img-float' + (isSingle ? ' single-img' : '') + '" id="imgs-'+p.id+'" style="display:none;">';
@@ -575,7 +584,6 @@ function render(title, poems) {{
         h += '<div class="poem-author">冰雪</div>';
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
         h += '<div class="poem-body">'+p.body+'</div>';
-        // 查看配图按钮在正文下方
         if(imgCount > 0){{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 查看配图（'+imgCount+'张）</button>';
         }}

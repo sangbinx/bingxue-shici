@@ -126,7 +126,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（菜单精简优化版）...")
+    print("   正在生成冰雪诗词数字图书馆（图片位置+菜单颜色修复）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -178,15 +178,21 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .menu-item {{ margin-bottom: 1px; }}
 .menu-title {{ padding: 6px 8px; cursor: pointer; font-size: 0.78em; letter-spacing: 1px; transition: 0.2s; border-radius: 3px; margin: 0 4px; background: #f8d0d0; color: #a33; text-align: center; font-weight: bold; }}
 .menu-title:hover {{ background: #f0b0b0; }}
+/* 选中状态的菜单加深颜色 */
+.menu-title.active {{ background: #e8a0a0 !important; color: #722 !important; box-shadow: inset 0 0 0 2px #a33; }}
 .right-panel .menu-title {{ background: #d0d8f8; color: #36c; }}
 .right-panel .menu-title:hover {{ background: #b8c8f0; }}
+.right-panel .menu-title.active {{ background: #a0b8e8 !important; color: #148 !important; box-shadow: inset 0 0 0 2px #36c; }}
 .submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #fdf0f0; margin: 0 4px; border-radius: 0 0 3px 3px; }}
 .right-panel .submenu {{ background: #f0f4fd; }}
 .submenu.open {{ max-height: 300px; }}
 .submenu a {{ display: inline-block; padding: 5px 6px; color: #6b5050; text-decoration: none; font-size: 0.7em; letter-spacing: 1px; cursor: pointer; border-radius: 2px; margin: 1px 2px; background: #fef6f6; white-space: nowrap; }}
 .right-panel .submenu a {{ color: #505a6b; background: #f8fafe; }}
-.submenu a:hover {{ background: #f8d0d0; }}
-.right-panel .submenu a:hover {{ background: #d0d8f8; }}
+.submenu a:hover {{ background: #f0d0d0; }}
+.right-panel .submenu a:hover {{ background: #c8d8f0; }}
+/* 三级菜单选中状态加深 */
+.submenu a.active {{ background: #e8c0c0 !important; color: #522 !important; font-weight: bold; }}
+.right-panel .submenu a.active {{ background: #a0b8e0 !important; color: #124 !important; font-weight: bold; }}
 .center-buttons button {{ width: 105px; padding: 6px 4px; background: #4caf50; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75em; letter-spacing: 1px; transition: 0.2s; }}
 .center-buttons button:hover {{ background: #388e3c; }}
 .links-wrapper {{ width: 105px; }}
@@ -265,12 +271,10 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .left-menu.open, .right-menu.open {{ max-height: 800px; }}
     .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
     .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
-    /* 手机版二级菜单按钮行（体裁5个，内容每行5个） */
     .mobile-second-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
     .mobile-second-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 50px; }}
     .mobile-theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
     .mobile-theme-row .menu-title {{ font-size: 0.72em; padding: 5px 3px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 55px; }}
-    /* 手机版三级菜单按钮行 */
     .submenu {{ display: flex; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; }}
     .submenu a {{ font-size: 0.7em; padding: 4px 5px; margin: 0; white-space: nowrap; }}
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
@@ -279,11 +283,15 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .center-buttons button[onclick*="openVideoModal"],
     .center-buttons button[onclick*="coze.com"] {{ display: none !important; }}
     .content {{ flex: none; width: 100%; padding: 8px 10px; overflow-y: visible; }}
-    .poem-card {{ padding: 12px 14px; margin-bottom: 12px; }}
-    .poem-title {{ font-size: 1em; }}
-    .poem-body {{ font-size: 0.95em; line-height: 1.9; }}
-    .poem-img-float {{ float: none !important; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
+    .poem-card {{ padding: 12px 14px; margin-bottom: 12px; display: flex; flex-direction: column; }}
+    .poem-title {{ font-size: 1em; order: 1; }}
+    .poem-author {{ order: 2; }}
+    .poem-date {{ order: 3; }}
+    .poem-body {{ font-size: 0.95em; line-height: 1.9; order: 4; }}
+    /* 手机版：图片放在正文下方、按钮上方 */
+    .poem-img-float {{ order: 5; float: none !important; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
     .poem-img-float img {{ max-height: 200px !important; }}
+    .img-toggle-btn {{ order: 6; }}
     .search-modal-content {{ width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }}
     .video-modal-content {{ width: 95%; height: 90vh; padding: 10px; }}
     .video-body {{ flex-direction: column; }}
@@ -397,6 +405,12 @@ function closeLinksSubmenu() {{
     document.getElementById('linksSubmenu').classList.remove('open');
 }}
 
+// 清除所有菜单的选中状态
+function clearAllActive() {{
+    document.querySelectorAll('.menu-title.active').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.submenu a.active').forEach(el => el.classList.remove('active'));
+}}
+
 function scrollToContent() {{
     const content = document.getElementById('content');
     if (content && window.innerWidth <= 1024) {{
@@ -435,6 +449,7 @@ function initMobileMenuToggle() {{
             if (rightMenu) rightMenu.classList.remove('open');
             document.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
             closeLinksSubmenu();
+            clearAllActive();
         }});
     }}
     if (rightTitle && rightMenu) {{
@@ -443,56 +458,64 @@ function initMobileMenuToggle() {{
             if (leftMenu) leftMenu.classList.remove('open');
             document.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
             closeLinksSubmenu();
+            clearAllActive();
         }});
     }}
 }}
 
-// ===== 构建左侧边栏 =====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
     let html = '';
-    // 二级菜单：体裁按钮行（每行5个）
     html += '<div class="mobile-second-row">';
     GENRES.forEach(g => {{
         html += '<div class="menu-title" onclick="toggleGenreThirdMenu(this,\\'' + g + '\\')">' + g + '</div>';
     }});
     html += '</div>';
-    // 三级菜单：每个体裁下的内容分类（去掉"全部"，精简为10个，两行每行5个）
     GENRES.forEach(g => {{
         html += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         THEMES.forEach(th => {{
-            html += '<a onclick="showFilteredByGenre(\\'' + g + '\\', \\'' + th + '\\')">' + th.split('与')[0].slice(0,2) + '</a>';
+            html += '<a onclick="showFilteredByGenre(\\'' + g + '\\', \\'' + th + '\\'); setActiveSubmenu(this);">' + th.split('与')[0].slice(0,2) + '</a>';
         }});
         html += '</div>';
     }});
     sb.innerHTML = html;
 }}
 
-// ===== 构建右侧边栏 =====
 function buildRightSidebar() {{
     const sb = document.getElementById('rightSidebar');
     let html = '';
-    // 二级菜单：内容分类行（每行5个，两行排完10个）
     html += '<div class="mobile-theme-row">';
     THEMES.forEach(th => {{
         html += '<div class="menu-title" onclick="toggleThemeThirdMenu(this,\\'' + th + '\\')">' + th.split('与')[0].slice(0,2) + '</div>';
     }});
     html += '</div>';
-    // 三级菜单：每个内容下的体裁分类（去掉"全部"）
     THEMES.forEach(th => {{
         html += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         GENRES.forEach(g => {{
-            html += '<a onclick="showFilteredByTheme(\\'' + g + '\\', \\'' + th + '\\')">' + g + '</a>';
+            html += '<a onclick="showFilteredByTheme(\\'' + g + '\\', \\'' + th + '\\'); setActiveSubmenu(this);">' + g + '</a>';
         }});
         html += '</div>';
     }});
     sb.innerHTML = html;
 }}
 
+function setActiveSubmenu(el) {{
+    // 清除同父级所有子项的选中状态
+    const parent = el.parentElement;
+    if (parent) {{
+        parent.querySelectorAll('a.active').forEach(a => a.classList.remove('active'));
+    }}
+    el.classList.add('active');
+}}
+
 function toggleGenreThirdMenu(el, genre) {{
-    // 先展示该体裁的全部诗词
+    // 清除所有二级菜单选中状态
+    clearAllActive();
+    // 设置当前二级菜单选中
+    el.classList.add('active');
+    // 展示该体裁的全部诗词
     showByGenre(genre);
-    // 再展开/收起对应的三级菜单
+    // 展开/收起对应的三级菜单
     const targetId = 'submenu-genre-' + genre.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -504,9 +527,13 @@ function toggleGenreThirdMenu(el, genre) {{
 }}
 
 function toggleThemeThirdMenu(el, theme) {{
-    // 先展示该内容的全部诗词
+    // 清除所有二级菜单选中状态
+    clearAllActive();
+    // 设置当前二级菜单选中
+    el.classList.add('active');
+    // 展示该内容的全部诗词
     showByTheme(theme);
-    // 再展开/收起对应的三级菜单
+    // 展开/收起对应的三级菜单
     const targetId = 'submenu-theme-' + theme.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
     const target = document.getElementById(targetId);
     if (!target) return;

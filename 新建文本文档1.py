@@ -126,7 +126,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（手机菜单交互修正）...")
+    print("   正在生成冰雪诗词数字图书馆（菜单精简优化版）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -182,8 +182,8 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .right-panel .menu-title:hover {{ background: #b8c8f0; }}
 .submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #fdf0f0; margin: 0 4px; border-radius: 0 0 3px 3px; }}
 .right-panel .submenu {{ background: #f0f4fd; }}
-.submenu.open {{ max-height: 500px; }}
-.submenu a {{ display: block; padding: 5px 12px; color: #6b5050; text-decoration: none; font-size: 0.72em; letter-spacing: 1px; cursor: pointer; border-radius: 2px; margin: 1px 2px; background: #fef6f6; }}
+.submenu.open {{ max-height: 300px; }}
+.submenu a {{ display: inline-block; padding: 5px 6px; color: #6b5050; text-decoration: none; font-size: 0.7em; letter-spacing: 1px; cursor: pointer; border-radius: 2px; margin: 1px 2px; background: #fef6f6; white-space: nowrap; }}
 .right-panel .submenu a {{ color: #505a6b; background: #f8fafe; }}
 .submenu a:hover {{ background: #f8d0d0; }}
 .right-panel .submenu a:hover {{ background: #d0d8f8; }}
@@ -192,7 +192,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .links-wrapper {{ width: 105px; }}
 .links-wrapper > button {{ width: 100%; }}
 .links-submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #e8f5e9; border-radius: 0 0 4px 4px; }}
-.links-submenu.open {{ max-height: 300px; }}
+.links-submenu.open {{ max-height: 200px; }}
 .links-submenu a {{ display: block; padding: 6px 12px; color: #2c3e50; text-decoration: none; font-size: 0.75em; letter-spacing: 1px; border-bottom: 1px solid #c8e6c9; }}
 .links-submenu a:hover {{ background: #c8e6c9; }}
 .content {{ flex: 1; padding: 15px 25px; overflow-y: auto; background: #f5fbe8; }}
@@ -203,7 +203,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .poem-body {{ font-size: 1.1em; line-height: 2.1; white-space: pre-wrap; font-family: "楷体", KaiTi, serif; margin-top: 0; }}
 .history-intro {{ background: linear-gradient(135deg, #fef9e7, #fefce8); padding: 14px 20px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #d4a853; text-align: center; }}
 .history-intro p {{ color: #a08030; font-size: 1em; letter-spacing: 2px; }}
-/* 桌面版：图片右浮动 */
 .poem-img-float {{ display: none; float: right; width: 280px; max-height: 420px; overflow-y: auto; margin-left: 16px; margin-bottom: 8px; padding: 4px; background: #fafaf5; border-radius: 6px; border: 1px solid #e8e0d0; }}
 .poem-img-float.open {{ display: block; }}
 .poem-img-float img {{ width: 100%; max-height: 200px; object-fit: scale-down; border-radius: 4px; margin-bottom: 6px; border: 1px solid #e0d5c1; cursor: pointer; display: block; }}
@@ -266,14 +265,14 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .left-menu.open, .right-menu.open {{ max-height: 800px; }}
     .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
     .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
-    /* 手机版二级菜单按钮行 */
+    /* 手机版二级菜单按钮行（体裁5个，内容每行5个） */
     .mobile-second-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
-    .mobile-second-row .menu-title {{ font-size: 0.78em; padding: 6px 8px; margin: 0; border-radius: 4px; min-width: 40px; text-align: center; display: inline-block; }}
-    /* 内容分类每行3个 */
+    .mobile-second-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 50px; }}
     .mobile-theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
-    .mobile-theme-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(33.33% - 6px); min-width: 80px; text-align: center; display: inline-block; }}
+    .mobile-theme-row .menu-title {{ font-size: 0.72em; padding: 5px 3px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 55px; }}
+    /* 手机版三级菜单按钮行 */
     .submenu {{ display: flex; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; }}
-    .submenu a {{ font-size: 0.72em; padding: 5px 8px; margin: 0; white-space: nowrap; }}
+    .submenu a {{ font-size: 0.7em; padding: 4px 5px; margin: 0; white-space: nowrap; }}
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
     .center-buttons button {{ width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }}
     .links-wrapper {{ width: auto; }}
@@ -283,7 +282,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .poem-card {{ padding: 12px 14px; margin-bottom: 12px; }}
     .poem-title {{ font-size: 1em; }}
     .poem-body {{ font-size: 0.95em; line-height: 1.9; }}
-    /* 手机版：图片不浮动 */
     .poem-img-float {{ float: none !important; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
     .poem-img-float img {{ max-height: 200px !important; }}
     .search-modal-content {{ width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }}
@@ -395,6 +393,10 @@ const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
 
+function closeLinksSubmenu() {{
+    document.getElementById('linksSubmenu').classList.remove('open');
+}}
+
 function scrollToContent() {{
     const content = document.getElementById('content');
     if (content && window.innerWidth <= 1024) {{
@@ -431,8 +433,8 @@ function initMobileMenuToggle() {{
         leftTitle.addEventListener('click', function() {{
             leftMenu.classList.toggle('open');
             if (rightMenu) rightMenu.classList.remove('open');
-            // 关闭已展开的三级菜单
             document.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
+            closeLinksSubmenu();
         }});
     }}
     if (rightTitle && rightMenu) {{
@@ -440,46 +442,45 @@ function initMobileMenuToggle() {{
             rightMenu.classList.toggle('open');
             if (leftMenu) leftMenu.classList.remove('open');
             document.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
+            closeLinksSubmenu();
         }});
     }}
 }}
 
-// ===== 构建左侧边栏（体裁） =====
+// ===== 构建左侧边栏 =====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
     let html = '';
-    // 二级菜单：体裁按钮行
+    // 二级菜单：体裁按钮行（每行5个）
     html += '<div class="mobile-second-row">';
     GENRES.forEach(g => {{
         html += '<div class="menu-title" onclick="toggleGenreThirdMenu(this,\\'' + g + '\\')">' + g + '</div>';
     }});
     html += '</div>';
-    // 三级菜单：每个体裁下的内容分类
+    // 三级菜单：每个体裁下的内容分类（去掉"全部"，精简为10个，两行每行5个）
     GENRES.forEach(g => {{
         html += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
-        html += '<a onclick="showByGenre(\\'' + g + '\\')">全部' + g + '</a>';
         THEMES.forEach(th => {{
-            html += '<a onclick="showFilteredByGenre(\\'' + g + '\\', \\'' + th + '\\')">' + th.split('与')[0] + '</a>';
+            html += '<a onclick="showFilteredByGenre(\\'' + g + '\\', \\'' + th + '\\')">' + th.split('与')[0].slice(0,2) + '</a>';
         }});
         html += '</div>';
     }});
     sb.innerHTML = html;
 }}
 
-// ===== 构建右侧边栏（内容） =====
+// ===== 构建右侧边栏 =====
 function buildRightSidebar() {{
     const sb = document.getElementById('rightSidebar');
     let html = '';
-    // 二级菜单：内容分类行，每行3个
+    // 二级菜单：内容分类行（每行5个，两行排完10个）
     html += '<div class="mobile-theme-row">';
     THEMES.forEach(th => {{
-        html += '<div class="menu-title" onclick="toggleThemeThirdMenu(this,\\'' + th + '\\')">' + th.split('与')[0] + '</div>';
+        html += '<div class="menu-title" onclick="toggleThemeThirdMenu(this,\\'' + th + '\\')">' + th.split('与')[0].slice(0,2) + '</div>';
     }});
     html += '</div>';
-    // 三级菜单：每个内容下的体裁分类
+    // 三级菜单：每个内容下的体裁分类（去掉"全部"）
     THEMES.forEach(th => {{
         html += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
-        html += '<a onclick="showByTheme(\\'' + th + '\\')">全部</a>';
         GENRES.forEach(g => {{
             html += '<a onclick="showFilteredByTheme(\\'' + g + '\\', \\'' + th + '\\')">' + g + '</a>';
         }});
@@ -488,38 +489,39 @@ function buildRightSidebar() {{
     sb.innerHTML = html;
 }}
 
-// 体裁二级点击：展开/收起对应的三级菜单，关闭其他三级
 function toggleGenreThirdMenu(el, genre) {{
+    // 先展示该体裁的全部诗词
+    showByGenre(genre);
+    // 再展开/收起对应的三级菜单
     const targetId = 'submenu-genre-' + genre.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
     const target = document.getElementById(targetId);
     if (!target) return;
-    // 关闭所有体裁三级菜单
     document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => {{
         if (s.id !== targetId) s.classList.remove('open');
     }});
-    // 切换当前
     target.classList.toggle('open');
+    closeLinksSubmenu();
 }}
 
-// 内容二级点击：展开/收起对应的三级菜单，关闭其他三级
 function toggleThemeThirdMenu(el, theme) {{
+    // 先展示该内容的全部诗词
+    showByTheme(theme);
+    // 再展开/收起对应的三级菜单
     const targetId = 'submenu-theme-' + theme.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
     const target = document.getElementById(targetId);
     if (!target) return;
-    // 关闭所有内容三级菜单
     document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => {{
         if (s.id !== targetId) s.classList.remove('open');
     }});
-    // 切换当前
     target.classList.toggle('open');
+    closeLinksSubmenu();
 }}
 
-// 电脑版保留原有menu-title点击逻辑（不属于mobile-second-row / mobile-theme-row）
+// 电脑版保留原有menu-title点击逻辑
 document.addEventListener('click', function(e) {{
     if (e.target.classList.contains('menu-title') && 
         !e.target.closest('.mobile-second-row') && 
         !e.target.closest('.mobile-theme-row')) {{
-        // 关闭所有子菜单
         document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
         const submenu = e.target.nextElementSibling;
         if (submenu && submenu.classList.contains('submenu')) {{
@@ -640,7 +642,7 @@ function showTodayPoems() {{
 
 function openReport() {{ document.getElementById('reportText').textContent = REPORT_TEXT; document.getElementById('reportModal').style.display='block'; }}
 function closeReport() {{ document.getElementById('reportModal').style.display='none'; }}
-function openSearch() {{ document.getElementById('searchModal').style.display='block'; }}
+function openSearch() {{ closeLinksSubmenu(); document.getElementById('searchModal').style.display='block'; }}
 function closeSearch() {{ document.getElementById('searchModal').style.display='none'; }}
 
 function doSearch() {{
@@ -661,6 +663,7 @@ function doSearch() {{
 }}
 
 function openVideoModal(type) {{
+    closeLinksSubmenu();
     const modal = document.getElementById('videoModal');
     const title = document.getElementById('videoModalTitle');
     const list = document.getElementById('videoList');
@@ -687,7 +690,7 @@ function playVideo(path, name, idx) {{
 
 function closeVideoModal() {{ document.getElementById('videoModal').style.display = 'none'; document.getElementById('videoPlayer').innerHTML = '<p>👈 请从左侧列表选择视频播放</p>'; }}
 
-function openGuestbook() {{ document.getElementById('guestbookModal').style.display = 'block'; loadGuestbook(); }}
+function openGuestbook() {{ closeLinksSubmenu(); document.getElementById('guestbookModal').style.display = 'block'; loadGuestbook(); }}
 function closeGuestbook() {{ document.getElementById('guestbookModal').style.display = 'none'; }}
 
 function loadGuestbook() {{

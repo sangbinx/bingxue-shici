@@ -112,7 +112,7 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 .guestbook-form button:hover { background: #388e3c; }
 .footer { background: #1b5e20; color: #c8e6c9; text-align: center; padding: 10px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; }
 .footer .counter { font-size: 0.9em; }
-.footer .qrcode-placeholder { width: 80px; height: 80px; border: 1px dashed #c8e6c9; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #a0c0a0; font-size: 0.7em; text-align: center; background: rgba(255,255,255,0.1); }
+.footer .qrcode-container img { width: 80px; height: 80px; border-radius: 4px; }
 
 /* ========== 手机端样式 ========== */
 @media screen and (max-width: 1024px) {
@@ -158,6 +158,7 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
     .guestbook-modal-content, .report-modal-content { width: 95%; min-width: auto; padding: 14px; margin: 15px auto; }
     .history-intro p { font-size: 0.85em; }
     .footer { font-size: 0.7em; padding: 8px; gap: 10px; }
+    .footer .qrcode-container img { width: 60px; height: 60px; }
     .back-to-top { bottom: 20px; right: 20px; width: 38px; height: 38px; font-size: 1em; }
 }
 @media screen and (max-width: 480px) {
@@ -215,9 +216,9 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
   <span>冰雪诗词数字图书馆 © 2026 | 共收录 2042 首诗词</span>
   <!-- 不蒜子计数器 -->
   <span class="counter">访问量：<span id="busuanzi_value_site_pv">-</span> 次</span>
-  <!-- 二维码预留位置 -->
-  <div class="qrcode-placeholder" title="1779152320-1.jpg">
-    📷<br>预留二维码
+  <!-- 二维码预留位置：请将qrcode.jpg放到诗词馆文件夹并推送 -->
+  <div class="qrcode-container" title="扫码访问冰雪诗词">
+    <img src="qrcode.jpg" alt="网站二维码" onerror="this.parentElement.innerHTML='<span style=color:#a0c0a0;font-size:0.7em;>📷二维码</span>'">
   </div>
 </div>
 
@@ -278,6 +279,16 @@ function clearAllActive() {
     document.querySelectorAll('.submenu a.active').forEach(el => el.classList.remove('active'));
 }
 
+// 关闭所有左侧三级菜单
+function closeAllLeftSubmenus() {
+    document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
+}
+
+// 关闭所有右侧三级菜单
+function closeAllRightSubmenus() {
+    document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => s.classList.remove('open'));
+}
+
 function scrollToContent() {
     const content = document.getElementById('content');
     if (content && window.innerWidth <= 1024) {
@@ -302,9 +313,28 @@ function init() {
     buildLinksSubmenu();
     initDrag();
     initMobileMenuToggle();
+    // 电脑版：点击左侧面板标题时，关闭右侧三级菜单
+    initDesktopPanelToggle();
     showTodayPoems();
 }
 
+// 电脑版面板标题互斥
+function initDesktopPanelToggle() {
+    const leftTitle = document.getElementById('leftPanelTitle');
+    const rightTitle = document.getElementById('rightPanelTitle');
+    if (leftTitle) {
+        leftTitle.addEventListener('click', function() {
+            closeAllRightSubmenus();
+        });
+    }
+    if (rightTitle) {
+        rightTitle.addEventListener('click', function() {
+            closeAllLeftSubmenus();
+        });
+    }
+}
+
+// 手机版菜单互斥
 function initMobileMenuToggle() {
     const leftTitle = document.getElementById('leftPanelTitle');
     const rightTitle = document.getElementById('rightPanelTitle');
@@ -330,17 +360,15 @@ function initMobileMenuToggle() {
     }
 }
 
-// ===== 构建左侧边栏（三级菜单统一放在二级菜单下方） =====
+// ===== 构建左侧边栏 =====
 function buildLeftSidebar() {
     const sb = document.getElementById('leftSidebar');
     let html = '';
-    // 二级菜单：体裁按钮行
     html += '<div class="mobile-second-row">';
     GENRES.forEach(g => {
         html += '<div class="menu-title" onclick="toggleGenreThirdMenu(this,\'' + g + '\')">' + g + '</div>';
     });
     html += '</div>';
-    // 三级菜单：统一放在二级菜单下方
     let subHtml = '';
     GENRES.forEach(g => {
         subHtml += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z一-龥]/g, '') + '">';
@@ -353,17 +381,15 @@ function buildLeftSidebar() {
     sb.innerHTML = html;
 }
 
-// ===== 构建右侧边栏（三级菜单统一放在二级菜单下方） =====
+// ===== 构建右侧边栏 =====
 function buildRightSidebar() {
     const sb = document.getElementById('rightSidebar');
     let html = '';
-    // 二级菜单：内容分类行
     html += '<div class="mobile-theme-row">';
     THEMES.forEach(th => {
         html += '<div class="menu-title" onclick="toggleThemeThirdMenu(this,\'' + th + '\')">' + th.split('与')[0].slice(0,2) + '</div>';
     });
     html += '</div>';
-    // 三级菜单：统一放在二级菜单下方
     let subHtml = '';
     THEMES.forEach(th => {
         subHtml += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z一-龥]/g, '') + '">';
@@ -388,6 +414,7 @@ function toggleGenreThirdMenu(el, genre) {
     clearAllActive();
     el.classList.add('active');
     showByGenre(genre);
+    closeAllRightSubmenus();
     const targetId = 'submenu-genre-' + genre.replace(/[^a-zA-Z一-龥]/g, '');
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -402,6 +429,7 @@ function toggleThemeThirdMenu(el, theme) {
     clearAllActive();
     el.classList.add('active');
     showByTheme(theme);
+    closeAllLeftSubmenus();
     const targetId = 'submenu-theme-' + theme.replace(/[^a-zA-Z一-龥]/g, '');
     const target = document.getElementById(targetId);
     if (!target) return;

@@ -126,7 +126,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（菜单互斥+三级菜单固定修复）...")
+    print("   正在生成冰雪诗词数字图书馆（全面修复版）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -156,16 +156,8 @@ def main():
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>冰雪诗词 · 数字图书馆</title>
-<!-- 百度统计代码开始 -->
-<script>
-var _hmt = _hmt || [];
-(function() {{
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?a78c6d40062f7f473f651d5f5670fe85";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-}})();
-</script>
+<!-- 百度统计代码开始（请用真实代码替换此行） -->
+BAIDU_CODE
 <!-- 百度统计代码结束 -->
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
@@ -366,9 +358,11 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 
 <div class="footer">
   <span>冰雪诗词数字图书馆 © 2026 | 共收录 {len(poems)} 首诗词</span>
-  <!-- 不蒜子计数器 -->
-  <span class="counter">访问量：<span id="busuanzi_value_site_pv">-</span> 次</span>
-  <!-- 二维码预留位置：请将qrcode.jpg放到诗词馆文件夹并推送 -->
+  <!-- 不蒜子累计访问量 -->
+  <span class="counter">累计访问：<span id="busuanzi_value_site_pv">-</span> 次</span>
+  <!-- 今日访问量（本地存储模拟） -->
+  <span class="counter">今日访问：<span id="today_visits">-</span> 次</span>
+  <!-- 二维码 -->
   <div class="qrcode-container" title="扫码访问冰雪诗词">
     <img src="qrcode.jpg" alt="网站二维码" onerror="this.parentElement.innerHTML='<span style=color:#a0c0a0;font-size:0.7em;>📷二维码</span>'">
   </div>
@@ -422,6 +416,35 @@ const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
 
+// ===== 今日访问量 =====
+(function() {{
+    const today = new Date().toDateString();
+    const stored = localStorage.getItem('today_visits_date');
+    const countSpan = document.getElementById('today_visits');
+    if (stored !== today) {{
+        localStorage.setItem('today_visits_date', today);
+        localStorage.setItem('today_visits_count', '1');
+        if (countSpan) countSpan.textContent = '1';
+    }} else {{
+        let count = parseInt(localStorage.getItem('today_visits_count') || '0') + 1;
+        localStorage.setItem('today_visits_count', count.toString());
+        if (countSpan) countSpan.textContent = count;
+    }}
+}})();
+
+// ===== 菜单互斥辅助函数 =====
+function closeAllSubmenus() {{
+    document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+}}
+
+function closeAllLeftSubmenus() {{
+    document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
+}}
+
+function closeAllRightSubmenus() {{
+    document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => s.classList.remove('open'));
+}}
+
 function closeLinksSubmenu() {{
     document.getElementById('linksSubmenu').classList.remove('open');
 }}
@@ -429,16 +452,6 @@ function closeLinksSubmenu() {{
 function clearAllActive() {{
     document.querySelectorAll('.menu-title.active').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.submenu a.active').forEach(el => el.classList.remove('active'));
-}}
-
-// 关闭所有左侧三级菜单
-function closeAllLeftSubmenus() {{
-    document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
-}}
-
-// 关闭所有右侧三级菜单
-function closeAllRightSubmenus() {{
-    document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => s.classList.remove('open'));
 }}
 
 function scrollToContent() {{
@@ -465,28 +478,29 @@ function init() {{
     buildLinksSubmenu();
     initDrag();
     initMobileMenuToggle();
-    // 电脑版：点击左侧面板标题时，关闭右侧三级菜单
     initDesktopPanelToggle();
     showTodayPoems();
 }}
 
-// 电脑版面板标题互斥
+// ===== 电脑版面板标题互斥 =====
 function initDesktopPanelToggle() {{
     const leftTitle = document.getElementById('leftPanelTitle');
     const rightTitle = document.getElementById('rightPanelTitle');
     if (leftTitle) {{
         leftTitle.addEventListener('click', function() {{
             closeAllRightSubmenus();
+            closeLinksSubmenu();
         }});
     }}
     if (rightTitle) {{
         rightTitle.addEventListener('click', function() {{
             closeAllLeftSubmenus();
+            closeLinksSubmenu();
         }});
     }}
 }}
 
-// 手机版菜单互斥
+// ===== 手机版菜单互斥 =====
 function initMobileMenuToggle() {{
     const leftTitle = document.getElementById('leftPanelTitle');
     const rightTitle = document.getElementById('rightPanelTitle');
@@ -496,7 +510,7 @@ function initMobileMenuToggle() {{
         leftTitle.addEventListener('click', function() {{
             leftMenu.classList.toggle('open');
             if (rightMenu) rightMenu.classList.remove('open');
-            document.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
+            closeAllSubmenus();
             closeLinksSubmenu();
             clearAllActive();
         }});
@@ -505,7 +519,7 @@ function initMobileMenuToggle() {{
         rightTitle.addEventListener('click', function() {{
             rightMenu.classList.toggle('open');
             if (leftMenu) leftMenu.classList.remove('open');
-            document.querySelectorAll('.submenu.open').forEach(s => s.classList.remove('open'));
+            closeAllSubmenus();
             closeLinksSubmenu();
             clearAllActive();
         }});
@@ -567,6 +581,7 @@ function toggleGenreThirdMenu(el, genre) {{
     el.classList.add('active');
     showByGenre(genre);
     closeAllRightSubmenus();
+    closeLinksSubmenu();
     const targetId = 'submenu-genre-' + genre.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -574,7 +589,6 @@ function toggleGenreThirdMenu(el, genre) {{
         if (s.id !== targetId) s.classList.remove('open');
     }});
     target.classList.toggle('open');
-    closeLinksSubmenu();
 }}
 
 function toggleThemeThirdMenu(el, theme) {{
@@ -582,6 +596,7 @@ function toggleThemeThirdMenu(el, theme) {{
     el.classList.add('active');
     showByTheme(theme);
     closeAllLeftSubmenus();
+    closeLinksSubmenu();
     const targetId = 'submenu-theme-' + theme.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
     const target = document.getElementById(targetId);
     if (!target) return;
@@ -589,7 +604,6 @@ function toggleThemeThirdMenu(el, theme) {{
         if (s.id !== targetId) s.classList.remove('open');
     }});
     target.classList.toggle('open');
-    closeLinksSubmenu();
 }}
 
 document.addEventListener('click', function(e) {{
@@ -614,6 +628,7 @@ function buildLinksSubmenu() {{
 }}
 
 function toggleLinks() {{
+    closeAllSubmenus();
     document.getElementById('linksSubmenu').classList.toggle('open');
 }}
 

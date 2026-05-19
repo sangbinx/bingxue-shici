@@ -16,6 +16,9 @@ FRIENDLY_LINKS = [
     {'name': '搜韵', 'url': 'https://sou-yun.cn/'},
     {'name': '诗词吾爱', 'url': 'https://www.52shici.com/'},
     {'name': '古诗词网', 'url': 'https://www.gushiwen.cn/'},
+    # 以下为社交平台预留链接，请替换为真实地址
+    {'name': '微信公众号', 'url': 'https://mp.weixin.qq.com/你的公众号链接'},
+    {'name': '抖音·爷孙诗语', 'url': 'https://www.douyin.com/user/你的抖音号'},
 ]
 
 def parse_poems_with_theme(filepath):
@@ -126,7 +129,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（全面修复版）...")
+    print("   正在生成冰雪诗词数字图书馆（最终优化版）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -199,7 +202,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .links-wrapper {{ width: 105px; }}
 .links-wrapper > button {{ width: 100%; }}
 .links-submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #e8f5e9; border-radius: 0 0 4px 4px; }}
-.links-submenu.open {{ max-height: 200px; }}
+.links-submenu.open {{ max-height: 300px; }}
 .links-submenu a {{ display: block; padding: 6px 12px; color: #2c3e50; text-decoration: none; font-size: 0.75em; letter-spacing: 1px; border-bottom: 1px solid #c8e6c9; }}
 .links-submenu a:hover {{ background: #c8e6c9; }}
 .content {{ flex: 1; padding: 15px 25px; overflow-y: auto; background: #f5fbe8; }}
@@ -359,9 +362,9 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="footer">
   <span>冰雪诗词数字图书馆 © 2026 | 共收录 {len(poems)} 首诗词</span>
   <!-- 不蒜子累计访问量 -->
-  <span class="counter">累计访问：<span id="busuanzi_value_site_pv">-</span> 次</span>
-  <!-- 今日访问量（本地存储模拟） -->
-  <span class="counter">今日访问：<span id="today_visits">-</span> 次</span>
+  <span class="counter">累计访问：<span id="busuanzi_value_site_pv">加载中</span> 次</span>
+  <!-- 不蒜子独立访客（今日参考） -->
+  <span class="counter">今日访客：<span id="busuanzi_value_site_uv">加载中</span> 人</span>
   <!-- 二维码 -->
   <div class="qrcode-container" title="扫码访问冰雪诗词">
     <img src="qrcode.jpg" alt="网站二维码" onerror="this.parentElement.innerHTML='<span style=color:#a0c0a0;font-size:0.7em;>📷二维码</span>'">
@@ -415,22 +418,6 @@ const FITNESS_VIDEOS = {fitness_videos_json};
 const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
-
-// ===== 今日访问量 =====
-(function() {{
-    const today = new Date().toDateString();
-    const stored = localStorage.getItem('today_visits_date');
-    const countSpan = document.getElementById('today_visits');
-    if (stored !== today) {{
-        localStorage.setItem('today_visits_date', today);
-        localStorage.setItem('today_visits_count', '1');
-        if (countSpan) countSpan.textContent = '1';
-    }} else {{
-        let count = parseInt(localStorage.getItem('today_visits_count') || '0') + 1;
-        localStorage.setItem('today_visits_count', count.toString());
-        if (countSpan) countSpan.textContent = count;
-    }}
-}})();
 
 // ===== 菜单互斥辅助函数 =====
 function closeAllSubmenus() {{
@@ -629,6 +616,7 @@ function buildLinksSubmenu() {{
 
 function toggleLinks() {{
     closeAllSubmenus();
+    closeLinksSubmenu();
     document.getElementById('linksSubmenu').classList.toggle('open');
 }}
 

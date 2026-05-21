@@ -17,7 +17,7 @@ FRIENDLY_LINKS = [
     {'name': '诗词吾爱', 'url': 'https://www.52shici.com/'},
     {'name': '古诗词网', 'url': 'https://www.gushiwen.cn/'},
     {'name': '微信公众号', 'url': 'https://mp.weixin.qq.com/你的公众号链接'},
-    {'name': '抖音·爷孙诗语', 'url': 'https://www.douyin.com/user/你的抖音号'},
+    {'name': '抖音·爷孙诗语', 'url': 'https://www.douyin.com/user/62266439084'},
 ]
 
 def parse_poems_with_theme(filepath):
@@ -128,7 +128,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（菜单互斥+三级固定修复）...")
+    print("   正在生成冰雪诗词数字图书馆（菜单+留言修复版）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -269,7 +269,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .right-panel {{ border-bottom: 1px solid #c0c8f0; }}
     .center-panel {{ border-bottom: 1px solid #f0e0a0; }}
     .left-panel .panel-title, .right-panel .panel-title, .center-panel .panel-title {{ font-size: 0.85em; padding: 8px 0; cursor: pointer; user-select: none; }}
-    .left-menu, .right-menu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }}
+    .left-menu, .right-menu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; position: relative; }}
     .left-menu.open, .right-menu.open {{ max-height: 800px; }}
     .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
     .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
@@ -277,6 +277,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .mobile-second-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 50px; }}
     .mobile-theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
     .mobile-theme-row .menu-title {{ font-size: 0.72em; padding: 5px 3px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 55px; }}
+    .submenu-fixed-area {{ position: relative; min-height: 0; }}
     .submenu {{ display: flex; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; }}
     .submenu a {{ font-size: 0.7em; padding: 4px 5px; margin: 0; white-space: nowrap; }}
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
@@ -411,35 +412,28 @@ const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
 
-// ===== 关闭所有子菜单（含二级和三级） =====
 function closeAllSubmenus() {{
     document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
 }}
-
 function closeAllLeftSubmenus() {{
     document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
 }}
-
 function closeAllRightSubmenus() {{
     document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => s.classList.remove('open'));
 }}
-
 function closeLinksSubmenu() {{
     document.getElementById('linksSubmenu').classList.remove('open');
 }}
-
 function clearAllActive() {{
     document.querySelectorAll('.menu-title.active').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.submenu a.active').forEach(el => el.classList.remove('active'));
 }}
-
-// ===== 关闭对侧整个菜单面板（含二级菜单容器） =====
+// 关闭对侧整个菜单面板（含二级菜单容器）
 function closeLeftMenuPanel() {{
     const leftMenu = document.getElementById('leftSidebar');
     if (leftMenu) leftMenu.classList.remove('open');
     closeAllLeftSubmenus();
 }}
-
 function closeRightMenuPanel() {{
     const rightMenu = document.getElementById('rightSidebar');
     if (rightMenu) rightMenu.classList.remove('open');
@@ -452,12 +446,10 @@ function scrollToContent() {{
         setTimeout(() => {{ content.scrollIntoView({{ behavior: 'smooth', block: 'start' }}); }}, 150);
     }}
 }}
-
 function scrollToTop() {{
     document.querySelector('.main').scrollIntoView({{ behavior: 'smooth', block: 'start' }});
     window.scrollTo({{ top: 0, behavior: 'smooth' }});
 }}
-
 window.addEventListener('scroll', function() {{
     const btn = document.getElementById('backToTop');
     if (window.scrollY > 300) {{ btn.style.display = 'block'; }}
@@ -491,7 +483,7 @@ function initDesktopPanelToggle() {{
     }}
 }}
 
-// ===== 手机版菜单互斥（完整版：关闭对侧二级+三级） =====
+// 手机版菜单互斥（完整版：关闭对侧二级+三级）
 function initMobileMenuToggle() {{
     const leftTitle = document.getElementById('leftPanelTitle');
     const rightTitle = document.getElementById('rightPanelTitle');
@@ -500,8 +492,7 @@ function initMobileMenuToggle() {{
     if (leftTitle && leftMenu) {{
         leftTitle.addEventListener('click', function() {{
             leftMenu.classList.toggle('open');
-            // 关闭对侧整个菜单面板（二级菜单容器）
-            closeRightMenuPanel();
+            closeRightMenuPanel();  // 关闭对侧二级菜单容器+三级
             closeLinksSubmenu();
             clearAllActive();
         }});
@@ -509,25 +500,21 @@ function initMobileMenuToggle() {{
     if (rightTitle && rightMenu) {{
         rightTitle.addEventListener('click', function() {{
             rightMenu.classList.toggle('open');
-            // 关闭对侧整个菜单面板（二级菜单容器）
-            closeLeftMenuPanel();
+            closeLeftMenuPanel();  // 关闭对侧二级菜单容器+三级
             closeLinksSubmenu();
             clearAllActive();
         }});
     }}
 }}
 
-// ===== 构建左侧边栏（三级菜单统一固定在二级按钮行下方） =====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
     let html = '';
-    // 二级按钮行
     html += '<div class="mobile-second-row">';
     GENRES.forEach(g => {{
         html += '<div class="menu-title" onclick="toggleGenreThirdMenu(this,\\'' + g + '\\')">' + g + '</div>';
     }});
     html += '</div>';
-    // 三级菜单统一区域：所有体裁的三级菜单都放在这里
     html += '<div class="submenu-fixed-area">';
     GENRES.forEach(g => {{
         html += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
@@ -540,17 +527,14 @@ function buildLeftSidebar() {{
     sb.innerHTML = html;
 }}
 
-// ===== 构建右侧边栏（三级菜单统一固定在二级按钮行下方） =====
 function buildRightSidebar() {{
     const sb = document.getElementById('rightSidebar');
     let html = '';
-    // 二级按钮行
     html += '<div class="mobile-theme-row">';
     THEMES.forEach(th => {{
         html += '<div class="menu-title" onclick="toggleThemeThirdMenu(this,\\'' + th + '\\')">' + th.split('与')[0].slice(0,2) + '</div>';
     }});
     html += '</div>';
-    // 三级菜单统一区域
     html += '<div class="submenu-fixed-area">';
     THEMES.forEach(th => {{
         html += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
@@ -772,8 +756,8 @@ function playVideo(path, name, idx) {{
 
 function closeVideoModal() {{ document.getElementById('videoModal').style.display = 'none'; document.getElementById('videoPlayer').innerHTML = '<p>👈 请从左侧列表选择视频播放</p>'; }}
 
-function openGuestbook() {{ closeLinksSubmenu(); document.getElementById('guestbookModal').style.display = 'block'; loadGuestbook(); }}
-function closeGuestbook() {{ document.getElementById('guestbookModal').style.display = 'none'; }}
+function openGuestbook() {{ closeLinksSubmenu(); document.getElementById('guestbookModal').style.display='block'; loadGuestbook(); }}
+function closeGuestbook() {{ document.getElementById('guestbookModal').style.display='none'; }}
 
 function loadGuestbook() {{
     const msgs = JSON.parse(localStorage.getItem('ice_guestbook') || '[]');

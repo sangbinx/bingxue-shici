@@ -12,15 +12,17 @@ FITNESS_VIDEO_DIR = '健身锻炼视频'
 OUTPUT_HTML = 'index.html'
 # -------------------------
 
+# 友情链接配置（微信公众号和抖音改为显示二维码）
 FRIENDLY_LINKS = [
     {'name': '搜韵', 'url': 'https://sou-yun.cn/'},
     {'name': '诗词吾爱', 'url': 'https://www.52shici.com/'},
     {'name': '古诗词网', 'url': 'https://www.gushiwen.cn/'},
-    {'name': '微信公众号', 'url': 'https://mp.weixin.qq.com/你的公众号链接'},
-    {'name': '抖音·爷孙诗语', 'url': 'https://www.douyin.com/user/62266439084'},
+    {'name': '微信公众号', 'type': 'qrcode', 'img': 'gzh_qr.jpg'},
+    {'name': '抖音视频', 'type': 'qrcode', 'img': 'douyin_qr.jpg'},
 ]
 
 def parse_poems_with_theme(filepath):
+    # ...（同之前，略）
     poems = []
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -97,6 +99,7 @@ def classify_themes(text):
     return matched_themes
 
 def find_images(poem_id, image_base_dir):
+    # ...（同之前）
     if not os.path.exists(image_base_dir):
         return []
     for dir_name in os.listdir(image_base_dir):
@@ -128,7 +131,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（菜单+留言修复版）...")
+    print("   正在生成冰雪诗词数字图书馆（最终整合版）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -158,6 +161,17 @@ def main():
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>冰雪诗词 · 数字图书馆</title>
+<!-- 百度统计代码开始（请替换为真实代码） -->
+<script>
+var _hmt = _hmt || [];
+(function() {{
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?a78c6d40062f7f473f651d5f5670fe85";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+}})();
+</script>
+<!-- 百度统计代码结束 -->
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0e3; color: #2c2c2c; display: flex; flex-direction: column; min-height: 100vh; }}
@@ -277,12 +291,16 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .mobile-second-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 50px; }}
     .mobile-theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
     .mobile-theme-row .menu-title {{ font-size: 0.72em; padding: 5px 3px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 55px; }}
-    .submenu-fixed-area {{ position: relative; min-height: 0; }}
-    .submenu {{ display: flex; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; }}
+    /* 三级菜单固定区域 */
+    .submenu-fixed-area {{ position: relative; min-height: 50px; }}
+    .submenu {{ position: absolute; top: 0; left: 0; width: 100%; display: none; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; background: #fdf0f0; border-radius: 0 0 3px 3px; }}
+    .right-panel .submenu {{ background: #f0f4fd; }}
+    .submenu.open {{ display: flex; }}
     .submenu a {{ font-size: 0.7em; padding: 4px 5px; margin: 0; white-space: nowrap; }}
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
     .center-buttons button {{ width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }}
     .links-wrapper {{ width: auto; }}
+    /* 手机端隐藏视频按钮和诗词创作 */
     .center-buttons button[onclick*="openVideoModal"],
     .center-buttons button[onclick*="coze.com"] {{ display: none !important; }}
     .content {{ flex: none; width: 100%; padding: 8px 10px; overflow-y: visible; }}
@@ -332,13 +350,13 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
   <div class="panel-title">综合功能区</div>
   <div class="center-buttons" id="centerButtons">
     <button onclick="openSearch()">三重检索</button>
-    <button onclick="openVideoModal('recite')">诗词朗诵</button>
-    <button onclick="alert('正在开发中，敬请期待！')">诗词创作</button>
+    <button onclick="showQRCode('诗词朗诵', 'gzh_qr.jpg')">诗词朗诵</button>
+    <button onclick="showQRCode('诗词创作', 'gzh_qr.jpg')">诗词创作</button>
     <div class="links-wrapper">
       <button onclick="toggleLinks()">相关链接</button>
       <div class="links-submenu" id="linksSubmenu"></div>
     </div>
-    <button onclick="openVideoModal('fitness')">健身视频</button>
+    <button onclick="showQRCode('健身视频', 'douyin_qr.jpg')">健身视频</button>
     <button onclick="openGuestbook()">访客留言</button>
     <button onclick="showTodayPoems()">今日诗词</button>
   </div>
@@ -393,25 +411,22 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="guestbook-modal-content">
 <span class="modal-close" onclick="closeGuestbook()">&times;</span>
 <h3>📝 访客留言</h3>
-<div id="guestbookMessages"></div>
-<div class="guestbook-form">
-  <input type="text" id="guestName" placeholder="您的昵称">
-  <textarea id="guestMsg" placeholder="写下您想说的话..."></textarea>
-  <button onclick="submitGuestbook()">提交留言</button>
-</div>
+<!-- Twikoo 评论区 -->
+<div id="twikoo"></div>
 </div>
 </div>
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- Twikoo CDN -->
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
 <script>
 const POEMS = {poems_json};
 const REPORT_TEXT = {report_escaped};
-const RECITE_VIDEOS = {recite_videos_json};
-const FITNESS_VIDEOS = {fitness_videos_json};
 const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
 
+// ----- 菜单互斥函数 -----
 function closeAllSubmenus() {{
     document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
 }}
@@ -428,7 +443,6 @@ function clearAllActive() {{
     document.querySelectorAll('.menu-title.active').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.submenu a.active').forEach(el => el.classList.remove('active'));
 }}
-// 关闭对侧整个菜单面板（含二级菜单容器）
 function closeLeftMenuPanel() {{
     const leftMenu = document.getElementById('leftSidebar');
     if (leftMenu) leftMenu.classList.remove('open');
@@ -450,6 +464,7 @@ function scrollToTop() {{
     document.querySelector('.main').scrollIntoView({{ behavior: 'smooth', block: 'start' }});
     window.scrollTo({{ top: 0, behavior: 'smooth' }});
 }}
+
 window.addEventListener('scroll', function() {{
     const btn = document.getElementById('backToTop');
     if (window.scrollY > 300) {{ btn.style.display = 'block'; }}
@@ -464,6 +479,12 @@ function init() {{
     initMobileMenuToggle();
     initDesktopPanelToggle();
     showTodayPoems();
+    // 初始化 Twikoo
+    twikoo.init({{
+        envId: 'YOUR_TWIKOO_ENV_ID',   // 替换成您的 Twikoo 环境 ID
+        el: '#twikoo',
+        lang: 'zh-CN'
+    }});
 }}
 
 function initDesktopPanelToggle() {{
@@ -483,7 +504,6 @@ function initDesktopPanelToggle() {{
     }}
 }}
 
-// 手机版菜单互斥（完整版：关闭对侧二级+三级）
 function initMobileMenuToggle() {{
     const leftTitle = document.getElementById('leftPanelTitle');
     const rightTitle = document.getElementById('rightPanelTitle');
@@ -492,7 +512,7 @@ function initMobileMenuToggle() {{
     if (leftTitle && leftMenu) {{
         leftTitle.addEventListener('click', function() {{
             leftMenu.classList.toggle('open');
-            closeRightMenuPanel();  // 关闭对侧二级菜单容器+三级
+            closeRightMenuPanel();
             closeLinksSubmenu();
             clearAllActive();
         }});
@@ -500,13 +520,14 @@ function initMobileMenuToggle() {{
     if (rightTitle && rightMenu) {{
         rightTitle.addEventListener('click', function() {{
             rightMenu.classList.toggle('open');
-            closeLeftMenuPanel();  // 关闭对侧二级菜单容器+三级
+            closeLeftMenuPanel();
             closeLinksSubmenu();
             clearAllActive();
         }});
     }}
 }}
 
+// ===== 侧边栏构建 =====
 function buildLeftSidebar() {{
     const sb = document.getElementById('leftSidebar');
     let html = '';
@@ -583,23 +604,16 @@ function toggleThemeThirdMenu(el, theme) {{
     if (target) target.classList.toggle('open');
 }}
 
-document.addEventListener('click', function(e) {{
-    if (e.target.classList.contains('menu-title') && 
-        !e.target.closest('.mobile-second-row') && 
-        !e.target.closest('.mobile-theme-row')) {{
-        document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
-        const submenu = e.target.nextElementSibling;
-        if (submenu && submenu.classList.contains('submenu')) {{
-            submenu.classList.add('open');
-        }}
-    }}
-}});
-
+// ===== 相关链接（支持二维码） =====
 function buildLinksSubmenu() {{
     const container = document.getElementById('linksSubmenu');
     let html = '';
     FRIENDLY_LINKS.forEach(link => {{
-        html += '<a href="#" onclick="window.open(\\'' + link.url + '\\', \\'_blank\\'); return false;">' + link.name + '</a>';
+        if (link.type === 'qrcode') {{
+            html += '<a href="#" onclick="showQRCode(\\'' + link.name + '\\', \\'' + link.img + '\\'); return false;">' + link.name + '</a>';
+        }} else {{
+            html += '<a href="#" onclick="window.open(\\'' + link.url + '\\', \\'_blank\\'); return false;">' + link.name + '</a>';
+        }}
     }});
     container.innerHTML = html;
 }}
@@ -609,6 +623,18 @@ function toggleLinks() {{
     document.getElementById('linksSubmenu').classList.toggle('open');
 }}
 
+// ===== 二维码展示函数 =====
+function showQRCode(title, imgFile) {{
+    const c = document.getElementById('content');
+    c.innerHTML = `<div style="text-align:center; padding:40px 20px;">
+        <h3 style="color:#2e7d32; margin-bottom:20px;">${{title}}</h3>
+        <img src="${{imgFile}}" style="max-width:300px; width:100%; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.1);" alt="${{title}}">
+        <p style="margin-top:10px; color:#888;">请用手机扫码关注</p>
+    </div>`;
+    scrollToContent();
+}}
+
+// ===== 诗词展示函数 =====
 function showByGenre(genre) {{
     let f = genre==='词牌诗词' ? POEMS.filter(p=>!['五绝','五律','七绝','七律'].includes(p.genre)) : POEMS.filter(p=>p.genre===genre);
     render(genre+' · 全部', f);
@@ -706,6 +732,13 @@ function showTodayPoems() {{
     c.scrollTop = 0;
 }}
 
+// 打开留言板（Twikoo 会自动加载）
+function openGuestbook() {{
+    closeLinksSubmenu();
+    document.getElementById('guestbookModal').style.display='block';
+}}
+function closeGuestbook() {{ document.getElementById('guestbookModal').style.display='none'; }}
+
 function openReport() {{ document.getElementById('reportText').textContent = REPORT_TEXT; document.getElementById('reportModal').style.display='block'; }}
 function closeReport() {{ document.getElementById('reportModal').style.display='none'; }}
 function openSearch() {{ closeLinksSubmenu(); document.getElementById('searchModal').style.display='block'; }}
@@ -726,61 +759,6 @@ function doSearch() {{
     closeSearch();
     render('综合检索结果', r);
     scrollToContent();
-}}
-
-function openVideoModal(type) {{
-    closeLinksSubmenu();
-    const modal = document.getElementById('videoModal');
-    const title = document.getElementById('videoModalTitle');
-    const list = document.getElementById('videoList');
-    const player = document.getElementById('videoPlayer');
-    let videos = [];
-    if (type === 'recite') {{ videos = RECITE_VIDEOS; title.textContent = '🎤 诗词朗诵'; }}
-    else {{ videos = FITNESS_VIDEOS; title.textContent = '💪 健身视频'; }}
-    player.innerHTML = '<p>👈 请从左侧列表选择视频播放</p>';
-    if (videos.length === 0) {{ list.innerHTML = '<p style="color:#888; padding:10px;">暂无视频</p>'; }}
-    else {{
-        let html = '';
-        videos.forEach((v, idx) => {{ html += '<div class="video-item" id="vid-item-'+idx+'" onclick="playVideo(\\'' + v.path + '\\', \\'' + v.name + '\\', '+idx+')"><span class="video-name">' + (idx+1) + '. ' + v.name + '</span></div>'; }});
-        list.innerHTML = html;
-    }}
-    modal.style.display = 'block';
-}}
-
-function playVideo(path, name, idx) {{
-    document.querySelectorAll('.video-item').forEach(el => el.classList.remove('active'));
-    const item = document.getElementById('vid-item-'+idx);
-    if(item) item.classList.add('active');
-    document.getElementById('videoPlayer').innerHTML = '<video controls autoplay style="width:100%; height:100%; border-radius:4px;"><source src="' + path + '" type="video/mp4">您的浏览器不支持视频播放。</video>';
-}}
-
-function closeVideoModal() {{ document.getElementById('videoModal').style.display = 'none'; document.getElementById('videoPlayer').innerHTML = '<p>👈 请从左侧列表选择视频播放</p>'; }}
-
-function openGuestbook() {{ closeLinksSubmenu(); document.getElementById('guestbookModal').style.display='block'; loadGuestbook(); }}
-function closeGuestbook() {{ document.getElementById('guestbookModal').style.display='none'; }}
-
-function loadGuestbook() {{
-    const msgs = JSON.parse(localStorage.getItem('ice_guestbook') || '[]');
-    const container = document.getElementById('guestbookMessages');
-    if(msgs.length === 0) {{ container.innerHTML = '<p style="color:#888;text-align:center;padding:16px;">暂无留言。</p>'; }}
-    else {{
-        let html = '';
-        msgs.slice(-20).reverse().forEach(m => {{ html += '<div class="guestbook-msg"><span class="msg-author">'+m.name+'</span><span class="msg-time">'+m.time+'</span><div class="msg-text">'+m.msg+'</div></div>'; }});
-        container.innerHTML = html;
-    }}
-}}
-
-function submitGuestbook() {{
-    const name = document.getElementById('guestName').value.trim();
-    const msg = document.getElementById('guestMsg').value.trim();
-    if(!name || !msg) {{ alert('请填写昵称和留言内容。'); return; }}
-    const msgs = JSON.parse(localStorage.getItem('ice_guestbook') || '[]');
-    const now = new Date();
-    msgs.push({{ name: name, msg: msg, time: now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+' '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0') }});
-    localStorage.setItem('ice_guestbook', JSON.stringify(msgs));
-    document.getElementById('guestName').value = '';
-    document.getElementById('guestMsg').value = '';
-    loadGuestbook();
 }}
 
 function initDrag() {{

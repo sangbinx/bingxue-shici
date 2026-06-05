@@ -483,31 +483,9 @@ function init() {{
         envId: 'https://twikoo-cloudflare.sangbinx.workers.dev',
         el: '#twikoo',
         lang: 'zh-CN',
-        pageSize: 5,           // 修改为5条
-        showPoweredBy: false    // 去掉版权信息
+        pageSize: 6, 
+        showPoweredBy: false
     }});
-    setupTwikooClearNickname(); // 修复昵称不清空
-}}
-
-// 修复：发送评论后自动清空昵称
-function setupTwikooClearNickname() {{
-    const container = document.getElementById('twikoo');
-    if (!container) return;
-    // 监听评论表单的动态生成
-    const observer = new MutationObserver(function() {{
-        const submitBtn = document.querySelector('#twikoo .tk-submit');
-        if (submitBtn && !submitBtn._clearAttached) {{
-            submitBtn._clearAttached = true;
-            submitBtn.addEventListener('click', function() {{
-                // 等待评论提交成功（延迟300ms后清空）
-                setTimeout(() => {{
-                    const nicknameInput = document.querySelector('#twikoo .tk-nickname .el-input__inner');
-                    if (nicknameInput) nicknameInput.value = '';
-                }}, 300);
-            }});
-        }}
-    }});
-    observer.observe(container, {{ childList: true, subtree: true }});
 }}
 
 function initDesktopPanelToggle() {{
@@ -561,7 +539,7 @@ function buildLeftSidebar() {{
     html += '</div>';
     html += '<div class="submenu-fixed-area">';
     GENRES.forEach(g => {{
-        html += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z\\u4e00-\\u9fa5]/g, '') + '">';
+        html += '<div class="submenu" id="submenu-genre-' + g.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         THEMES.forEach(th => {{
             html += '<a onclick="showFilteredByGenre(\\'' + g + '\\', \\'' + th + '\\'); setActiveSubmenu(this);">' + th.split('与')[0].slice(0,2) + '</a>';
         }});
@@ -581,7 +559,7 @@ function buildRightSidebar() {{
     html += '</div>';
     html += '<div class="submenu-fixed-area">';
     THEMES.forEach(th => {{
-        html += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z\\u4e00-\\u9fa5]/g, '') + '">';
+        html += '<div class="submenu" id="submenu-theme-' + th.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '') + '">';
         GENRES.forEach(g => {{
             html += '<a onclick="showFilteredByTheme(\\'' + g + '\\', \\'' + th + '\\'); setActiveSubmenu(this);">' + g + '</a>';
         }});
@@ -605,7 +583,7 @@ function toggleGenreThirdMenu(el, genre) {{
     showByGenre(genre);
     closeAllRightSubmenus();
     closeLinksSubmenu();
-    const targetId = 'submenu-genre-' + genre.replace(/[^a-zA-Z\\u4e00-\\u9fa5]/g, '');
+    const targetId = 'submenu-genre-' + genre.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
     document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => {{
         if (s.id !== targetId) s.classList.remove('open');
     }});
@@ -619,7 +597,7 @@ function toggleThemeThirdMenu(el, theme) {{
     showByTheme(theme);
     closeAllLeftSubmenus();
     closeLinksSubmenu();
-    const targetId = 'submenu-theme-' + theme.replace(/[^a-zA-Z\\u4e00-\\u9fa5]/g, '');
+    const targetId = 'submenu-theme-' + theme.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
     document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => {{
         if (s.id !== targetId) s.classList.remove('open');
     }});
@@ -705,9 +683,11 @@ function exportEdits() {{
         lines.push(id + '|||' + editedPoems[id]);
     }}
     const output = lines.join('\\n');
+    // 复制到剪贴板
     navigator.clipboard.writeText(output).then(() => {{
         alert('✅ 已复制 ' + Object.keys(editedPoems).length + ' 条修改记录到剪贴板！\\n\\n请运行 sync_poems.py 脚本，粘贴记录完成同步。');
     }}).catch(() => {{
+        // 如果剪贴板失败，显示在弹窗中
         alert('📤 请复制以下内容：\\n\\n' + output + '\\n\\n然后运行 sync_poems.py 脚本，粘贴记录完成同步。');
     }});
 }}

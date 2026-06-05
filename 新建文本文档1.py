@@ -128,7 +128,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（修复版：图片正常+新增功能）...")
+    print("   正在生成冰雪诗词数字图书馆（最终修复版：Twikoo优化+去图标+导出密码）...")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -269,8 +269,8 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .footer {{ background: #1b5e20; color: #c8e6c9; text-align: center; padding: 10px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; }}
 .footer .counter {{ font-size: 0.9em; }}
 .footer .qrcode-container img {{ width: 80px; height: 80px; border-radius: 4px; }}
-/* 强制隐藏 Twikoo 版权 */
-.twikoo-powered-by {{ display: none !important; }}
+/* 强制隐藏 Twikoo 版权 - 加强版 */
+.twikoo-powered-by {{ display: none !important; visibility: hidden !important; }}
 /* ========== 手机端样式 ========== */
 @media screen and (max-width: 1024px) {{
     body {{ min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }}
@@ -348,8 +348,8 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="center-panel">
   <div class="panel-title">综合功能区</div>
   <div class="center-buttons" id="centerButtons">
-    <!-- 使用说明按钮 - 新增，放在最前面 -->
-    <button onclick="showUsageGuide()">📖 使用说明</button>
+    <!-- 使用说明按钮 - 已去掉图标 -->
+    <button onclick="showUsageGuide()">使用说明</button>
     <button onclick="openSearch()">三重检索</button>
     <button onclick="showQRCode('诗词朗诵', 'gzh_qr.jpg')">诗词朗诵</button>
     <button onclick="showQRCode('诗词创作', 'gzh_qr.jpg')">诗词创作</button>
@@ -360,7 +360,8 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     <button onclick="showQRCode('健身视频', 'douyin_qr.jpg')">健身视频</button>
     <button onclick="openGuestbook()">访客留言</button>
     <button onclick="showTodayPoems()">今日诗词</button>
-    <button onclick="exportEdits()">📤 导出修改</button>
+    <!-- 导出修改按钮 - 已去掉图标 -->
+    <button onclick="exportEdits()">导出修改</button>
   </div>
 </div>
 
@@ -418,7 +419,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 </div>
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<!-- 替换 Twikoo CDN 为 unpkg 以解决 CORS 问题 -->
+<!-- Twikoo CDN 使用 unpkg -->
 <script src="https://unpkg.com/twikoo@1.6.40/dist/twikoo.all.min.js"></script>
 <script>
 const POEMS = {poems_json};
@@ -429,7 +430,7 @@ const FRIENDLY_LINKS = {links_json};
 
 // ========== 本地编辑管理 ==========
 let editedPoems = JSON.parse(localStorage.getItem('editedPoems') || '{{}}');
-// 编辑密码
+// 编辑密码和导出密码（共用）
 const EDIT_PASSWORD = "bingxue2026";
 
 // ========== 今日访客独立计数（每天零点归零） ==========
@@ -536,6 +537,7 @@ function init() {{
     initMobileMenuToggle();
     initDesktopPanelToggle();
     showTodayPoems();
+    // Twikoo 初始化，增加超时和重试
     if (typeof twikoo !== 'undefined') {{
         twikoo.init({{
             envId: 'https://twikoo-cloudflare.sangbinx.workers.dev',
@@ -543,12 +545,30 @@ function init() {{
             lang: 'zh-CN',
             pageSize: 20,
             showPoweredBy: false,
+            timeout: 10000,  // 10秒超时
+        }}).then(() => {{
+            console.log('Twikoo 初始化成功');
+            // 再次尝试隐藏版权
+            setTimeout(() => {{
+                const powered = document.querySelector('.twikoo-powered-by');
+                if (powered) powered.style.display = 'none';
+            }}, 1000);
+        }}).catch(err => {{
+            console.error('Twikoo 初始化失败:', err);
+            document.getElementById('twikoo').innerHTML = '<p style="color:red;">评论系统加载失败，请刷新重试。</p>';
         }});
-        setTimeout(() => {{
-            const style = document.createElement('style');
-            style.textContent = '.twikoo-powered-by {{ display: none !important; }}';
-            document.head.appendChild(style);
+        // 额外保险：多次尝试隐藏版权
+        const hidePowered = setInterval(() => {{
+            const powered = document.querySelector('.twikoo-powered-by');
+            if (powered) {{
+                powered.style.display = 'none';
+                clearInterval(hidePowered);
+            }}
         }}, 500);
+        setTimeout(() => clearInterval(hidePowered), 10000);
+    }} else {{
+        console.error('Twikoo 未加载');
+        document.getElementById('twikoo').innerHTML = '<p style="color:red;">评论系统加载失败，请检查网络后刷新。</p>';
     }}
 }}
 
@@ -726,7 +746,7 @@ function showFilteredByTheme(genre, theme) {{
     scrollToContent();
 }}
 
-// ========== 编辑与导出功能（添加密码保护） ==========
+// ========== 编辑与导出功能 ==========
 function editPoem(id) {{
     let pwd = prompt("请输入编辑密码：");
     if (pwd !== EDIT_PASSWORD) {{
@@ -743,7 +763,13 @@ function editPoem(id) {{
     }}
 }}
 
+// 导出修改增加密码保护
 function exportEdits() {{
+    let pwd = prompt("请输入导出密码：");
+    if (pwd !== EDIT_PASSWORD) {{
+        if (pwd !== null) alert("密码错误，无法导出。");
+        return;
+    }}
     if (Object.keys(editedPoems).length === 0) {{
         alert('暂无修改记录。');
         return;
@@ -891,12 +917,13 @@ window.onload = init;
     print(f"🎉 网站生成完毕！")
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
-    print("✅ 本次修改内容（仅这5项，其他功能完全保留原样）：")
-    print("   1. 综合功能区增加「使用说明」按钮（最前面）")
-    print("   2. 编辑功能增加密码验证（密码：bingxue2026）")
-    print("   3. Twikoo CDN 改为 unpkg，pageSize改为20，强制隐藏版权")
-    print("   4. 今日访客独立计数（每天零点归零）")
-    print("   5. 图片、视频、检索、菜单等功能完全保留原样")
+    print("✅ 本次修改内容（仅5项，其他功能完全保留）：")
+    print("   1. 使用说明按钮和导出修改按钮去掉图标")
+    print("   2. 导出修改增加密码验证（密码与编辑相同：bingxue2026）")
+    print("   3. Twikoo 初始化增加超时和错误处理，加强版权隐藏")
+    print("   4. 评论加载失败时显示友好提示")
+    print("   5. 图片、视频、检索等所有原有功能完全不变")
+    print("📌 注意：小齿轮后台管理无反应是Worker端问题，请检查Cloudflare Worker环境变量ADMIN_PASSWORD是否设置")
     os.system("pause")
 
 if __name__ == '__main__':

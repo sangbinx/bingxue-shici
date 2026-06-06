@@ -420,7 +420,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <!-- Twikoo CDN 使用 unpkg -->
-<script src="https://unpkg.com/twikoo@1.6.40/dist/twikoo.all.min.js"></script>
+<script src="https://unpkg.com/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
 <script>
 const POEMS = {poems_json};
 const REPORT_TEXT = {report_escaped};
@@ -540,7 +540,7 @@ function init() {{
     // Twikoo 初始化，增加超时和重试
     if (typeof twikoo !== 'undefined') {{
         twikoo.init({{
-            envId: 'https://twikoo-cloudflare.sangbinx.workers.dev',
+            envId: 'https://twikoo.bingxue2026.com',
             el: '#twikoo',
             lang: 'zh-CN',
             pageSize: 20,

@@ -827,7 +827,7 @@ function initDrag() {{
 function initTwikoo() {{
     if (typeof twikoo !== 'undefined') {{
         twikoo.init({{
-            envId: 'https://twikoo.冰雪2026.com',
+            envId: 'https://twikoo.bingxue2026.com',
             el: '#twikoo',
             lang: 'zh-CN',
             pageSize: 20,

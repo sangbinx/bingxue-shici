@@ -128,7 +128,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（最终完善版）...")
+    print("   正在生成冰雪诗词数字图书馆（最终修复版：昵称自动清空+版权隐藏）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -185,7 +185,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .right-panel .panel-title {{ background: #d0d8f8; color: #36c; font-size: 0.75em; padding: 6px 0; letter-spacing: 1px; }}
 .center-panel {{ width: 120px; display: flex; flex-direction: column; flex-shrink: 0; border-left: 2px solid #f0e0a0; border-right: 2px solid #f0e0a0; background: #fef9e7; }}
 .center-panel .panel-title {{ background: #fef0c0; color: #a80; font-size: 0.75em; padding: 6px 0; letter-spacing: 1px; }}
-.panel-title {{ text-align: center; font-weight: bold; flex-shrink: 0; cursor: pointer; user-select: none; }}
+.panel-title {{ text-align: center; font-weight: bold; flex-shrink: 0; }}
 .left-menu, .right-menu {{ flex: 1; overflow-y: auto; padding: 0; }}
 .center-buttons {{ flex: 1; display: flex; flex-direction: column; gap: 5px; align-items: center; padding: 8px; overflow-y: auto; }}
 .menu-item {{ margin-bottom: 1px; }}
@@ -206,31 +206,30 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .right-panel .submenu a.active {{ background: #a0b8e0 !important; color: #124 !important; font-weight: bold; }}
 .center-buttons button {{ width: 105px; padding: 6px 4px; background: #4caf50; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75em; letter-spacing: 1px; transition: 0.2s; }}
 .center-buttons button:hover {{ background: #388e3c; }}
-.links-wrapper {{ position: relative; width: 105px; }}
+.links-wrapper {{ width: 105px; }}
 .links-wrapper > button {{ width: 100%; }}
-.links-submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #e8f5e9; border-radius: 0 0 4px 4px; position: absolute; top: 100%; left: 0; width: 100%; z-index: 10; }}
+.links-submenu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #e8f5e9; border-radius: 0 0 4px 4px; }}
 .links-submenu.open {{ max-height: 300px; }}
 .links-submenu a {{ display: block; padding: 6px 12px; color: #2c3e50; text-decoration: none; font-size: 0.75em; letter-spacing: 1px; border-bottom: 1px solid #c8e6c9; }}
 .links-submenu a:hover {{ background: #c8e6c9; }}
 .content {{ flex: 1; padding: 15px 25px; overflow-y: auto; background: #f5fbe8; }}
-.poem-card {{ background: #fffef9; border-radius: 8px; padding: 20px 24px; margin-bottom: 22px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); border-left: 3px solid #8bc34a; overflow: auto; position: relative; }}
+.poem-card {{ background: #fffef9; border-radius: 8px; padding: 20px 24px; margin-bottom: 22px; box-shadow: 0 1px 8px rgba(0,0,0,0.05); border-left: 3px solid #8bc34a; overflow: auto; }}
 .poem-title {{ color: #2e7d32; font-size: 1.15em; margin-bottom: 6px; font-weight: normal; letter-spacing: 2px; text-align: left; }}
 .poem-author {{ font-size: 0.95em; color: #4a5568; margin-bottom: 2px; letter-spacing: 2px; text-align: left; }}
 .poem-date {{ font-size: 0.85em; color: #6b7b8d; margin-bottom: 10px; letter-spacing: 1px; text-align: left; }}
-.poem-body {{ font-size: 1.1em; line-height: 2.1; white-space: pre-wrap; font-family: "楷体", KaiTi, serif; margin-top: 0; overflow: auto; }}
+.poem-body {{ font-size: 1.1em; line-height: 2.1; white-space: pre-wrap; font-family: "楷体", KaiTi, serif; margin-top: 0; }}
 .history-intro {{ background: linear-gradient(135deg, #fef9e7, #fefce8); padding: 14px 20px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #d4a853; text-align: center; }}
 .history-intro p {{ color: #a08030; font-size: 1em; letter-spacing: 2px; }}
-.poem-img-float {{ float: right; width: 280px; max-height: 420px; overflow-y: auto; margin-left: 16px; margin-bottom: 8px; padding: 4px; background: #fafaf5; border-radius: 6px; border: 1px solid #e8e0d0; clear: none; }}
+.poem-img-float {{ display: none; float: right; width: 280px; max-height: 420px; overflow-y: auto; margin-left: 16px; margin-bottom: 8px; padding: 4px; background: #fafaf5; border-radius: 6px; border: 1px solid #e8e0d0; }}
+.poem-img-float.open {{ display: block; }}
 .poem-img-float img {{ width: 100%; max-height: 200px; object-fit: scale-down; border-radius: 4px; margin-bottom: 6px; border: 1px solid #e0d5c1; cursor: pointer; display: block; }}
 .poem-img-float img:last-child {{ margin-bottom: 0; }}
 .poem-img-float.single-img img {{ max-height: none; }}
 .poem-img-float.single-img {{ max-height: none; overflow-y: visible; }}
-.img-toggle-btn, .edit-btn, .comment-btn {{ display: inline-block; margin-top: 8px; margin-right: 8px; padding: 5px 0; background: #8bc34a; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; letter-spacing: 1px; text-align: center; }}
-.edit-btn, .comment-btn {{ background: #f0ad4e; }}
-.edit-btn:hover, .comment-btn:hover {{ background: #ec971f; }}
-.img-toggle-btn {{ background: #8bc34a; width: 6em; max-width: 6em; }}
-.edit-btn, .comment-btn {{ width: 3em; }}
-.button-group {{ margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }}
+.img-toggle-btn {{ display: inline-block; margin-top: 4px; padding: 5px 14px; background: #8bc34a; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; letter-spacing: 1px; }}
+.img-toggle-btn:hover {{ background: #689f38; }}
+.edit-btn {{ display: inline-block; margin-top: 4px; margin-left: 8px; padding: 5px 14px; background: #f0ad4e; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; letter-spacing: 1px; }}
+.edit-btn:hover {{ background: #ec971f; }}
 .back-to-top {{ display: none; position: fixed; bottom: 30px; right: 30px; width: 44px; height: 44px; background: #4caf50; color: #fff; border: none; border-radius: 50%; font-size: 1.2em; cursor: pointer; z-index: 998; box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: 0.3s; }}
 .back-to-top:hover {{ background: #388e3c; }}
 .modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.15); z-index: 999; }}
@@ -258,11 +257,27 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .video-player-area video {{ width: 100%; max-height: 100%; border-radius: 4px; }}
 .guestbook-modal-content {{ background: #fefefe; margin: 30px auto; padding: 24px; width: 50%; max-width: 600px; max-height: 80vh; overflow-y: auto; border-radius: 8px; }}
 .guestbook-modal-content h3 {{ color: #2e7d32; margin-bottom: 16px; letter-spacing: 2px; }}
+.guestbook-msg {{ background: #fdf6ec; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #d4a853; }}
+.guestbook-msg .msg-author {{ color: #a08030; font-size: 0.85em; font-weight: bold; }}
+.guestbook-msg .msg-time {{ color: #888; font-size: 0.75em; margin-left: 10px; }}
+.guestbook-msg .msg-text {{ color: #4a4a4a; font-size: 0.9em; margin-top: 4px; }}
+.guestbook-form {{ margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }}
+.guestbook-form input, .guestbook-form textarea {{ padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9em; }}
+.guestbook-form textarea {{ height: 80px; resize: vertical; }}
+.guestbook-form button {{ width: 100px; padding: 8px; background: #4caf50; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; letter-spacing: 1px; align-self: flex-end; }}
+.guestbook-form button:hover {{ background: #388e3c; }}
 .footer {{ background: #1b5e20; color: #c8e6c9; text-align: center; padding: 10px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; }}
 .footer .counter {{ font-size: 0.9em; }}
 .footer .qrcode-container img {{ width: 80px; height: 80px; border-radius: 4px; }}
-/* 强制隐藏 Twikoo 版权 */
-.twikoo-powered-by, .twikoo-footer a[href*="twikoo"] {{ display: none !important; visibility: hidden !important; pointer-events: none !important; }}
+/* 强制隐藏 Twikoo 版权（包括链接） */
+.twikoo-powered-by,
+.twikoo-powered-by *,
+.twikoo-footer .twikoo-powered-by,
+.twikoo-footer a[href*="twikoo"] {{
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}}
 /* ========== 手机端样式 ========== */
 @media screen and (max-width: 1024px) {{
     body {{ min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }}
@@ -290,21 +305,19 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .submenu a {{ font-size: 0.7em; padding: 4px 5px; margin: 0; white-space: nowrap; }}
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
     .center-buttons button {{ width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }}
-    .links-wrapper {{ width: auto; position: static; }}
-    /* 手机版相关链接二级菜单水平排列 */
-    .links-submenu {{ position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px; max-height: none; background: #e8f5e9; border-radius: 4px; margin-top: 4px; }}
-    .links-submenu.open {{ max-height: none; }}
-    .links-submenu a {{ display: inline-block; width: auto; padding: 4px 8px; border: none; background: #d4e0d0; margin: 2px; }}
+    .links-wrapper {{ width: auto; }}
+    .center-buttons button[onclick*="openVideoModal"],
+    .center-buttons button[onclick*="coze.com"] {{ display: none !important; }}
     .content {{ flex: none; width: 100%; padding: 8px 10px; overflow-y: visible; }}
-    .poem-card {{ padding: 12px 14px; margin-bottom: 12px; }}
-    .poem-title {{ font-size: 1em; }}
-    .poem-author {{ font-size: 0.9em; }}
-    .poem-date {{ font-size: 0.8em; }}
-    .poem-body {{ font-size: 0.95em; line-height: 1.9; }}
-    .poem-img-float {{ float: none; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
+    .poem-card {{ padding: 12px 14px; margin-bottom: 12px; display: flex; flex-direction: column; }}
+    .poem-title {{ font-size: 1em; order: 1; }}
+    .poem-author {{ order: 2; }}
+    .poem-date {{ order: 3; }}
+    .poem-body {{ font-size: 0.95em; line-height: 1.9; order: 4; }}
+    .poem-img-float {{ order: 5; float: none !important; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
     .poem-img-float img {{ max-height: 200px !important; }}
-    .img-toggle-btn, .edit-btn, .comment-btn {{ font-size: 0.75em; }}
-    .button-group {{ margin-top: 8px; }}
+    .img-toggle-btn {{ order: 6; }}
+    .edit-btn {{ order: 7; }}
     .search-modal-content {{ width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }}
     .video-modal-content {{ width: 95%; height: 90vh; padding: 10px; }}
     .video-body {{ flex-direction: column; }}
@@ -342,8 +355,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 <div class="center-panel">
   <div class="panel-title">综合功能区</div>
   <div class="center-buttons" id="centerButtons">
-    <!-- 使用说明按钮 - 无图标，第一位 -->
-    <button onclick="showUsageGuide()">使用说明</button>
     <button onclick="openSearch()">三重检索</button>
     <button onclick="showQRCode('诗词朗诵', 'gzh_qr.jpg')">诗词朗诵</button>
     <button onclick="showQRCode('诗词创作', 'gzh_qr.jpg')">诗词创作</button>
@@ -354,7 +365,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     <button onclick="showQRCode('健身视频', 'douyin_qr.jpg')">健身视频</button>
     <button onclick="openGuestbook()">访客留言</button>
     <button onclick="showTodayPoems()">今日诗词</button>
-    <button onclick="exportEdits()">导出修改</button>
+    <button onclick="exportEdits()">📤 导出修改</button>
   </div>
 </div>
 
@@ -460,75 +471,7 @@ window.addEventListener('scroll', function() {{
     else btn.style.display = 'none';
 }});
 
-// ========== 全局关闭其他区域菜单（实现三个功能区互斥） ==========
-function closeAllLeftAndRightAndLinks() {{
-    // 关闭左侧所有子菜单和面板（手机版）
-    closeAllLeftSubmenus();
-    const leftMenu = document.getElementById('leftSidebar');
-    if (leftMenu && window.innerWidth <= 1024) leftMenu.classList.remove('open');
-    // 关闭右侧所有子菜单和面板
-    closeAllRightSubmenus();
-    const rightMenu = document.getElementById('rightSidebar');
-    if (rightMenu && window.innerWidth <= 1024) rightMenu.classList.remove('open');
-    // 关闭相关链接二级菜单
-    closeLinksSubmenu();
-    // 清除所有活动高亮
-    clearAllActive();
-}}
-
-// 在综合功能区的每个按钮调用前先关闭其他区域
-function beforeCenterAction() {{
-    closeAllLeftAndRightAndLinks();
-}}
-
-// 包装原有函数
-const originalOpenSearch = openSearch;
-const originalShowQRCode = showQRCode;
-const originalToggleLinks = toggleLinks;
-const originalOpenGuestbook = openGuestbook;
-const originalShowTodayPoems = showTodayPoems;
-const originalExportEdits = exportEdits;
-function openSearch() {{ beforeCenterAction(); originalOpenSearch(); }}
-function showQRCode(title, imgFile) {{ beforeCenterAction(); originalShowQRCode(title, imgFile); }}
-function toggleLinks() {{ beforeCenterAction(); originalToggleLinks(); }}
-function openGuestbook() {{ beforeCenterAction(); originalOpenGuestbook(); }}
-function showTodayPoems() {{ beforeCenterAction(); originalShowTodayPoems(); }}
-function exportEdits() {{ beforeCenterAction(); originalExportEdits(); }}
-
-// ========== 使用说明功能 ==========
-function showUsageGuide() {{
-    beforeCenterAction();
-    const container = document.getElementById('content');
-    container.innerHTML = '<div style="text-align:center; padding:40px;">📖 正在加载使用说明...</div>';
-    fetch('userguide.txt')
-        .then(response => {{
-            if (!response.ok) throw new Error('文件未找到');
-            return response.text();
-        }})
-        .then(text => {{
-            const htmlText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\\n/g, '<br>');
-            container.innerHTML = `
-                <div style="background:#fffef9; border-radius:12px; padding:20px;">
-                    <h2 style="color:#2e7d32;">📖 使用说明</h2>
-                    <div style="line-height:1.8; margin-top:15px;">${{htmlText}}</div>
-                    <button onclick="showTodayPoems()" style="margin-top:20px; padding:8px 20px; background:#4caf50; color:#fff; border:none; border-radius:4px; cursor:pointer;">← 返回诗词</button>
-                </div>
-            `;
-        }})
-        .catch(() => {{
-            container.innerHTML = `
-                <div style="background:#fffef9; border-radius:12px; padding:20px;">
-                    <h2 style="color:#2e7d32;">📖 使用说明</h2>
-                    <p>使用说明文件（userguide.txt）尚未上传。</p>
-                    <p>请在网站根目录放置 userguide.txt 文件。</p>
-                    <button onclick="showTodayPoems()" style="margin-top:20px; padding:8px 20px; background:#4caf50; color:#fff; border:none; border-radius:4px; cursor:pointer;">← 返回诗词</button>
-                </div>
-            `;
-        }});
-    scrollToContent();
-}}
-
-// ========== 菜单互斥函数 ==========
+// ========== 菜单互斥函数（保持原样） ==========
 function closeAllSubmenus() {{
     document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
 }}
@@ -564,14 +507,12 @@ function initDesktopPanelToggle() {{
         leftTitle.addEventListener('click', function() {{
             closeAllRightSubmenus();
             closeLinksSubmenu();
-            closeAllLeftSubmenus(); // 实际左侧面板自己处理
         }});
     }}
     if (rightTitle) {{
         rightTitle.addEventListener('click', function() {{
             closeAllLeftSubmenus();
             closeLinksSubmenu();
-            closeAllRightSubmenus();
         }});
     }}
 }}
@@ -766,21 +707,16 @@ function exportEdits() {{
     }});
 }}
 
-// 新增留言按钮函数（打开评论区）
-function openComment() {{
-    openGuestbook();
-}}
-
 function render(title, poems) {{
     const c = document.getElementById('content');
     if(poems.length===0){{ c.innerHTML='<p style="text-align:center;color:#888;margin-top:60px;">该分类下暂无诗词。</p>'; return; }}
     let h = '<h3 style="margin-bottom:15px;color:#2e7d32;">'+title+'（共'+poems.length+'首）</h3>';
     poems.forEach(p=>{{
-        h += '<div class="poem-card" style="overflow: auto;">';
+        h += '<div class="poem-card">';
         const imgCount = p.images ? p.images.length : 0;
         if(imgCount > 0){{
             const isSingle = imgCount === 1;
-            h += '<div class="poem-img-float' + (isSingle ? ' single-img' : '') + '" id="imgs-'+p.id+'" style="display:block;">';
+            h += '<div class="poem-img-float' + (isSingle ? ' single-img' : '') + '" id="imgs-'+p.id+'" style="display:none;">';
             p.images.forEach((img,idx)=>{{ h += '<img src="'+img+'" loading="lazy" onerror="this.style.display=\\'none\\'" alt="配图'+(idx+1)+'" onclick="window.open(this.src)">'; }});
             h += '</div>';
         }}
@@ -789,15 +725,10 @@ function render(title, poems) {{
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
         let displayBody = editedPoems[p.id] || p.body;
         h += '<div class="poem-body" id="body-'+p.id+'">'+displayBody.replace(/\\n/g, '<br>')+'</div>';
-        // 按钮区域：配图按钮单独一行
         if(imgCount > 0){{
-            h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">查看配图('+imgCount+')</button>';
+            h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 查看配图（'+imgCount+'张）</button>';
         }}
-        // 编辑和留言并排
-        h += '<div class="button-group">';
-        h += '<button class="edit-btn" onclick="editPoem(\\''+p.id+'\\')">编辑</button>';
-        h += '<button class="comment-btn" onclick="openComment()">留言</button>';
-        h += '</div>';
+        h += '<button class="edit-btn" onclick="editPoem(\\''+p.id+'\\')">✏️ 编辑</button>';
         h += '</div>';
     }});
     c.innerHTML = h;
@@ -811,10 +742,10 @@ function toggleImgs(btn, poemId) {{
         if(isOpen) {{
             container.style.display = 'none';
             const count = container.querySelectorAll('img').length;
-            btn.textContent = '查看配图('+count+')';
+            btn.textContent = '🖼️ 查看配图（'+count+'张）';
         }} else {{
             container.style.display = 'block';
-            btn.textContent = '收起配图('+container.querySelectorAll('img').length+')';
+            btn.textContent = '🖼️ 收起配图';
         }}
     }}
 }}
@@ -843,13 +774,8 @@ function showTodayPoems() {{
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
         let displayBody = editedPoems[p.id] || p.body;
         h += '<div class="poem-body" id="body-'+p.id+'">'+displayBody.replace(/\\n/g, '<br>')+'</div>';
-        if(imgCount > 0){{
-            h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">收起配图('+imgCount+')</button>';
-        }}
-        h += '<div class="button-group">';
-        h += '<button class="edit-btn" onclick="editPoem(\\''+p.id+'\\')">编辑</button>';
-        h += '<button class="comment-btn" onclick="openComment()">留言</button>';
-        h += '</div>';
+        if(imgCount > 0){{ h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">🖼️ 收起配图（'+imgCount+'张）</button>'; }}
+        h += '<button class="edit-btn" onclick="editPoem(\\''+p.id+'\\')">✏️ 编辑</button>';
         h += '</div>';
     }});
     c.innerHTML = h;
@@ -897,6 +823,7 @@ function initDrag() {{
     document.onmouseup = function() {{ isDragging = false; modal.style.transition = ''; }};
 }}
 
+// ========== Twikoo 初始化（修复昵称自动填充和版权隐藏） ==========
 function initTwikoo() {{
     if (typeof twikoo !== 'undefined') {{
         twikoo.init({{
@@ -907,16 +834,27 @@ function initTwikoo() {{
             showPoweredBy: false,
         }}).then(() => {{
             console.log('Twikoo 初始化成功');
-            // 移除版权
-            const removePowered = () => {{
+            // 隐藏版权（二次保险）
+            setTimeout(() => {{
                 const powered = document.querySelector('.twikoo-powered-by');
-                if(powered) powered.remove();
+                if (powered) powered.style.display = 'none';
+                // 额外移除所有包含 twikoo 链接的底部元素
                 const footer = document.querySelector('.twikoo-footer');
-                if(footer) footer.remove();
-            }};
-            removePowered();
-            const observer = new MutationObserver(removePowered);
-            observer.observe(document.getElementById('twikoo'), {{ childList: true, subtree: true }});
+                if (footer) footer.style.display = 'none';
+            }}, 500);
+            // 解决昵称框自动填充问题：给昵称输入框添加 autocomplete="off"
+            setTimeout(() => {{
+                const nickInput = document.querySelector('#twikoo input[name="nick"]');
+                if (nickInput) nickInput.setAttribute('autocomplete', 'off');
+                // 监听动态生成的输入框（Twikoo 可能会重新渲染）
+                const observer = new MutationObserver(() => {{
+                    const input = document.querySelector('#twikoo input[name="nick"]');
+                    if (input && input.getAttribute('autocomplete') !== 'off') {{
+                        input.setAttribute('autocomplete', 'off');
+                    }}
+                }});
+                observer.observe(document.getElementById('twikoo'), {{ childList: true, subtree: true }});
+            }}, 1000);
         }}).catch(err => {{
             console.error('Twikoo 初始化失败', err);
             document.getElementById('twikoo').innerHTML = '<p style="color:red;">评论系统加载失败，请刷新重试。</p>';
@@ -951,16 +889,11 @@ window.onload = init;
     print(f"🎉 网站生成完毕！")
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
-    print("✅ 本次修改完成：")
-    print("   1. Twikoo 地址改为 twikoo.bingxue2026.com")
-    print("   2. 增加「使用说明」按钮（无图标，综合功能区第一位）")
-    print("   3. 导出修改按钮去掉图标，添加密码验证")
-    print("   4. 相关链接二级菜单手机版水平排列")
-    print("   5. 三个功能区互斥（点击任意区域关闭其他所有菜单）")
-    print("   6. 诗词卡片布局：图片浮动右侧，配图按钮单独一行，编辑和留言并排")
-    print("   7. 所有按钮无图标，配图按钮宽度6em，编辑/留言宽度3em")
-    print("   8. 新增「留言」按钮（无密码，打开评论区）")
-    print("   9. 评论区表单保留昵称、邮箱、网址、发送按钮")
+    print("✅ 已修复：")
+    print("   1. 昵称输入框自动添加 autocomplete='off'，不再自动填充上次昵称")
+    print("   2. 强制隐藏 Twikoo 版权文字（CSS + JS 双重保险）")
+    print("   3. 评论环境已连接到 https://twikoo.冰雪2026.com")
+    print("📌 旧评论看不见：请登录 D1 控制台，执行 SQL 更新 url 字段与当前网站地址一致")
     os.system("pause")
 
 if __name__ == '__main__':

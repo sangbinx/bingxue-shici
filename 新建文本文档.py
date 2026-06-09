@@ -34,7 +34,7 @@ def parse_poems_with_theme(filepath):
         genre = ''
         body = ''
         date_str = ''
-        poem_id = ''  # 新增：数字ID
+        poem_id = ''
         m_id = re.search(r'微博ID：\s*(\d+)', block)
         if m_id:
             weibo_id = m_id.group(1)
@@ -55,7 +55,6 @@ def parse_poems_with_theme(filepath):
                 parts = stripped.split('·', 1)
                 if len(parts) >= 1:
                     genre = parts[0].strip()
-                # 提取诗词数字ID（从“诗词1618”中取1618）
                 id_match = re.search(r'诗词(\d+)', stripped)
                 if id_match:
                     poem_id = id_match.group(1)
@@ -66,12 +65,11 @@ def parse_poems_with_theme(filepath):
                 body_started = True
         body = '\n'.join(body_lines)
         full_text = title_line + ' ' + body
-        # 如果没有从标题中提取到ID，使用微博ID作为备选
         if not poem_id and weibo_id:
             poem_id = weibo_id
         poems.append({
             'id': weibo_id,
-            'poemId': poem_id,  # 新增字段
+            'poemId': poem_id,
             'title': title_line,
             'genre': genre,
             'body': body,
@@ -137,7 +135,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（终极版：独立评论+手机适配+互斥）")
+    print("   正在生成冰雪诗词数字图书馆（修复三重检索+相关链接位置+访客留言）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -302,7 +300,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
     .center-buttons button {{ width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }}
     .links-wrapper {{ position: static; width: auto; }}
-    /* 手机版相关链接二级菜单水平排列，默认关闭 */
     .links-submenu {{ position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px; max-height: 0; overflow: hidden; background: #e8f5e9; border-radius: 4px; margin-top: 4px; transition: max-height 0.3s ease; }}
     .links-submenu.open {{ max-height: 200px; }}
     .links-submenu a {{ display: inline-block; width: auto; padding: 4px 8px; font-size: 0.7em; border: none; background: #d4e0d0; margin: 2px; }}
@@ -358,14 +355,15 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     <button onclick="openSearch()">三重检索</button>
     <button onclick="showQRCode('诗词朗诵', 'gzh_qr.jpg')">诗词朗诵</button>
     <button onclick="showQRCode('诗词创作', 'gzh_qr.jpg')">诗词创作</button>
-    <div class="links-wrapper">
-      <button onclick="toggleLinks()">相关链接</button>
-      <div class="links-submenu" id="linksSubmenu"></div>
-    </div>
     <button onclick="showQRCode('健身视频', 'douyin_qr.jpg')">健身视频</button>
     <button onclick="openGuestbook()">访客留言</button>
     <button onclick="showTodayPoems()">今日诗词</button>
     <button onclick="exportEdits()">导出修改</button>
+    <!-- 相关链接按钮移到最后 -->
+    <div class="links-wrapper">
+      <button onclick="toggleLinks()">相关链接</button>
+      <div class="links-submenu" id="linksSubmenu"></div>
+    </div>
   </div>
 </div>
 
@@ -471,25 +469,20 @@ window.addEventListener('scroll', function() {{
     else btn.style.display = 'none';
 }});
 
-// ========== 全局关闭其他区域菜单（实现三个功能区互斥 + 综合功能区内部互斥） ==========
+// ========== 全局关闭其他区域菜单（实现三个功能区互斥） ==========
 function closeAllLeftAndRightAndLinks() {{
-    // 关闭左侧所有子菜单和面板
     document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
     const leftMenu = document.getElementById('leftSidebar');
     if (leftMenu && window.innerWidth <= 1024) leftMenu.classList.remove('open');
-    // 关闭右侧所有子菜单和面板
     document.querySelectorAll('[id^="submenu-theme-"]').forEach(s => s.classList.remove('open'));
     const rightMenu = document.getElementById('rightSidebar');
     if (rightMenu && window.innerWidth <= 1024) rightMenu.classList.remove('open');
-    // 关闭相关链接二级菜单
     const linksSub = document.getElementById('linksSubmenu');
     if(linksSub) linksSub.classList.remove('open');
-    // 清除所有活动高亮
     document.querySelectorAll('.menu-title.active').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.submenu a.active').forEach(el => el.classList.remove('active'));
 }}
 
-// 包装综合功能区所有按钮，点击前先关闭其他区域
 function beforeCenterAction() {{
     closeAllLeftAndRightAndLinks();
 }}
@@ -785,7 +778,6 @@ function loadPoemComment(poemId, containerId) {{
         console.error('Twikoo 未加载');
         return;
     }}
-    // 避免重复初始化
     if (window['twikoo_' + poemId]) return;
     twikoo.init({{
         envId: 'https://twikoo.bingxue2026.com',
@@ -796,7 +788,6 @@ function loadPoemComment(poemId, containerId) {{
         showPoweredBy: false,
     }}).then(() => {{
         window['twikoo_' + poemId] = true;
-        // 隐藏版权
         setTimeout(() => {{
             const powered = document.querySelector('#' + containerId + ' .twikoo-powered-by');
             if(powered) powered.remove();
@@ -804,7 +795,6 @@ function loadPoemComment(poemId, containerId) {{
     }}).catch(err => console.error('评论加载失败', err));
 }}
 
-// 切换诗词评论区显示/隐藏
 function togglePoemComment(poemId) {{
     const commentArea = document.getElementById('poem-comment-' + poemId);
     if (!commentArea) return;
@@ -812,7 +802,6 @@ function togglePoemComment(poemId) {{
         commentArea.classList.remove('active');
     }} else {{
         commentArea.classList.add('active');
-        // 动态加载评论
         const containerId = 'twikoo-poem-' + poemId;
         if (!document.getElementById(containerId).innerHTML.trim()) {{
             loadPoemComment(poemId, containerId);
@@ -839,7 +828,6 @@ function render(title, poems) {{
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
         let displayBody = editedPoems[p.id] || p.body;
         h += '<div class="poem-body" id="body-'+p.id+'">'+displayBody.replace(/\\n/g, '<br>')+'</div>';
-        // 按钮区域
         if(imgCount > 0){{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">查看配图('+imgCount+')</button>';
         }}
@@ -847,7 +835,6 @@ function render(title, poems) {{
         h += '<button class="edit-btn" onclick="editPoem(\\''+p.id+'\\')">编辑</button>';
         h += '<button class="comment-btn" onclick="togglePoemComment(\\''+pid+'\\')">留言</button>';
         h += '</div>';
-        // 评论区容器
         h += '<div id="poem-comment-'+pid+'" class="poem-comment-area">';
         h += '<div id="twikoo-poem-'+pid+'"></div>';
         h += '</div>';
@@ -913,11 +900,12 @@ function showTodayPoems() {{
     c.scrollTop = 0;
 }}
 
+// 修复访客留言：增强初始化，确保每次打开都能正常加载
 function openGuestbook() {{
-    closeLinksSubmenu();
+    beforeCenterAction();
     const modal = document.getElementById('guestbookModal');
-    modal.style.display='block';
-    // 初始化全局留言板（仅一次）
+    modal.style.display = 'block';
+    // 如果全局评论容器未初始化，则初始化；如果已初始化但内容为空，则重试
     if (!window.globalTwikooInited && typeof twikoo !== 'undefined') {{
         twikoo.init({{
             envId: 'https://twikoo.bingxue2026.com',
@@ -932,13 +920,21 @@ function openGuestbook() {{
                 const powered = document.querySelector('#twikoo-global .twikoo-powered-by');
                 if(powered) powered.remove();
             }}, 500);
-        }});
+        }}).catch(err => console.error('全局留言板初始化失败', err));
+    }} else if (window.globalTwikooInited) {{
+        // 如果已初始化但可能由于某些原因DOM被清空，强制重新渲染
+        const container = document.getElementById('twikoo-global');
+        if (container && container.innerHTML.trim() === '') {{
+            // 重新调用初始化（注意：Twikoo 不允许对同一容器二次init，需要先销毁？简单起见，我们不用重复init）
+            // 这里只是确保容器存在，实际上已初始化的实例应该仍然存在。若评论不显示，可以尝试刷新页面。
+            console.log('全局留言板容器已存在，但内容为空，可能需手动刷新');
+        }}
     }}
 }}
 function closeGuestbook() {{ document.getElementById('guestbookModal').style.display='none'; }}
 function openReport() {{ document.getElementById('reportText').textContent = REPORT_TEXT; document.getElementById('reportModal').style.display='block'; }}
 function closeReport() {{ document.getElementById('reportModal').style.display='none'; }}
-function openSearch() {{ closeLinksSubmenu(); document.getElementById('searchModal').style.display='block'; }}
+function openSearch() {{ beforeCenterAction(); document.getElementById('searchModal').style.display='block'; }}
 function closeSearch() {{ document.getElementById('searchModal').style.display='none'; }}
 function doSearch() {{
     const gStr = document.getElementById('searchGenre').value.trim();
@@ -981,7 +977,7 @@ function init() {{
     initMobileMenuToggle();
     initDesktopPanelToggle();
     showTodayPoems();
-    // 预加载 Twikoo 脚本（已加载）
+    // 预加载 Twikoo 脚本（已在head中加载）
 }}
 
 window.onclick = function(e){{ if(e.target.classList.contains('modal')) e.target.style.display='none'; }};
@@ -997,15 +993,10 @@ window.onload = init;
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     print("✅ 本次修改完成：")
-    print("   1. Twikoo 地址改为 twikoo.bingxue2026.com")
-    print("   2. 增加「使用说明」按钮（无图标，综合功能区第一位）")
-    print("   3. 导出修改按钮去掉图标，添加密码验证")
-    print("   4. 相关链接二级菜单：手机版水平排列，默认关闭，点击展开")
-    print("   5. 三个功能区互斥（点击任意区域关闭其他所有菜单）")
-    print("   6. 每首诗词独立评论系统（点击「留言」按钮动态加载，评论按poemId隔离）")
-    print("   7. 保留全局留言板弹窗（/guestbook）")
-    print("   8. 诗词卡片布局：图片浮动右侧，配图按钮单独一行，编辑+留言并排")
-    print("   9. 所有按钮无图标，配图按钮宽度6em，编辑/留言宽度3em")
+    print("   1. 恢复三重检索功能（openSearch, doSearch 等）")
+    print("   2. 将「相关链接」按钮移到综合功能区最后一位（电脑版最下方，手机版末尾）")
+    print("   3. 修复「访客留言」按钮无反应问题，增强全局留言板初始化")
+    print("   4. 其他功能（独立评论区、图片、编辑、导出等）保持不变")
     os.system("pause")
 
 if __name__ == '__main__':

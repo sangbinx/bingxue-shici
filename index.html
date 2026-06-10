@@ -111,6 +111,33 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 .footer .qrcode-container img { width: 80px; height: 80px; border-radius: 4px; }
 /* 强制隐藏 Twikoo 版权 */
 .twikoo-powered-by, .twikoo-footer a[href*="twikoo"] { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+/* AI写诗模态框额外样式 */
+#aiPoemModal .ai-poem-form-group {
+    margin-bottom: 15px;
+}
+#aiPoemModal .ai-poem-form-group label {
+    display: inline-block;
+    width: 100px;
+    font-weight: bold;
+}
+#aiPoemModal .ai-poem-form-group input, 
+#aiPoemModal .ai-poem-form-group select {
+    width: calc(100% - 110px);
+    padding: 5px;
+}
+#aiPoemModal .ai-poem-form-group textarea {
+    width: calc(100% - 110px);
+    height: 80px;
+    padding: 5px;
+}
+#aiPoemModal .ai-poem-result {
+    margin-top: 15px;
+    background: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    font-family: "楷体", KaiTi, serif;
+}
 /* ========== 手机端样式 ========== */
 @media screen and (max-width: 1024px) {
     body { min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }
@@ -193,7 +220,8 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
     <button onclick="showUsageGuide()">使用说明</button>
     <button onclick="openSearch()">三重检索</button>
     <button onclick="showQRCode('诗词朗诵', 'gzh_qr.jpg')">诗词朗诵</button>
-    <button onclick="showQRCode('诗词创作', 'gzh_qr.jpg')">诗词创作</button>
+    <!-- AI写诗按钮，替换原来的诗词创作 -->
+    <button onclick="openAiPoem()">AI写诗</button>
     <button onclick="showQRCode('健身视频', 'douyin_qr.jpg')">健身视频</button>
     <button onclick="openGuestbook()">访客留言</button>
     <button onclick="showTodayPoems()">今日诗词</button>
@@ -259,6 +287,43 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 </div>
 </div>
 
+<!-- AI写诗模态框 -->
+<div class="modal" id="aiPoemModal">
+<div class="guestbook-modal-content" style="width: 60%; max-width: 600px;">
+<span class="modal-close" onclick="closeAiPoem()">&times;</span>
+<h3>🤖 AI写诗</h3>
+<div>
+  <div class="ai-poem-form-group">
+    <label>韵律：</label>
+    <select id="aiRhyme">
+      <option value="1">平水韵</option>
+      <option value="2">中华新韵</option>
+    </select>
+  </div>
+  <div class="ai-poem-form-group">
+    <label>体裁：</label>
+    <select id="aiGenre">
+      <option value="1">五绝</option>
+      <option value="2">五律</option>
+      <option value="3">七绝</option>
+      <option value="4">七律</option>
+      <option value="5">其他词牌</option>
+    </select>
+    <div id="ciPaiGroup" style="display:none; margin-top:5px;">
+      <label>词牌名：</label>
+      <input type="text" id="aiCiPai" placeholder="如：浣溪沙、清平乐">
+    </div>
+  </div>
+  <div class="ai-poem-form-group">
+    <label>关键词/描述：</label>
+    <textarea id="aiPrompt" placeholder="输入几个关键词或用一段话描述您想要的诗词内容，例如：春天 花朵 思乡"></textarea>
+  </div>
+  <button class="search-btn" onclick="generatePoem()" style="margin-left:0;">生成诗词</button>
+  <div id="aiPoemResult" class="ai-poem-result" style="display:none;"></div>
+</div>
+</div>
+</div>
+
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script src="https://unpkg.com/twikoo@1.6.40/dist/twikoo.all.min.js"></script>
 <script>
@@ -267,6 +332,8 @@ const REPORT_TEXT = "╔══════════════════�
 const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = [{"name": "搜韵", "url": "https://sou-yun.cn/"}, {"name": "诗词吾爱", "url": "https://www.52shici.com/"}, {"name": "古诗词网", "url": "https://www.gushiwen.cn/"}, {"name": "微信公众号", "type": "qrcode", "img": "gzh_qr.jpg"}, {"name": "抖音视频", "type": "qrcode", "img": "douyin_qr.jpg"}];
+
+// 注意：DeepSeek API Key 已在 Cloudflare Worker 环境变量中安全存储，前端通过 Worker 代理调用
 
 // ========== 本地编辑管理 ==========
 let editedPoems = JSON.parse(localStorage.getItem('editedPoems') || '{}');
@@ -308,7 +375,7 @@ window.addEventListener('scroll', function() {
     else btn.style.display = 'none';
 });
 
-// ========== 全局关闭其他区域菜单（实现三个功能区互斥） ==========
+// ========== 全局关闭其他区域菜单 ==========
 function closeAllLeftAndRightAndLinks() {
     document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
     const leftMenu = document.getElementById('leftSidebar');
@@ -611,7 +678,92 @@ function exportEdits() {
     });
 }
 
-// 为每首诗词独立加载评论（动态，按需）
+// ========== AI写诗功能（通过Cloudflare Worker代理，安全调用DeepSeek API） ==========
+function openAiPoem() {
+    beforeCenterAction();
+    document.getElementById('aiPoemModal').style.display = 'block';
+    // 重置表单
+    document.getElementById('aiGenre').value = '1';
+    document.getElementById('aiCiPai').value = '';
+    document.getElementById('aiPrompt').value = '';
+    document.getElementById('aiPoemResult').style.display = 'none';
+    document.getElementById('ciPaiGroup').style.display = 'none';
+}
+function closeAiPoem() {
+    document.getElementById('aiPoemModal').style.display = 'none';
+}
+// 监听体裁选择变化
+document.addEventListener('DOMContentLoaded', function() {
+    const genreSelect = document.getElementById('aiGenre');
+    if (genreSelect) {
+        genreSelect.addEventListener('change', function() {
+            const ciPaiGroup = document.getElementById('ciPaiGroup');
+            if (this.value === '5') {
+                ciPaiGroup.style.display = 'block';
+            } else {
+                ciPaiGroup.style.display = 'none';
+            }
+        });
+    }
+});
+async function generatePoem() {
+    const rhyme = document.getElementById('aiRhyme').value;
+    const genreVal = document.getElementById('aiGenre').value;
+    let genreText = '';
+    let ciPai = '';
+    if (genreVal === '1') genreText = '五绝';
+    else if (genreVal === '2') genreText = '五律';
+    else if (genreVal === '3') genreText = '七绝';
+    else if (genreVal === '4') genreText = '七律';
+    else if (genreVal === '5') {
+        ciPai = document.getElementById('aiCiPai').value.trim();
+        if (!ciPai) {
+            alert('请输入词牌名');
+            return;
+        }
+        genreText = ciPai;
+    }
+    const promptText = document.getElementById('aiPrompt').value.trim();
+    if (!promptText) {
+        alert('请输入关键词或描述');
+        return;
+    }
+    const resultDiv = document.getElementById('aiPoemResult');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '⏳ AI 正在创作中，请稍候...';
+    try {
+        // 调用 Cloudflare Worker 代理接口（安全，无需暴露 API Key）
+        const response = await fetch('/api/generate-poem', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                rhyme: rhyme,
+                genre: genreText,
+                ciPai: ciPai,
+                prompt: promptText
+            })
+        });
+        const data = await response.json();
+        if (data.poem) {
+            resultDiv.innerHTML = `<strong>生成的诗词：</strong><br>${data.poem.replace(/\n/g, '<br>')}<br><button class="search-btn" style="margin-top:10px;" onclick="copyPoem()">复制诗词</button>`;
+            window.lastGeneratedPoem = data.poem;
+        } else {
+            resultDiv.innerHTML = `生成失败：${data.error || '未知错误'}`;
+        }
+    } catch (err) {
+        resultDiv.innerHTML = `网络错误：${err.message}`;
+    }
+}
+function copyPoem() {
+    if (window.lastGeneratedPoem) {
+        navigator.clipboard.writeText(window.lastGeneratedPoem);
+        alert('已复制诗词到剪贴板');
+    }
+}
+
+// ========== 每首诗词独立评论 ==========
 function loadPoemComment(poemId, containerId) {
     if (typeof twikoo === 'undefined') {
         console.error('Twikoo 未加载');
@@ -627,6 +779,22 @@ function loadPoemComment(poemId, containerId) {
         showPoweredBy: false,
     }).then(() => {
         window['twikoo_' + poemId] = true;
+        // 清空昵称框（监听评论提交事件）
+        const clearNickname = () => {
+            setTimeout(() => {
+                const nickInputs = document.querySelectorAll('#' + containerId + ' .tk-nick');
+                nickInputs.forEach(input => input.value = '');
+            }, 100);
+        };
+        const observer = new MutationObserver(() => {
+            const submitBtn = document.querySelector('#' + containerId + ' .tk-submit');
+            if (submitBtn && !submitBtn.hasAttribute('data-listener')) {
+                submitBtn.setAttribute('data-listener', 'true');
+                submitBtn.addEventListener('click', clearNickname);
+            }
+        });
+        observer.observe(document.getElementById(containerId), { childList: true, subtree: true });
+        // 隐藏版权
         setTimeout(() => {
             const powered = document.querySelector('#' + containerId + ' .twikoo-powered-by');
             if(powered) powered.remove();
@@ -739,13 +907,13 @@ function showTodayPoems() {
     c.scrollTop = 0;
 }
 
-// 修复访客留言：增强初始化，确保每次打开都能正常加载
+// ========== 全局留言板（访客留言） ==========
+let globalTwikooInited = false;
 function openGuestbook() {
     beforeCenterAction();
     const modal = document.getElementById('guestbookModal');
     modal.style.display = 'block';
-    // 如果全局评论容器未初始化，则初始化；如果已初始化但内容为空，则重试
-    if (!window.globalTwikooInited && typeof twikoo !== 'undefined') {
+    if (!globalTwikooInited && typeof twikoo !== 'undefined') {
         twikoo.init({
             envId: 'https://twikoo.bingxue2026.com',
             el: '#twikoo-global',
@@ -754,20 +922,26 @@ function openGuestbook() {
             pageSize: 20,
             showPoweredBy: false,
         }).then(() => {
-            window.globalTwikooInited = true;
+            globalTwikooInited = true;
+            const clearGlobalNick = () => {
+                setTimeout(() => {
+                    const nickInput = document.querySelector('#twikoo-global .tk-nick');
+                    if (nickInput) nickInput.value = '';
+                }, 100);
+            };
+            const observer = new MutationObserver(() => {
+                const submitBtn = document.querySelector('#twikoo-global .tk-submit');
+                if (submitBtn && !submitBtn.hasAttribute('data-listener')) {
+                    submitBtn.setAttribute('data-listener', 'true');
+                    submitBtn.addEventListener('click', clearGlobalNick);
+                }
+            });
+            observer.observe(document.getElementById('twikoo-global'), { childList: true, subtree: true });
             setTimeout(() => {
                 const powered = document.querySelector('#twikoo-global .twikoo-powered-by');
                 if(powered) powered.remove();
             }, 500);
         }).catch(err => console.error('全局留言板初始化失败', err));
-    } else if (window.globalTwikooInited) {
-        // 如果已初始化但可能由于某些原因DOM被清空，强制重新渲染
-        const container = document.getElementById('twikoo-global');
-        if (container && container.innerHTML.trim() === '') {
-            // 重新调用初始化（注意：Twikoo 不允许对同一容器二次init，需要先销毁？简单起见，我们不用重复init）
-            // 这里只是确保容器存在，实际上已初始化的实例应该仍然存在。若评论不显示，可以尝试刷新页面。
-            console.log('全局留言板容器已存在，但内容为空，可能需手动刷新');
-        }
     }
 }
 function closeGuestbook() { document.getElementById('guestbookModal').style.display='none'; }
@@ -816,7 +990,6 @@ function init() {
     initMobileMenuToggle();
     initDesktopPanelToggle();
     showTodayPoems();
-    // 预加载 Twikoo 脚本（已在head中加载）
 }
 
 window.onclick = function(e){ if(e.target.classList.contains('modal')) e.target.style.display='none'; };

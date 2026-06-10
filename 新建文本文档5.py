@@ -12,8 +12,6 @@ FITNESS_VIDEO_DIR = '健身锻炼视频'
 OUTPUT_HTML = 'index.html'
 # -------------------------
 
-# 注意：DeepSeek API Key 已设置在 Cloudflare Worker 的环境变量中，前端脚本中不再需要硬编码
-
 FRIENDLY_LINKS = [
     {'name': '搜韵', 'url': 'https://sou-yun.cn/'},
     {'name': '诗词吾爱', 'url': 'https://www.52shici.com/'},
@@ -137,7 +135,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（最终稳定版：AI写诗代理+留言修复+统计）")
+    print("   正在生成冰雪诗词数字图书馆（修复三重检索+相关链接位置+访客留言）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -274,33 +272,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .footer .qrcode-container img {{ width: 80px; height: 80px; border-radius: 4px; }}
 /* 强制隐藏 Twikoo 版权 */
 .twikoo-powered-by, .twikoo-footer a[href*="twikoo"] {{ display: none !important; visibility: hidden !important; pointer-events: none !important; }}
-/* AI写诗模态框额外样式 */
-#aiPoemModal .ai-poem-form-group {{
-    margin-bottom: 15px;
-}}
-#aiPoemModal .ai-poem-form-group label {{
-    display: inline-block;
-    width: 100px;
-    font-weight: bold;
-}}
-#aiPoemModal .ai-poem-form-group input, 
-#aiPoemModal .ai-poem-form-group select {{
-    width: calc(100% - 110px);
-    padding: 5px;
-}}
-#aiPoemModal .ai-poem-form-group textarea {{
-    width: calc(100% - 110px);
-    height: 80px;
-    padding: 5px;
-}}
-#aiPoemModal .ai-poem-result {{
-    margin-top: 15px;
-    background: #f0f0f0;
-    padding: 10px;
-    border-radius: 5px;
-    white-space: pre-wrap;
-    font-family: "楷体", KaiTi, serif;
-}}
 /* ========== 手机端样式 ========== */
 @media screen and (max-width: 1024px) {{
     body {{ min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }}
@@ -383,8 +354,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     <button onclick="showUsageGuide()">使用说明</button>
     <button onclick="openSearch()">三重检索</button>
     <button onclick="showQRCode('诗词朗诵', 'gzh_qr.jpg')">诗词朗诵</button>
-    <!-- AI写诗按钮，替换原来的诗词创作 -->
-    <button onclick="openAiPoem()">AI写诗</button>
+    <button onclick="showQRCode('诗词创作', 'gzh_qr.jpg')">诗词创作</button>
     <button onclick="showQRCode('健身视频', 'douyin_qr.jpg')">健身视频</button>
     <button onclick="openGuestbook()">访客留言</button>
     <button onclick="showTodayPoems()">今日诗词</button>
@@ -450,43 +420,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 </div>
 </div>
 
-<!-- AI写诗模态框 -->
-<div class="modal" id="aiPoemModal">
-<div class="guestbook-modal-content" style="width: 60%; max-width: 600px;">
-<span class="modal-close" onclick="closeAiPoem()">&times;</span>
-<h3>🤖 AI写诗</h3>
-<div>
-  <div class="ai-poem-form-group">
-    <label>韵律：</label>
-    <select id="aiRhyme">
-      <option value="1">平水韵</option>
-      <option value="2">中华新韵</option>
-    </select>
-  </div>
-  <div class="ai-poem-form-group">
-    <label>体裁：</label>
-    <select id="aiGenre">
-      <option value="1">五绝</option>
-      <option value="2">五律</option>
-      <option value="3">七绝</option>
-      <option value="4">七律</option>
-      <option value="5">其他词牌</option>
-    </select>
-    <div id="ciPaiGroup" style="display:none; margin-top:5px;">
-      <label>词牌名：</label>
-      <input type="text" id="aiCiPai" placeholder="如：浣溪沙、清平乐">
-    </div>
-  </div>
-  <div class="ai-poem-form-group">
-    <label>关键词/描述：</label>
-    <textarea id="aiPrompt" placeholder="输入几个关键词或用一段话描述您想要的诗词内容，例如：春天 花朵 思乡"></textarea>
-  </div>
-  <button class="search-btn" onclick="generatePoem()" style="margin-left:0;">生成诗词</button>
-  <div id="aiPoemResult" class="ai-poem-result" style="display:none;"></div>
-</div>
-</div>
-</div>
-
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script src="https://unpkg.com/twikoo@1.6.40/dist/twikoo.all.min.js"></script>
 <script>
@@ -495,8 +428,6 @@ const REPORT_TEXT = {report_escaped};
 const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
-
-// 注意：DeepSeek API Key 已在 Cloudflare Worker 环境变量中安全存储，前端通过 Worker 代理调用
 
 // ========== 本地编辑管理 ==========
 let editedPoems = JSON.parse(localStorage.getItem('editedPoems') || '{{}}');
@@ -538,7 +469,7 @@ window.addEventListener('scroll', function() {{
     else btn.style.display = 'none';
 }});
 
-// ========== 全局关闭其他区域菜单 ==========
+// ========== 全局关闭其他区域菜单（实现三个功能区互斥） ==========
 function closeAllLeftAndRightAndLinks() {{
     document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
     const leftMenu = document.getElementById('leftSidebar');
@@ -841,92 +772,7 @@ function exportEdits() {{
     }});
 }}
 
-// ========== AI写诗功能（通过Cloudflare Worker代理，安全调用DeepSeek API） ==========
-function openAiPoem() {{
-    beforeCenterAction();
-    document.getElementById('aiPoemModal').style.display = 'block';
-    // 重置表单
-    document.getElementById('aiGenre').value = '1';
-    document.getElementById('aiCiPai').value = '';
-    document.getElementById('aiPrompt').value = '';
-    document.getElementById('aiPoemResult').style.display = 'none';
-    document.getElementById('ciPaiGroup').style.display = 'none';
-}}
-function closeAiPoem() {{
-    document.getElementById('aiPoemModal').style.display = 'none';
-}}
-// 监听体裁选择变化
-document.addEventListener('DOMContentLoaded', function() {{
-    const genreSelect = document.getElementById('aiGenre');
-    if (genreSelect) {{
-        genreSelect.addEventListener('change', function() {{
-            const ciPaiGroup = document.getElementById('ciPaiGroup');
-            if (this.value === '5') {{
-                ciPaiGroup.style.display = 'block';
-            }} else {{
-                ciPaiGroup.style.display = 'none';
-            }}
-        }});
-    }}
-}});
-async function generatePoem() {{
-    const rhyme = document.getElementById('aiRhyme').value;
-    const genreVal = document.getElementById('aiGenre').value;
-    let genreText = '';
-    let ciPai = '';
-    if (genreVal === '1') genreText = '五绝';
-    else if (genreVal === '2') genreText = '五律';
-    else if (genreVal === '3') genreText = '七绝';
-    else if (genreVal === '4') genreText = '七律';
-    else if (genreVal === '5') {{
-        ciPai = document.getElementById('aiCiPai').value.trim();
-        if (!ciPai) {{
-            alert('请输入词牌名');
-            return;
-        }}
-        genreText = ciPai;
-    }}
-    const promptText = document.getElementById('aiPrompt').value.trim();
-    if (!promptText) {{
-        alert('请输入关键词或描述');
-        return;
-    }}
-    const resultDiv = document.getElementById('aiPoemResult');
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '⏳ AI 正在创作中，请稍候...';
-    try {{
-        // 调用 Cloudflare Worker 代理接口（安全，无需暴露 API Key）
-        const response = await fetch('/api/generate-poem', {{
-            method: 'POST',
-            headers: {{
-                'Content-Type': 'application/json',
-            }},
-            body: JSON.stringify({{
-                rhyme: rhyme,
-                genre: genreText,
-                ciPai: ciPai,
-                prompt: promptText
-            }})
-        }});
-        const data = await response.json();
-        if (data.poem) {{
-            resultDiv.innerHTML = `<strong>生成的诗词：</strong><br>${{data.poem.replace(/\\n/g, '<br>')}}<br><button class="search-btn" style="margin-top:10px;" onclick="copyPoem()">复制诗词</button>`;
-            window.lastGeneratedPoem = data.poem;
-        }} else {{
-            resultDiv.innerHTML = `生成失败：${{data.error || '未知错误'}}`;
-        }}
-    }} catch (err) {{
-        resultDiv.innerHTML = `网络错误：${{err.message}}`;
-    }}
-}}
-function copyPoem() {{
-    if (window.lastGeneratedPoem) {{
-        navigator.clipboard.writeText(window.lastGeneratedPoem);
-        alert('已复制诗词到剪贴板');
-    }}
-}}
-
-// ========== 每首诗词独立评论 ==========
+// 为每首诗词独立加载评论（动态，按需）
 function loadPoemComment(poemId, containerId) {{
     if (typeof twikoo === 'undefined') {{
         console.error('Twikoo 未加载');
@@ -942,22 +788,6 @@ function loadPoemComment(poemId, containerId) {{
         showPoweredBy: false,
     }}).then(() => {{
         window['twikoo_' + poemId] = true;
-        // 清空昵称框（监听评论提交事件）
-        const clearNickname = () => {{
-            setTimeout(() => {{
-                const nickInputs = document.querySelectorAll('#' + containerId + ' .tk-nick');
-                nickInputs.forEach(input => input.value = '');
-            }}, 100);
-        }};
-        const observer = new MutationObserver(() => {{
-            const submitBtn = document.querySelector('#' + containerId + ' .tk-submit');
-            if (submitBtn && !submitBtn.hasAttribute('data-listener')) {{
-                submitBtn.setAttribute('data-listener', 'true');
-                submitBtn.addEventListener('click', clearNickname);
-            }}
-        }});
-        observer.observe(document.getElementById(containerId), {{ childList: true, subtree: true }});
-        // 隐藏版权
         setTimeout(() => {{
             const powered = document.querySelector('#' + containerId + ' .twikoo-powered-by');
             if(powered) powered.remove();
@@ -1070,13 +900,13 @@ function showTodayPoems() {{
     c.scrollTop = 0;
 }}
 
-// ========== 全局留言板（访客留言） ==========
-let globalTwikooInited = false;
+// 修复访客留言：增强初始化，确保每次打开都能正常加载
 function openGuestbook() {{
     beforeCenterAction();
     const modal = document.getElementById('guestbookModal');
     modal.style.display = 'block';
-    if (!globalTwikooInited && typeof twikoo !== 'undefined') {{
+    // 如果全局评论容器未初始化，则初始化；如果已初始化但内容为空，则重试
+    if (!window.globalTwikooInited && typeof twikoo !== 'undefined') {{
         twikoo.init({{
             envId: 'https://twikoo.bingxue2026.com',
             el: '#twikoo-global',
@@ -1085,26 +915,20 @@ function openGuestbook() {{
             pageSize: 20,
             showPoweredBy: false,
         }}).then(() => {{
-            globalTwikooInited = true;
-            const clearGlobalNick = () => {{
-                setTimeout(() => {{
-                    const nickInput = document.querySelector('#twikoo-global .tk-nick');
-                    if (nickInput) nickInput.value = '';
-                }}, 100);
-            }};
-            const observer = new MutationObserver(() => {{
-                const submitBtn = document.querySelector('#twikoo-global .tk-submit');
-                if (submitBtn && !submitBtn.hasAttribute('data-listener')) {{
-                    submitBtn.setAttribute('data-listener', 'true');
-                    submitBtn.addEventListener('click', clearGlobalNick);
-                }}
-            }});
-            observer.observe(document.getElementById('twikoo-global'), {{ childList: true, subtree: true }});
+            window.globalTwikooInited = true;
             setTimeout(() => {{
                 const powered = document.querySelector('#twikoo-global .twikoo-powered-by');
                 if(powered) powered.remove();
             }}, 500);
         }}).catch(err => console.error('全局留言板初始化失败', err));
+    }} else if (window.globalTwikooInited) {{
+        // 如果已初始化但可能由于某些原因DOM被清空，强制重新渲染
+        const container = document.getElementById('twikoo-global');
+        if (container && container.innerHTML.trim() === '') {{
+            // 重新调用初始化（注意：Twikoo 不允许对同一容器二次init，需要先销毁？简单起见，我们不用重复init）
+            // 这里只是确保容器存在，实际上已初始化的实例应该仍然存在。若评论不显示，可以尝试刷新页面。
+            console.log('全局留言板容器已存在，但内容为空，可能需手动刷新');
+        }}
     }}
 }}
 function closeGuestbook() {{ document.getElementById('guestbookModal').style.display='none'; }}
@@ -1153,6 +977,7 @@ function init() {{
     initMobileMenuToggle();
     initDesktopPanelToggle();
     showTodayPoems();
+    // 预加载 Twikoo 脚本（已在head中加载）
 }}
 
 window.onclick = function(e){{ if(e.target.classList.contains('modal')) e.target.style.display='none'; }};
@@ -1168,15 +993,10 @@ window.onload = init;
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     print("✅ 本次修改完成：")
-    print("   1. 恢复三重检索功能")
-    print("   2. 相关链接移到最后，手机版水平排列")
-    print("   3. 新增AI写诗功能（通过Cloudflare Worker代理，安全调用DeepSeek API）")
-    print("   4. 完善百度统计（今日访客独立计数）")
-    print("   5. 评论昵称自动清零（通过监听提交事件）")
-    print("   6. 评论区版权彻底隐藏")
-    print("   7. 全局留言板与诗词独立留言严格隔离（path不同）")
-    print("   8. 修复访客留言按钮稳定性")
-    print("⚠️  请确保 Cloudflare Worker 中已设置 DEEPSEEK_API_KEY 环境变量")
+    print("   1. 恢复三重检索功能（openSearch, doSearch 等）")
+    print("   2. 将「相关链接」按钮移到综合功能区最后一位（电脑版最下方，手机版末尾）")
+    print("   3. 修复「访客留言」按钮无反应问题，增强全局留言板初始化")
+    print("   4. 其他功能（独立评论区、图片、编辑、导出等）保持不变")
     os.system("pause")
 
 if __name__ == '__main__':

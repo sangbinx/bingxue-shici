@@ -12,7 +12,8 @@ FITNESS_VIDEO_DIR = '健身锻炼视频'
 OUTPUT_HTML = 'index.html'
 # -------------------------
 
-# 注意：DeepSeek API Key 已设置在 Cloudflare Worker 的环境变量中，前端脚本中不再需要硬编码
+DEEPSEEK_API_KEY = "YOUR_DEEPSEEK_API_KEY"  # 注：此变量不再使用，实际API Key已在Cloudflare Worker中配置，仅前端调用 Worker 地址
+AI_POEM_WORKER_URL = "https://poem.bingxue2026.com"  # AI写诗独立服务地址
 
 FRIENDLY_LINKS = [
     {'name': '搜韵', 'url': 'https://sou-yun.cn/'},
@@ -57,9 +58,15 @@ def parse_poems_with_theme(filepath):
                 parts = stripped.split('·', 1)
                 if len(parts) >= 1:
                     genre = parts[0].strip()
+                # 提取数字ID（优先从“诗词1618”中取1618，兼容各种格式）
                 id_match = re.search(r'诗词(\d+)', stripped)
                 if id_match:
                     poem_id = id_match.group(1)
+                else:
+                    # 若没有“诗词数字”模式，尝试提取任意连续数字
+                    num_match = re.search(r'\b(\d+)\b', stripped)
+                    if num_match and not poem_id:
+                        poem_id = num_match.group(1)
             if author_found and body_started:
                 if stripped and not stripped.startswith('图片') and stripped != '(无配图)':
                     body_lines.append(stripped)
@@ -67,8 +74,9 @@ def parse_poems_with_theme(filepath):
                 body_started = True
         body = '\n'.join(body_lines)
         full_text = title_line + ' ' + body
-        if not poem_id and weibo_id:
-            poem_id = weibo_id
+        # 后备ID：使用微博ID或临时生成
+        if not poem_id:
+            poem_id = weibo_id if weibo_id else str(abs(hash(title_line)) % 1000000)
         poems.append({
             'id': weibo_id,
             'poemId': poem_id,
@@ -137,7 +145,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（最终稳定版：AI写诗代理+留言修复+统计）")
+    print("   正在生成冰雪诗词数字图书馆（最终修复版：留言显示+AI写诗独立）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -383,13 +391,11 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     <button onclick="showUsageGuide()">使用说明</button>
     <button onclick="openSearch()">三重检索</button>
     <button onclick="showQRCode('诗词朗诵', 'gzh_qr.jpg')">诗词朗诵</button>
-    <!-- AI写诗按钮，替换原来的诗词创作 -->
     <button onclick="openAiPoem()">AI写诗</button>
     <button onclick="showQRCode('健身视频', 'douyin_qr.jpg')">健身视频</button>
     <button onclick="openGuestbook()">访客留言</button>
     <button onclick="showTodayPoems()">今日诗词</button>
     <button onclick="exportEdits()">导出修改</button>
-    <!-- 相关链接按钮移到最后 -->
     <div class="links-wrapper">
       <button onclick="toggleLinks()">相关链接</button>
       <div class="links-submenu" id="linksSubmenu"></div>
@@ -495,8 +501,6 @@ const REPORT_TEXT = {report_escaped};
 const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
-
-// 注意：DeepSeek API Key 已在 Cloudflare Worker 环境变量中安全存储，前端通过 Worker 代理调用
 
 // ========== 本地编辑管理 ==========
 let editedPoems = JSON.parse(localStorage.getItem('editedPoems') || '{{}}');
@@ -841,7 +845,8 @@ function exportEdits() {{
     }});
 }}
 
-// ========== AI写诗功能（通过Cloudflare Worker代理，安全调用DeepSeek API） ==========
+// ========== AI写诗功能（独立Worker调用）==========
+let globalTwikooInited = false;
 function openAiPoem() {{
     beforeCenterAction();
     document.getElementById('aiPoemModal').style.display = 'block';
@@ -855,7 +860,6 @@ function openAiPoem() {{
 function closeAiPoem() {{
     document.getElementById('aiPoemModal').style.display = 'none';
 }}
-// 监听体裁选择变化
 document.addEventListener('DOMContentLoaded', function() {{
     const genreSelect = document.getElementById('aiGenre');
     if (genreSelect) {{
@@ -872,22 +876,22 @@ document.addEventListener('DOMContentLoaded', function() {{
 async function generatePoem() {{
     const rhyme = document.getElementById('aiRhyme').value;
     const genreVal = document.getElementById('aiGenre').value;
-    let genreText = '';
+    let genre = '';
     let ciPai = '';
-    if (genreVal === '1') genreText = '五绝';
-    else if (genreVal === '2') genreText = '五律';
-    else if (genreVal === '3') genreText = '七绝';
-    else if (genreVal === '4') genreText = '七律';
+    if (genreVal === '1') genre = '五绝';
+    else if (genreVal === '2') genre = '五律';
+    else if (genreVal === '3') genre = '七绝';
+    else if (genreVal === '4') genre = '七律';
     else if (genreVal === '5') {{
         ciPai = document.getElementById('aiCiPai').value.trim();
         if (!ciPai) {{
             alert('请输入词牌名');
             return;
         }}
-        genreText = ciPai;
+        genre = ciPai;
     }}
-    const promptText = document.getElementById('aiPrompt').value.trim();
-    if (!promptText) {{
+    const prompt = document.getElementById('aiPrompt').value.trim();
+    if (!prompt) {{
         alert('请输入关键词或描述');
         return;
     }}
@@ -895,25 +899,19 @@ async function generatePoem() {{
     resultDiv.style.display = 'block';
     resultDiv.innerHTML = '⏳ AI 正在创作中，请稍候...';
     try {{
-        // 调用 Cloudflare Worker 代理接口（安全，无需暴露 API Key）
-        const response = await fetch('/api/generate-poem', {{
+        const response = await fetch('https://poem.bingxue2026.com', {{
             method: 'POST',
-            headers: {{
-                'Content-Type': 'application/json',
-            }},
-            body: JSON.stringify({{
-                rhyme: rhyme,
-                genre: genreText,
-                ciPai: ciPai,
-                prompt: promptText
-            }})
+            headers: {{ 'Content-Type': 'application/json' }},
+            body: JSON.stringify({{ rhyme, genre, ciPai, prompt }})
         }});
         const data = await response.json();
         if (data.poem) {{
             resultDiv.innerHTML = `<strong>生成的诗词：</strong><br>${{data.poem.replace(/\\n/g, '<br>')}}<br><button class="search-btn" style="margin-top:10px;" onclick="copyPoem()">复制诗词</button>`;
             window.lastGeneratedPoem = data.poem;
+        }} else if (data.error) {{
+            resultDiv.innerHTML = `生成失败：${{data.error}}`;
         }} else {{
-            resultDiv.innerHTML = `生成失败：${{data.error || '未知错误'}}`;
+            resultDiv.innerHTML = `生成失败，请稍后重试。`;
         }}
     }} catch (err) {{
         resultDiv.innerHTML = `网络错误：${{err.message}}`;
@@ -942,25 +940,30 @@ function loadPoemComment(poemId, containerId) {{
         showPoweredBy: false,
     }}).then(() => {{
         window['twikoo_' + poemId] = true;
-        // 清空昵称框（监听评论提交事件）
-        const clearNickname = () => {{
-            setTimeout(() => {{
-                const nickInputs = document.querySelectorAll('#' + containerId + ' .tk-nick');
-                nickInputs.forEach(input => input.value = '');
-            }}, 100);
-        }};
-        const observer = new MutationObserver(() => {{
-            const submitBtn = document.querySelector('#' + containerId + ' .tk-submit');
-            if (submitBtn && !submitBtn.hasAttribute('data-listener')) {{
-                submitBtn.setAttribute('data-listener', 'true');
-                submitBtn.addEventListener('click', clearNickname);
-            }}
-        }});
-        observer.observe(document.getElementById(containerId), {{ childList: true, subtree: true }});
-        // 隐藏版权
+        // 隐藏版权和清空昵称（通用）
         setTimeout(() => {{
             const powered = document.querySelector('#' + containerId + ' .twikoo-powered-by');
             if(powered) powered.remove();
+            // 添加昵称自动清空监听（利用MutationObserver）
+            const containerEl = document.getElementById(containerId);
+            if (containerEl && !containerEl.hasAttribute('data-clear-nick')) {{
+                containerEl.setAttribute('data-clear-nick', 'true');
+                const observer = new MutationObserver(() => {{
+                    const nickInput = containerEl.querySelector('.tk-nick');
+                    if (nickInput && !nickInput.hasAttribute('data-listener')) {{
+                        nickInput.setAttribute('data-listener', 'true');
+                        const submitBtn = containerEl.querySelector('.tk-submit');
+                        if (submitBtn) {{
+                            submitBtn.addEventListener('click', () => {{
+                                setTimeout(() => {{
+                                    if (nickInput) nickInput.value = '';
+                                }}, 100);
+                            }});
+                        }}
+                    }}
+                }});
+                observer.observe(containerEl, {{ childList: true, subtree: true }});
+            }}
         }}, 500);
     }}).catch(err => console.error('评论加载失败', err));
 }}
@@ -1070,8 +1073,7 @@ function showTodayPoems() {{
     c.scrollTop = 0;
 }}
 
-// ========== 全局留言板（访客留言） ==========
-let globalTwikooInited = false;
+// ========== 全局留言板（访客留言）修复 ==========
 function openGuestbook() {{
     beforeCenterAction();
     const modal = document.getElementById('guestbookModal');
@@ -1086,21 +1088,28 @@ function openGuestbook() {{
             showPoweredBy: false,
         }}).then(() => {{
             globalTwikooInited = true;
-            const clearGlobalNick = () => {{
-                setTimeout(() => {{
-                    const nickInput = document.querySelector('#twikoo-global .tk-nick');
-                    if (nickInput) nickInput.value = '';
-                }}, 100);
-            }};
-            const observer = new MutationObserver(() => {{
-                const submitBtn = document.querySelector('#twikoo-global .tk-submit');
-                if (submitBtn && !submitBtn.hasAttribute('data-listener')) {{
-                    submitBtn.setAttribute('data-listener', 'true');
-                    submitBtn.addEventListener('click', clearGlobalNick);
-                }}
-            }});
-            observer.observe(document.getElementById('twikoo-global'), {{ childList: true, subtree: true }});
+            // 昵称自动清空
             setTimeout(() => {{
+                const container = document.getElementById('twikoo-global');
+                if (container && !container.hasAttribute('data-clear-nick')) {{
+                    container.setAttribute('data-clear-nick', 'true');
+                    const observer = new MutationObserver(() => {{
+                        const nickInput = container.querySelector('.tk-nick');
+                        if (nickInput && !nickInput.hasAttribute('data-listener')) {{
+                            nickInput.setAttribute('data-listener', 'true');
+                            const submitBtn = container.querySelector('.tk-submit');
+                            if (submitBtn) {{
+                                submitBtn.addEventListener('click', () => {{
+                                    setTimeout(() => {{
+                                        if (nickInput) nickInput.value = '';
+                                    }}, 100);
+                                }});
+                            }}
+                        }}
+                    }});
+                    observer.observe(container, {{ childList: true, subtree: true }});
+                }}
+                // 隐藏版权
                 const powered = document.querySelector('#twikoo-global .twikoo-powered-by');
                 if(powered) powered.remove();
             }}, 500);
@@ -1168,15 +1177,11 @@ window.onload = init;
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     print("✅ 本次修改完成：")
-    print("   1. 恢复三重检索功能")
-    print("   2. 相关链接移到最后，手机版水平排列")
-    print("   3. 新增AI写诗功能（通过Cloudflare Worker代理，安全调用DeepSeek API）")
-    print("   4. 完善百度统计（今日访客独立计数）")
-    print("   5. 评论昵称自动清零（通过监听提交事件）")
-    print("   6. 评论区版权彻底隐藏")
-    print("   7. 全局留言板与诗词独立留言严格隔离（path不同）")
-    print("   8. 修复访客留言按钮稳定性")
-    print("⚠️  请确保 Cloudflare Worker 中已设置 DEEPSEEK_API_KEY 环境变量")
+    print("   1. 修复全局留言板：path统一为/guestbook，pageSize=20，增加昵称自动清空")
+    print("   2. 修复每首诗词独立评论：增强poemId提取算法，确保path为/poem/数字ID")
+    print("   3. AI写诗独立模块调用地址已使用 poem.bingxue2026.com（全小写）")
+    print("   4. 所有其他功能（图片、检索、编辑等）未作任何改动")
+    print("⚠️  注意：旧评论（url字段不匹配）若仍不显示，请登录D1执行SQL迁移，脚本未自动迁移以避免误操作")
     os.system("pause")
 
 if __name__ == '__main__':

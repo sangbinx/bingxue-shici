@@ -14,6 +14,7 @@ OUTPUT_HTML = 'index.html'
 
 # DeepSeek API 配置（请替换为您自己的 API Key）
 DEEPSEEK_API_KEY = "YOUR_DEEPSEEK_API_KEY"  # 请在此填入您的 DeepSeek API Key
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 FRIENDLY_LINKS = [
     {'name': '搜韵', 'url': 'https://sou-yun.cn/'},
@@ -77,8 +78,7 @@ def parse_poems_with_theme(filepath):
             'genre': genre,
             'body': body,
             'date': date_str,
-            'themes': classify_themes(full_text),
-            'images': []
+            'themes': classify_themes(full_text)
         })
     return poems
 
@@ -139,7 +139,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（最终版：评论区完整优化+AI写诗扩大50%）")
+    print("   正在生成冰雪诗词数字图书馆（最终完整版：评论区优化+AI写诗增强）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -274,8 +274,70 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .footer {{ background: #1b5e20; color: #c8e6c9; text-align: center; padding: 10px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; }}
 .footer .counter {{ font-size: 0.9em; }}
 .footer .qrcode-container img {{ width: 80px; height: 80px; border-radius: 4px; }}
-/* AI写诗模态框手机版扩大50% */
-@media screen and (max-width: 768px) {{
+/* 评论区优化样式 - 隐藏多余按钮但保留小齿轮 */
+.tk-actions .tk-icon, .tk-emoji, .tk-image, .tk-preview,
+button:has(svg):not(.tk-admin-icon) {{
+    display: none !important;
+}}
+/* 禁用版权链接点击 */
+.twikoo-powered-by a, .tk-footer a {{
+    pointer-events: none !important;
+    cursor: default !important;
+    text-decoration: none !important;
+    color: #666 !important;
+}}
+/* ========== 手机端样式 ========== */
+@media screen and (max-width: 1024px) {{
+    body {{ min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }}
+    .header {{ padding: 8px 12px; gap: 4px; }}
+    .header h1 {{ font-size: 1.2em; letter-spacing: 3px; }}
+    .header-info {{ font-size: 0.7em; flex-wrap: wrap; justify-content: center; text-align: center; }}
+    .main {{ flex-direction: column; flex: none; width: 100%; }}
+    .left-panel, .center-panel, .right-panel {{ width: 100%; max-height: none; border: none; flex-shrink: 0; flex: none; padding: 4px 0; }}
+    .left-panel {{ border-bottom: 1px solid #f0c0c0; }}
+    .right-panel {{ border-bottom: 1px solid #c0c8f0; }}
+    .center-panel {{ border-bottom: 1px solid #f0e0a0; }}
+    .left-panel .panel-title, .right-panel .panel-title, .center-panel .panel-title {{ font-size: 0.85em; padding: 8px 0; cursor: pointer; user-select: none; }}
+    .left-menu, .right-menu {{ max-height: 0; overflow: hidden; transition: max-height 0.3s ease; position: relative; }}
+    .left-menu.open, .right-menu.open {{ max-height: 800px; }}
+    .left-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
+    .right-panel .panel-title::after {{ content: ' ▼'; font-size: 0.6em; }}
+    .mobile-second-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
+    .mobile-second-row .menu-title {{ font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 50px; }}
+    .mobile-theme-row {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }}
+    .mobile-theme-row .menu-title {{ font-size: 0.72em; padding: 5px 3px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 55px; }}
+    .submenu-fixed-area {{ position: relative; min-height: 50px; }}
+    .submenu {{ position: absolute; top: 0; left: 0; width: 100%; display: none; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; background: #fdf0f0; border-radius: 0 0 3px 3px; }}
+    .right-panel .submenu {{ background: #f0f4fd; }}
+    .submenu.open {{ display: flex; }}
+    .submenu a {{ font-size: 0.7em; padding: 4px 5px; margin: 0; white-space: nowrap; }}
+    .center-buttons {{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }}
+    .center-buttons button {{ width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }}
+    .links-wrapper {{ position: static; width: auto; }}
+    .links-submenu {{ position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px; max-height: 0; overflow: hidden; background: #e8f5e9; border-radius: 4px; margin-top: 4px; transition: max-height 0.3s ease; }}
+    .links-submenu.open {{ max-height: 200px; }}
+    .links-submenu a {{ display: inline-block; width: auto; padding: 4px 8px; font-size: 0.7em; border: none; background: #d4e0d0; margin: 2px; }}
+    .content {{ flex: none; width: 100%; padding: 8px 10px; overflow-y: visible; }}
+    .poem-card {{ padding: 12px 14px; margin-bottom: 12px; }}
+    .poem-title {{ font-size: 1em; }}
+    .poem-author {{ font-size: 0.9em; }}
+    .poem-date {{ font-size: 0.8em; }}
+    .poem-body {{ font-size: 0.95em; line-height: 1.9; }}
+    .poem-img-float {{ float: none; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }}
+    .poem-img-float img {{ max-height: 200px !important; }}
+    .img-toggle-btn, .edit-btn, .comment-btn {{ font-size: 0.75em; }}
+    .button-group {{ margin-top: 8px; }}
+    .search-modal-content {{ width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }}
+    .video-modal-content {{ width: 95%; height: 90vh; padding: 10px; }}
+    .video-body {{ flex-direction: column; }}
+    .video-list-side {{ width: 100%; border-right: none; border-bottom: 1px solid #e0d5c1; padding-right: 0; padding-bottom: 6px; max-height: 130px; }}
+    .video-player-area {{ min-height: 250px; }}
+    .guestbook-modal-content, .report-modal-content {{ width: 95%; min-width: auto; padding: 14px; margin: 15px auto; }}
+    .history-intro p {{ font-size: 0.85em; }}
+    .footer {{ font-size: 0.7em; padding: 8px; gap: 10px; }}
+    .footer .qrcode-container img {{ width: 60px; height: 60px; }}
+    .back-to-top {{ bottom: 20px; right: 20px; width: 38px; height: 38px; font-size: 1em; }}
+    /* AI写诗模态框手机版放大1/2 */
     .guestbook-modal-content {{
         width: 90% !important;
         max-width: 90% !important;
@@ -283,6 +345,10 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     }}
 }}
 @media screen and (max-width: 480px) {{
+    .header h1 {{ font-size: 1.1em; letter-spacing: 2px; }}
+    .center-buttons button {{ font-size: 0.72em; padding: 6px 8px; }}
+    .poem-body {{ font-size: 0.9em; }}
+    /* AI写诗模态框手机版进一步放大 */
     .guestbook-modal-content {{
         width: 95% !important;
         max-width: 95% !important;
@@ -377,7 +443,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 </div>
 </div>
 
-<!-- AI写诗模态框（手机版扩大50%） -->
+<!-- AI写诗模态框（增大手机版尺寸） -->
 <div class="modal" id="aiPoemModal">
 <div class="guestbook-modal-content" style="width: 60%; max-width: 700px;">
 <span class="modal-close" onclick="closeAiPoem()">&times;</span>
@@ -424,7 +490,7 @@ const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
 
-// DeepSeek API 配置（使用独立的 AI Poem Worker 地址）
+// DeepSeek API 配置（使用独立的 AI Poem Worker 地址，请替换为实际地址）
 const AI_POEM_WORKER_URL = 'https://poem.bingxue2026.com';  // 请替换为您的 AI 写诗 Worker 地址
 
 // ========== 本地编辑管理 ==========
@@ -770,7 +836,7 @@ function exportEdits() {{
     }});
 }}
 
-// ========== AI写诗功能 ==========
+// ========== AI写诗功能（支持平水韵、中华新韵、词林正韵） ==========
 function openAiPoem() {{
     beforeCenterAction();
     document.getElementById('aiPoemModal').style.display = 'block';
@@ -793,7 +859,7 @@ document.addEventListener('DOMContentLoaded', function() {{
     }}
 }});
 async function generatePoem() {{
-    const rhyme = document.getElementById('aiRhyme').value;
+    const rhyme = document.getElementById('aiRhyme').value; // "1" 平水韵, "2" 中华新韵, "3" 词林正韵
     const genreVal = document.getElementById('aiGenre').value;
     let genreText = '';
     let ciPai = '';
@@ -851,119 +917,44 @@ function copyPoem() {{
     }}
 }}
 
-// ========== 评论区优化函数（基于您成功的调试脚本，一字不改） ==========
-// 这些函数完全来自于您提供的调试脚本，用于实现昵称清空、按钮隐藏、版权禁用等功能
-let currentTwikooRoot = null;
-
-function locateTwikooContainer() {{
-    const submitBtn = document.querySelector('.tk-submit');
-    if (!submitBtn) return null;
-    let container = submitBtn.closest('div[id^="twikoo-"], div[class*="twikoo"]');
-    if (!container) {{
-        let el = submitBtn.parentElement;
-        for (let i = 0; i < 5 && el; i++) {{
-            if (el.tagName === 'DIV' && (el.id || el.className)) {{
-                container = el;
-                break;
-            }}
-            el = el.parentElement;
-        }}
-    }}
-    return container;
-}}
-
-function clearNicknameInContainer(container) {{
-    if (!container) return false;
-    const nickInput = container.querySelector('input[placeholder*="昵称"], input.tk-nick, input.el-input__inner, input[name="nick"]');
-    if (nickInput) {{
-        nickInput.value = '';
-        nickInput.setAttribute('autocomplete', 'off');
-        return true;
-    }}
-    return false;
-}}
-
-function hideExtraButtonsInContainer(container) {{
-    if (!container) return 0;
-    const btns = container.querySelectorAll('button');
-    let hiddenCount = 0;
-    btns.forEach(btn => {{
+// ========== 评论区优化函数（共用） ==========
+function optimizeTwikooContainer(containerElement) {{
+    if (!containerElement) return;
+    // 1. 清空昵称框（查找多种可能的选择器）
+    const nickInput = containerElement.querySelector('input[placeholder*="昵称"], input.tk-nick, input.el-input__inner, input[name="nick"]');
+    if (nickInput) nickInput.value = '';
+    // 2. 隐藏多余按钮（包括预览、表情、图片、SVG图标，但保留小齿轮 .tk-admin-icon）
+    const allBtns = containerElement.querySelectorAll('button');
+    allBtns.forEach(btn => {{
         const text = btn.innerText.trim();
         const hasSvg = btn.querySelector('svg');
-        const isPreview = (text === '预览' || text === 'Preview');
-        const aria = btn.getAttribute('aria-label') || '';
-        const isEmojiOrImage = aria.includes('表情') || aria.includes('图片');
-        if (hasSvg || isPreview || isEmojiOrImage) {{
+        const isAdmin = btn.classList.contains('tk-admin-icon') || btn.querySelector('.tk-admin-icon');
+        if ((text === '' || text === '预览' || hasSvg) && !isAdmin) {{
             btn.style.display = 'none';
-            hiddenCount++;
         }}
     }});
-    return hiddenCount;
-}}
-
-function disableCopyrightLinkInContainer(container) {{
-    if (!container) return 0;
-    const links = container.querySelectorAll('a');
-    let modified = 0;
+    // 3. 禁用版权链接（移除 href，使其不可点击）
+    const links = containerElement.querySelectorAll('a');
     links.forEach(link => {{
-        if (link.href && link.href.includes('twikoo.js.org')) {{
+        if (link.href && (link.href.includes('twikoo.js.org') || link.innerText.includes('Twikoo'))) {{
             link.removeAttribute('href');
+            link.style.pointerEvents = 'none';
             link.style.cursor = 'default';
             link.style.color = '#666';
-            link.style.textDecoration = 'none';
-            modified++;
         }}
     }});
-    return modified;
-}}
-
-function hideThreeSvgIconsInContainer(container) {{
-    if (!container) return 0;
-    const targetViewBoxes = ['0 0 496 512', '0 0 512 512', '0 0 640 512'];
-    let hiddenCount = 0;
-    const allSvgs = container.querySelectorAll('svg');
-    allSvgs.forEach(svg => {{
-        const viewBox = svg.getAttribute('viewBox');
-        if (viewBox && targetViewBoxes.includes(viewBox)) {{
-            let parent = svg.parentElement;
-            while (parent && parent.tagName !== 'BUTTON') {{
-                parent = parent.parentElement;
-            }}
-            if (parent && parent.tagName === 'BUTTON') {{
-                parent.style.display = 'none';
-                hiddenCount++;
-            }} else {{
-                svg.style.display = 'none';
-                hiddenCount++;
-            }}
-        }}
-    }});
-    return hiddenCount;
-}}
-
-function bindSubmitClearInContainer(container) {{
-    if (!container) return;
-    const submitBtn = container.querySelector('.tk-submit');
+    // 4. 绑定提交后自动清空昵称
+    const submitBtn = containerElement.querySelector('.tk-submit');
     if (submitBtn && !submitBtn.hasAttribute('data-clear-bound')) {{
         submitBtn.setAttribute('data-clear-bound', 'true');
-        const clearHandler = () => {{
+        const clearNick = () => {{
             setTimeout(() => {{
-                const input = container.querySelector('input[placeholder*="昵称"], input.tk-nick, input.el-input__inner, input[name="nick"]');
+                const input = containerElement.querySelector('input[placeholder*="昵称"], input.tk-nick, input.el-input__inner, input[name="nick"]');
                 if (input) input.value = '';
             }}, 200);
         }};
-        submitBtn.addEventListener('click', clearHandler);
+        submitBtn.addEventListener('click', clearNick);
     }}
-}}
-
-function applyAllTwikooOptimizations() {{
-    const container = locateTwikooContainer();
-    if (!container) return;
-    clearNicknameInContainer(container);
-    hideExtraButtonsInContainer(container);
-    disableCopyrightLinkInContainer(container);
-    hideThreeSvgIconsInContainer(container);
-    bindSubmitClearInContainer(container);
 }}
 
 // ========== 每首诗词独立评论加载 ==========
@@ -982,15 +973,10 @@ function loadPoemComment(poemId, containerId) {{
         showPoweredBy: false
     }}).then(() => {{
         window['twikoo_' + poemId] = true;
+        // 等待评论区渲染完成后再执行优化
         setTimeout(() => {{
             const container = document.getElementById(containerId);
-            if (container) {{
-                clearNicknameInContainer(container);
-                hideExtraButtonsInContainer(container);
-                disableCopyrightLinkInContainer(container);
-                hideThreeSvgIconsInContainer(container);
-                bindSubmitClearInContainer(container);
-            }}
+            if (container) optimizeTwikooContainer(container);
         }}, 500);
     }}).catch(err => console.error('评论加载失败', err));
 }}
@@ -1007,14 +993,9 @@ function togglePoemComment(poemId) {{
         if (containerDiv && containerDiv.innerHTML.trim() === '') {{
             loadPoemComment(poemId, containerId);
         }} else {{
+            // 如果已经加载过，重新应用优化（防止被重置）
             setTimeout(() => {{
-                if (containerDiv) {{
-                    clearNicknameInContainer(containerDiv);
-                    hideExtraButtonsInContainer(containerDiv);
-                    disableCopyrightLinkInContainer(containerDiv);
-                    hideThreeSvgIconsInContainer(containerDiv);
-                    bindSubmitClearInContainer(containerDiv);
-                }}
+                if (containerDiv) optimizeTwikooContainer(containerDiv);
             }}, 100);
         }}
     }}
@@ -1123,44 +1104,20 @@ function openGuestbook() {{
             el: '#twikoo-global',
             path: '/guestbook',
             lang: 'zh-CN',
-            pageSize: 30,
+            pageSize: 20,
             showPoweredBy: false
         }}).then(() => {{
             globalTwikooInited = true;
             setTimeout(() => {{
                 const container = document.getElementById('twikoo-global');
-                if (container) {{
-                    clearNicknameInContainer(container);
-                    hideExtraButtonsInContainer(container);
-                    disableCopyrightLinkInContainer(container);
-                    hideThreeSvgIconsInContainer(container);
-                    bindSubmitClearInContainer(container);
-                }}
-            }}, 800);
-            // 观察动态变化（如加载更多评论后重新应用优化）
-            const observer = new MutationObserver(() => {{
-                const container = document.getElementById('twikoo-global');
-                if (container) {{
-                    clearNicknameInContainer(container);
-                    hideExtraButtonsInContainer(container);
-                    disableCopyrightLinkInContainer(container);
-                    hideThreeSvgIconsInContainer(container);
-                    bindSubmitClearInContainer(container);
-                }}
-            }});
-            const targetNode = document.getElementById('twikoo-global');
-            if (targetNode) observer.observe(targetNode, {{ childList: true, subtree: true }});
+                if (container) optimizeTwikooContainer(container);
+            }}, 500);
         }}).catch(err => console.error('全局留言板初始化失败', err));
     }} else if (globalTwikooInited) {{
+        // 每次打开弹窗重新应用优化（确保昵称框等状态正确）
         setTimeout(() => {{
             const container = document.getElementById('twikoo-global');
-            if (container) {{
-                clearNicknameInContainer(container);
-                hideExtraButtonsInContainer(container);
-                disableCopyrightLinkInContainer(container);
-                hideThreeSvgIconsInContainer(container);
-                bindSubmitClearInContainer(container);
-            }}
+            if (container) optimizeTwikooContainer(container);
         }}, 200);
     }}
 }}
@@ -1225,11 +1182,11 @@ window.onload = init;
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     print("✅ 本次修改完成：")
-    print("   1. 评论区功能完全基于您成功的调试脚本，一字不改地融入")
-    print("   2. 昵称自动清空、预览按钮隐藏、三个小图标隐藏、版权链接禁用")
-    print("   3. AI写诗模态框手机版扩大50%（通过媒体查询）")
-    print("   4. 全局留言板和每首诗词独立评论区均应用完整优化")
-    print("⚠️  请务必在脚本开头的 AI_POEM_WORKER_URL 中填入实际的 Worker 地址")
+    print("   1. 评论区昵称自动清空、隐藏预览/表情/图片按钮，保留小齿轮")
+    print("   2. 禁用版权链接（不可点击）")
+    print("   3. AI写诗韵律增加‘词林正韵’，手机版弹窗增大50%")
+    print("   4. 优化所有评论容器（全局留言板 + 每首诗词独立评论）")
+    print("⚠️  请务必在脚本开头的 DEEPSEEK_API_KEY 和 AI_POEM_WORKER_URL 中填入实际值")
     os.system("pause")
 
 if __name__ == '__main__':

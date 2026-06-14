@@ -139,7 +139,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（最终版：评论区完整优化+AI写诗扩大50%）")
+    print("   正在生成冰雪诗词数字图书馆（最终版 + 专家评论区优化）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -288,6 +288,16 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
         max-width: 95% !important;
     }}
 }}
+/* ========== 评论区专家优化样式 ========== */
+/* 隐藏预览按钮 */
+.tk-preview {{ display: none !important; }}
+/* 隐藏 M 加号、表情包、上传按钮 */
+.tk-submit-action-icon,
+.OwO,
+.OwO-logo,
+[class*="OwO"],
+.tk-upload-btn,
+[class*="upload"] {{ display: none !important; }}
 </style>
 </head>
 <body>
@@ -851,121 +861,6 @@ function copyPoem() {{
     }}
 }}
 
-// ========== 评论区优化函数（基于您成功的调试脚本，一字不改） ==========
-// 这些函数完全来自于您提供的调试脚本，用于实现昵称清空、按钮隐藏、版权禁用等功能
-let currentTwikooRoot = null;
-
-function locateTwikooContainer() {{
-    const submitBtn = document.querySelector('.tk-submit');
-    if (!submitBtn) return null;
-    let container = submitBtn.closest('div[id^="twikoo-"], div[class*="twikoo"]');
-    if (!container) {{
-        let el = submitBtn.parentElement;
-        for (let i = 0; i < 5 && el; i++) {{
-            if (el.tagName === 'DIV' && (el.id || el.className)) {{
-                container = el;
-                break;
-            }}
-            el = el.parentElement;
-        }}
-    }}
-    return container;
-}}
-
-function clearNicknameInContainer(container) {{
-    if (!container) return false;
-    const nickInput = container.querySelector('input[placeholder*="昵称"], input.tk-nick, input.el-input__inner, input[name="nick"]');
-    if (nickInput) {{
-        nickInput.value = '';
-        nickInput.setAttribute('autocomplete', 'off');
-        return true;
-    }}
-    return false;
-}}
-
-function hideExtraButtonsInContainer(container) {{
-    if (!container) return 0;
-    const btns = container.querySelectorAll('button');
-    let hiddenCount = 0;
-    btns.forEach(btn => {{
-        const text = btn.innerText.trim();
-        const hasSvg = btn.querySelector('svg');
-        const isPreview = (text === '预览' || text === 'Preview');
-        const aria = btn.getAttribute('aria-label') || '';
-        const isEmojiOrImage = aria.includes('表情') || aria.includes('图片');
-        if (hasSvg || isPreview || isEmojiOrImage) {{
-            btn.style.display = 'none';
-            hiddenCount++;
-        }}
-    }});
-    return hiddenCount;
-}}
-
-function disableCopyrightLinkInContainer(container) {{
-    if (!container) return 0;
-    const links = container.querySelectorAll('a');
-    let modified = 0;
-    links.forEach(link => {{
-        if (link.href && link.href.includes('twikoo.js.org')) {{
-            link.removeAttribute('href');
-            link.style.cursor = 'default';
-            link.style.color = '#666';
-            link.style.textDecoration = 'none';
-            modified++;
-        }}
-    }});
-    return modified;
-}}
-
-function hideThreeSvgIconsInContainer(container) {{
-    if (!container) return 0;
-    const targetViewBoxes = ['0 0 496 512', '0 0 512 512', '0 0 640 512'];
-    let hiddenCount = 0;
-    const allSvgs = container.querySelectorAll('svg');
-    allSvgs.forEach(svg => {{
-        const viewBox = svg.getAttribute('viewBox');
-        if (viewBox && targetViewBoxes.includes(viewBox)) {{
-            let parent = svg.parentElement;
-            while (parent && parent.tagName !== 'BUTTON') {{
-                parent = parent.parentElement;
-            }}
-            if (parent && parent.tagName === 'BUTTON') {{
-                parent.style.display = 'none';
-                hiddenCount++;
-            }} else {{
-                svg.style.display = 'none';
-                hiddenCount++;
-            }}
-        }}
-    }});
-    return hiddenCount;
-}}
-
-function bindSubmitClearInContainer(container) {{
-    if (!container) return;
-    const submitBtn = container.querySelector('.tk-submit');
-    if (submitBtn && !submitBtn.hasAttribute('data-clear-bound')) {{
-        submitBtn.setAttribute('data-clear-bound', 'true');
-        const clearHandler = () => {{
-            setTimeout(() => {{
-                const input = container.querySelector('input[placeholder*="昵称"], input.tk-nick, input.el-input__inner, input[name="nick"]');
-                if (input) input.value = '';
-            }}, 200);
-        }};
-        submitBtn.addEventListener('click', clearHandler);
-    }}
-}}
-
-function applyAllTwikooOptimizations() {{
-    const container = locateTwikooContainer();
-    if (!container) return;
-    clearNicknameInContainer(container);
-    hideExtraButtonsInContainer(container);
-    disableCopyrightLinkInContainer(container);
-    hideThreeSvgIconsInContainer(container);
-    bindSubmitClearInContainer(container);
-}}
-
 // ========== 每首诗词独立评论加载 ==========
 function loadPoemComment(poemId, containerId) {{
     if (typeof twikoo === 'undefined') {{
@@ -982,16 +877,6 @@ function loadPoemComment(poemId, containerId) {{
         showPoweredBy: false
     }}).then(() => {{
         window['twikoo_' + poemId] = true;
-        setTimeout(() => {{
-            const container = document.getElementById(containerId);
-            if (container) {{
-                clearNicknameInContainer(container);
-                hideExtraButtonsInContainer(container);
-                disableCopyrightLinkInContainer(container);
-                hideThreeSvgIconsInContainer(container);
-                bindSubmitClearInContainer(container);
-            }}
-        }}, 500);
     }}).catch(err => console.error('评论加载失败', err));
 }}
 
@@ -1006,16 +891,6 @@ function togglePoemComment(poemId) {{
         const containerDiv = document.getElementById(containerId);
         if (containerDiv && containerDiv.innerHTML.trim() === '') {{
             loadPoemComment(poemId, containerId);
-        }} else {{
-            setTimeout(() => {{
-                if (containerDiv) {{
-                    clearNicknameInContainer(containerDiv);
-                    hideExtraButtonsInContainer(containerDiv);
-                    disableCopyrightLinkInContainer(containerDiv);
-                    hideThreeSvgIconsInContainer(containerDiv);
-                    bindSubmitClearInContainer(containerDiv);
-                }}
-            }}, 100);
         }}
     }}
 }}
@@ -1111,7 +986,7 @@ function showTodayPoems() {{
     c.scrollTop = 0;
 }}
 
-// ========== 全局留言板（访客留言）优化 ==========
+// ========== 全局留言板（访客留言） ==========
 let globalTwikooInited = false;
 function openGuestbook() {{
     beforeCenterAction();
@@ -1127,41 +1002,7 @@ function openGuestbook() {{
             showPoweredBy: false
         }}).then(() => {{
             globalTwikooInited = true;
-            setTimeout(() => {{
-                const container = document.getElementById('twikoo-global');
-                if (container) {{
-                    clearNicknameInContainer(container);
-                    hideExtraButtonsInContainer(container);
-                    disableCopyrightLinkInContainer(container);
-                    hideThreeSvgIconsInContainer(container);
-                    bindSubmitClearInContainer(container);
-                }}
-            }}, 800);
-            // 观察动态变化（如加载更多评论后重新应用优化）
-            const observer = new MutationObserver(() => {{
-                const container = document.getElementById('twikoo-global');
-                if (container) {{
-                    clearNicknameInContainer(container);
-                    hideExtraButtonsInContainer(container);
-                    disableCopyrightLinkInContainer(container);
-                    hideThreeSvgIconsInContainer(container);
-                    bindSubmitClearInContainer(container);
-                }}
-            }});
-            const targetNode = document.getElementById('twikoo-global');
-            if (targetNode) observer.observe(targetNode, {{ childList: true, subtree: true }});
         }}).catch(err => console.error('全局留言板初始化失败', err));
-    }} else if (globalTwikooInited) {{
-        setTimeout(() => {{
-            const container = document.getElementById('twikoo-global');
-            if (container) {{
-                clearNicknameInContainer(container);
-                hideExtraButtonsInContainer(container);
-                disableCopyrightLinkInContainer(container);
-                hideThreeSvgIconsInContainer(container);
-                bindSubmitClearInContainer(container);
-            }}
-        }}, 200);
     }}
 }}
 function closeGuestbook() {{ document.getElementById('guestbookModal').style.display='none'; }}
@@ -1215,6 +1056,32 @@ function init() {{
 window.onclick = function(e){{ if(e.target.classList.contains('modal')) e.target.style.display='none'; }};
 window.onload = init;
 </script>
+
+<!-- ==================== Twikoo 评论区专家优化代码 ==================== -->
+<script>
+(function() {{
+  // 第一步：页面加载前清除记忆数据，确保昵称框为空
+  try {{
+    localStorage.removeItem('twikoo');
+  }} catch(e) {{}}
+
+  // 第二步：页面加载完成后，处理版权链接（去掉超链接，保留文字）
+  window.addEventListener('load', function() {{
+    setTimeout(function() {{
+      var footerLinks = document.querySelectorAll('.tk-footer a');
+      footerLinks.forEach(function(link) {{
+        var span = document.createElement('span');
+        span.textContent = link.textContent;
+        if (link.parentNode) {{
+          link.parentNode.replaceChild(span, link);
+        }}
+      }});
+    }}, 600);
+  }});
+}})();
+</script>
+<!-- ==================== 优化结束 ==================== -->
+
 </body>
 </html>'''
 
@@ -1225,10 +1092,9 @@ window.onload = init;
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     print("✅ 本次修改完成：")
-    print("   1. 评论区功能完全基于您成功的调试脚本，一字不改地融入")
-    print("   2. 昵称自动清空、预览按钮隐藏、三个小图标隐藏、版权链接禁用")
-    print("   3. AI写诗模态框手机版扩大50%（通过媒体查询）")
-    print("   4. 全局留言板和每首诗词独立评论区均应用完整优化")
+    print("   1. 完全融入专家提供的评论区优化方案（CSS隐藏按钮 + localStorage清除 + 版权链接去超链接）")
+    print("   2. 保留原有所有功能（图片、检索、菜单、AI写诗等）")
+    print("   3. AI写诗模态框手机版扩大50%")
     print("⚠️  请务必在脚本开头的 AI_POEM_WORKER_URL 中填入实际的 Worker 地址")
     os.system("pause")
 

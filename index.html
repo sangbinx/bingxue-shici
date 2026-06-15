@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>冰雪诗词 · 数字图书馆</title>
 <!-- 百度统计代码开始 -->
 <script>
@@ -104,35 +104,250 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 .video-player-area { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 500px; background: #fafafa; border-radius: 6px; }
 .video-player-area p { color: #888; font-size: 1.1em; }
 .video-player-area video { width: 100%; max-height: 100%; border-radius: 4px; }
-.guestbook-modal-content { background: #fefefe; margin: 30px auto; padding: 24px; width: 50%; max-width: 600px; max-height: 80vh; overflow-y: auto; border-radius: 8px; }
-.guestbook-modal-content h3 { color: #2e7d32; margin-bottom: 16px; letter-spacing: 2px; }
 .footer { background: #1b5e20; color: #c8e6c9; text-align: center; padding: 10px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; }
 .footer .counter { font-size: 0.9em; }
 .footer .qrcode-container img { width: 80px; height: 80px; border-radius: 4px; }
-/* AI写诗模态框手机版扩大50% */
-@media screen and (max-width: 768px) {
-    .guestbook-modal-content {
-        width: 90% !important;
-        max-width: 90% !important;
-        padding: 20px !important;
-    }
+/* AI写诗模态框样式（紧凑布局，浅粉色，四韵律） */
+#aiPoemModal .guestbook-modal-content {
+    background: #fce4e4;
+    border-radius: 16px;
+    padding: 20px 24px;
+    width: 50%;
+    max-width: 550px;
+    max-height: 85vh;
+    overflow-y: auto;
+    border: 1px solid #f0d0d0;
 }
-@media screen and (max-width: 480px) {
-    .guestbook-modal-content {
-        width: 95% !important;
-        max-width: 95% !important;
-    }
+#aiPoemModal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8c8c8;
 }
-/* ========== 评论区专家优化样式 ========== */
-/* 隐藏预览按钮 */
+#aiPoemModal .modal-header h3 {
+    font-size: 1.1rem;
+    font-weight: normal;
+    color: #a33;
+    margin: 0;
+}
+#aiPoemModal .modal-header .modal-close {
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #c66;
+    line-height: 1;
+}
+#aiPoemModal .modal-header .modal-close:hover {
+    color: #a33;
+}
+#aiPoemModal .compact-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+#aiPoemModal .compact-row .label {
+    width: 60px;
+    flex-shrink: 0;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #a33;
+}
+#aiPoemModal .compact-row .control {
+    flex: 1;
+}
+#aiPoemModal .compact-row select,
+#aiPoemModal .compact-row input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #e0c0c0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: #fffef9;
+}
+#aiPoemModal .two-cols {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 16px;
+}
+#aiPoemModal .two-cols .compact-row {
+    flex: 1;
+    margin-bottom: 0;
+}
+#aiPoemModal .ci-pai-group {
+    margin-bottom: 16px;
+}
+#aiPoemModal .prompt-section {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+#aiPoemModal .prompt-label {
+    width: 60px;
+    flex-shrink: 0;
+    padding-top: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #a33;
+}
+#aiPoemModal .prompt-textarea {
+    flex: 1;
+}
+#aiPoemModal .prompt-textarea textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #e0c0c0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    resize: vertical;
+    height: 110px;
+    background: #fffef9;
+}
+#aiPoemModal .button-row {
+    margin-top: 4px;
+    margin-bottom: 20px;
+    padding-left: 60px;
+}
+#aiPoemModal .generate-btn {
+    background-color: #a33;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#aiPoemModal .generate-btn:hover {
+    background-color: #722;
+}
+#aiPoemModal .ai-poem-result {
+    background: #fff8f0;
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 8px;
+    border: 1px solid #e8d0d0;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    max-height: 260px;
+    overflow-y: auto;
+    display: none;
+}
+#aiPoemModal .ai-poem-result.show {
+    display: block;
+}
+#aiPoemModal .copy-btn {
+    background: #c96;
+    color: #fff;
+    border: none;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    margin-top: 10px;
+    cursor: pointer;
+}
+/* 评论区专家优化样式 */
 .tk-preview { display: none !important; }
-/* 隐藏 M 加号、表情包、上传按钮 */
 .tk-submit-action-icon,
 .OwO,
 .OwO-logo,
 [class*="OwO"],
 .tk-upload-btn,
 [class*="upload"] { display: none !important; }
+/* 手机版适配 */
+@media screen and (max-width: 1024px) {
+    body { min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }
+    .header { padding: 8px 12px; gap: 4px; }
+    .header h1 { font-size: 1.2em; letter-spacing: 3px; }
+    .header-info { font-size: 0.7em; flex-wrap: wrap; justify-content: center; text-align: center; }
+    .main { flex-direction: column; flex: none; width: 100%; }
+    .left-panel, .center-panel, .right-panel { width: 100%; max-height: none; border: none; flex-shrink: 0; flex: none; padding: 4px 0; }
+    .left-panel { border-bottom: 1px solid #f0c0c0; }
+    .right-panel { border-bottom: 1px solid #c0c8f0; }
+    .center-panel { border-bottom: 1px solid #f0e0a0; }
+    .left-panel .panel-title, .right-panel .panel-title, .center-panel .panel-title { font-size: 0.85em; padding: 8px 0; cursor: pointer; user-select: none; }
+    .left-menu, .right-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; position: relative; }
+    .left-menu.open, .right-menu.open { max-height: 800px; }
+    .left-panel .panel-title::after { content: ' ▼'; font-size: 0.6em; }
+    .right-panel .panel-title::after { content: ' ▼'; font-size: 0.6em; }
+    .mobile-second-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }
+    .mobile-second-row .menu-title { font-size: 0.75em; padding: 6px 4px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 50px; }
+    .mobile-theme-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 6px; }
+    .mobile-theme-row .menu-title { font-size: 0.72em; padding: 5px 3px; margin: 0; border-radius: 4px; width: calc(20% - 5px); text-align: center; display: inline-block; min-width: 55px; }
+    .submenu-fixed-area { position: relative; min-height: 50px; }
+    .submenu { position: absolute; top: 0; left: 0; width: 100%; display: none; flex-wrap: wrap; gap: 3px; padding: 4px 6px; justify-content: center; background: #fdf0f0; border-radius: 0 0 3px 3px; }
+    .right-panel .submenu { background: #f0f4fd; }
+    .submenu.open { display: flex; }
+    .submenu a { font-size: 0.7em; padding: 4px 5px; margin: 0; white-space: nowrap; }
+    .center-buttons { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }
+    .center-buttons button { width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }
+    .links-wrapper { position: static; width: auto; }
+    .links-submenu { position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px; max-height: 0; overflow: hidden; background: #e8f5e9; border-radius: 4px; margin-top: 4px; transition: max-height 0.3s ease; }
+    .links-submenu.open { max-height: 200px; }
+    .links-submenu a { display: inline-block; width: auto; padding: 4px 8px; font-size: 0.7em; border: none; background: #d4e0d0; margin: 2px; }
+    .content { flex: none; width: 100%; padding: 8px 10px; overflow-y: visible; }
+    .poem-card { padding: 12px 14px; margin-bottom: 12px; }
+    .poem-title { font-size: 1em; }
+    .poem-author { font-size: 0.9em; }
+    .poem-date { font-size: 0.8em; }
+    .poem-body { font-size: 0.95em; line-height: 1.9; }
+    .poem-img-float { float: none; width: 100% !important; max-width: 100% !important; margin: 8px 0 !important; max-height: none !important; }
+    .poem-img-float img { max-height: 200px !important; }
+    .img-toggle-btn, .edit-btn, .comment-btn { font-size: 0.75em; }
+    .button-group { margin-top: 8px; }
+    .search-modal-content { width: 90%; left: 5%; min-width: auto; position: fixed; top: 50px; }
+    .video-modal-content { width: 95%; height: 90vh; padding: 10px; }
+    .video-body { flex-direction: column; }
+    .video-list-side { width: 100%; border-right: none; border-bottom: 1px solid #e0d5c1; padding-right: 0; padding-bottom: 6px; max-height: 130px; }
+    .video-player-area { min-height: 250px; }
+    .guestbook-modal-content, .report-modal-content { width: 95%; min-width: auto; padding: 14px; margin: 15px auto; }
+    .history-intro p { font-size: 0.85em; }
+    .footer { font-size: 0.7em; padding: 8px; gap: 10px; }
+    .footer .qrcode-container img { width: 60px; height: 60px; }
+    .back-to-top { bottom: 20px; right: 20px; width: 38px; height: 38px; font-size: 1em; }
+    /* AI写诗手机版 */
+    #aiPoemModal .guestbook-modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+    }
+    #aiPoemModal .compact-row .label {
+        width: 55px;
+        font-size: 0.85rem;
+    }
+    #aiPoemModal .prompt-label {
+        width: 55px;
+        font-size: 0.85rem;
+    }
+    #aiPoemModal .button-row {
+        padding-left: 55px;
+    }
+    #aiPoemModal .two-cols {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+@media screen and (max-width: 480px) {
+    .header h1 { font-size: 1.1em; letter-spacing: 2px; }
+    .center-buttons button { font-size: 0.72em; padding: 6px 8px; }
+    .poem-body { font-size: 0.9em; }
+    #aiPoemModal .compact-row .label {
+        width: 50px;
+        font-size: 0.8rem;
+    }
+    #aiPoemModal .prompt-label {
+        width: 50px;
+        font-size: 0.8rem;
+    }
+    #aiPoemModal .button-row {
+        padding-left: 50px;
+    }
+    #aiPoemModal .generate-btn {
+        padding: 6px 16px;
+        font-size: 0.85rem;
+    }
+}
 </style>
 </head>
 <body>
@@ -222,40 +437,58 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 </div>
 </div>
 
-<!-- AI写诗模态框（手机版扩大50%） -->
+<!-- AI写诗模态框（紧凑布局，四韵律） -->
 <div class="modal" id="aiPoemModal">
-<div class="guestbook-modal-content" style="width: 60%; max-width: 700px;">
-<span class="modal-close" onclick="closeAiPoem()">&times;</span>
-<h3>🤖 AI写诗</h3>
+<div class="guestbook-modal-content">
+<div class="modal-header">
+  <h3>🤖 AI写诗</h3>
+  <span class="modal-close" onclick="closeAiPoem()">&times;</span>
+</div>
 <div>
-  <div class="ai-poem-form-group">
-    <label>韵律：</label>
-    <select id="aiRhyme">
-      <option value="1">平水韵</option>
-      <option value="2">中华新韵</option>
-      <option value="3">词林正韵</option>
-    </select>
-  </div>
-  <div class="ai-poem-form-group">
-    <label>体裁：</label>
-    <select id="aiGenre">
-      <option value="1">五绝</option>
-      <option value="2">五律</option>
-      <option value="3">七绝</option>
-      <option value="4">七律</option>
-      <option value="5">其他词牌</option>
-    </select>
-    <div id="ciPaiGroup" style="display:none; margin-top:5px;">
-      <label>词牌名：</label>
-      <input type="text" id="aiCiPai" placeholder="如：浣溪沙、清平乐">
+  <div class="two-cols">
+    <div class="compact-row">
+      <span class="label">韵律：</span>
+      <div class="control">
+        <select id="aiRhyme">
+          <option value="1">平水韵</option>
+          <option value="2">中华新韵</option>
+          <option value="3">中华通韵</option>
+          <option value="4">词林正韵</option>
+        </select>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="label">体裁：</span>
+      <div class="control">
+        <select id="aiGenre">
+          <option value="1">五绝</option>
+          <option value="2">五律</option>
+          <option value="3">七绝</option>
+          <option value="4">七律</option>
+          <option value="5">其他词牌</option>
+        </select>
+      </div>
     </div>
   </div>
-  <div class="ai-poem-form-group">
-    <label>关键词/描述：</label>
-    <textarea id="aiPrompt" placeholder="输入几个关键词或用一段话描述您想要的诗词内容，例如：春天 花朵 思乡"></textarea>
+  <div id="ciPaiGroup" class="compact-row ci-pai-group" style="display: none;">
+    <span class="label">词牌名：</span>
+    <div class="control">
+      <input type="text" id="aiCiPai" placeholder="例如：浣溪沙、清平乐">
+    </div>
   </div>
-  <button class="search-btn" onclick="generatePoem()" style="margin-left:0;">生成诗词</button>
-  <div id="aiPoemResult" class="ai-poem-result" style="display:none;"></div>
+  <div class="prompt-section">
+    <div class="prompt-label">关键词/描述：</div>
+    <div class="prompt-textarea">
+      <textarea id="aiPrompt" placeholder="输入几个关键词或用一段话描述诗词内容，例如：春天 思乡 柳絮"></textarea>
+    </div>
+  </div>
+  <div class="button-row">
+    <button class="generate-btn" id="generatePoemBtn">生成诗词</button>
+  </div>
+  <div id="aiPoemResult" class="ai-poem-result">
+    <div id="poemOutput"></div>
+    <button id="copyPoemBtn" class="copy-btn" style="display: none;">复制诗词</button>
+  </div>
 </div>
 </div>
 </div>
@@ -622,7 +855,10 @@ function openAiPoem() {
     document.getElementById('aiGenre').value = '1';
     document.getElementById('aiCiPai').value = '';
     document.getElementById('aiPrompt').value = '';
-    document.getElementById('aiPoemResult').style.display = 'none';
+    const resultDiv = document.getElementById('aiPoemResult');
+    resultDiv.classList.remove('show');
+    document.getElementById('poemOutput').innerHTML = '';
+    document.getElementById('copyPoemBtn').style.display = 'none';
     document.getElementById('ciPaiGroup').style.display = 'none';
 }
 function closeAiPoem() {
@@ -633,10 +869,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (genreSelect) {
         genreSelect.addEventListener('change', function() {
             const ciPaiGroup = document.getElementById('ciPaiGroup');
-            ciPaiGroup.style.display = this.value === '5' ? 'block' : 'none';
+            ciPaiGroup.style.display = this.value === '5' ? 'flex' : 'none';
         });
     }
 });
+
 async function generatePoem() {
     const rhyme = document.getElementById('aiRhyme').value;
     const genreVal = document.getElementById('aiGenre').value;
@@ -662,11 +899,15 @@ async function generatePoem() {
     let rhymeText = '';
     if (rhyme === '1') rhymeText = '平水韵';
     else if (rhyme === '2') rhymeText = '中华新韵';
+    else if (rhyme === '3') rhymeText = '中华通韵';
     else rhymeText = '词林正韵';
     
     const resultDiv = document.getElementById('aiPoemResult');
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '⏳ AI 正在创作中，请稍候...';
+    const poemOutput = document.getElementById('poemOutput');
+    const copyBtn = document.getElementById('copyPoemBtn');
+    resultDiv.classList.add('show');
+    poemOutput.innerText = '✍️ AI 正在创作中，请稍候...';
+    copyBtn.style.display = 'none';
     try {
         const response = await fetch(AI_POEM_WORKER_URL, {
             method: 'POST',
@@ -680,21 +921,33 @@ async function generatePoem() {
         });
         const data = await response.json();
         if (data.poem) {
-            resultDiv.innerHTML = `<strong>生成的诗词：</strong><br>${data.poem.replace(/\n/g, '<br>')}<br><button class="search-btn" style="margin-top:10px;" onclick="copyPoem()">复制诗词</button>`;
-            window.lastGeneratedPoem = data.poem;
+            poemOutput.innerText = data.poem;
+            copyBtn.style.display = 'inline-block';
         } else {
-            resultDiv.innerHTML = `生成失败：${data.error || '未知错误'}`;
+            poemOutput.innerText = '生成失败：' + (data.error || '未知错误');
         }
     } catch (err) {
-        resultDiv.innerHTML = `网络错误：${err.message}`;
+        poemOutput.innerText = '网络错误：' + err.message;
     }
 }
+
 function copyPoem() {
-    if (window.lastGeneratedPoem) {
-        navigator.clipboard.writeText(window.lastGeneratedPoem);
-        alert('已复制诗词到剪贴板');
-    }
+    const poemText = document.getElementById('poemOutput').innerText;
+    if (!poemText || poemText.includes('正在创作中') || poemText.includes('失败')) return;
+    navigator.clipboard.writeText(poemText).then(() => {
+        alert('✅ 诗词已复制到剪贴板');
+    }).catch(() => {
+        alert('复制失败，请手动复制');
+    });
 }
+
+// 绑定 AI 写诗按钮事件（需要在 DOM 加载后）
+document.addEventListener('DOMContentLoaded', function() {
+    const genBtn = document.getElementById('generatePoemBtn');
+    if (genBtn) genBtn.addEventListener('click', generatePoem);
+    const copyBtn = document.getElementById('copyPoemBtn');
+    if (copyBtn) copyBtn.addEventListener('click', copyPoem);
+});
 
 // ========== 每首诗词独立评论加载 ==========
 function loadPoemComment(poemId, containerId) {
@@ -895,12 +1148,9 @@ window.onload = init;
 <!-- ==================== Twikoo 评论区专家优化代码 ==================== -->
 <script>
 (function() {
-  // 第一步：页面加载前清除记忆数据，确保昵称框为空
   try {
     localStorage.removeItem('twikoo');
   } catch(e) {}
-
-  // 第二步：页面加载完成后，处理版权链接（去掉超链接，保留文字）
   window.addEventListener('load', function() {
     setTimeout(function() {
       var footerLinks = document.querySelectorAll('.tk-footer a');

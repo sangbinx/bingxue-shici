@@ -139,7 +139,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（AI写诗融合版 - 紧凑布局+四韵律）")
+    print("   正在生成冰雪诗词数字图书馆（AI写诗布局优化+手机适配修复）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -272,146 +272,113 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .footer {{ background: #1b5e20; color: #c8e6c9; text-align: center; padding: 10px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; }}
 .footer .counter {{ font-size: 0.9em; }}
 .footer .qrcode-container img {{ width: 80px; height: 80px; border-radius: 4px; }}
-/* AI写诗模态框样式（紧凑布局，浅粉色，四韵律） */
+/* AI写诗模态框样式 - 按您的布局要求 */
 #aiPoemModal .guestbook-modal-content {{
-    background: #fce4e4;
-    border-radius: 16px;
-    padding: 20px 24px;
     width: 50%;
-    max-width: 550px;
+    max-width: 600px;
     max-height: 85vh;
     overflow-y: auto;
-    border: 1px solid #f0d0d0;
 }}
 #aiPoemModal .modal-header {{
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e8c8c8;
+    border-bottom: 1px solid #e0d5c8;
+    padding-bottom: 10px;
 }}
 #aiPoemModal .modal-header h3 {{
-    font-size: 1.1rem;
-    font-weight: normal;
-    color: #a33;
     margin: 0;
+    font-size: 1.1em;
+    color: #2e7d32;
+    font-weight: normal;
 }}
 #aiPoemModal .modal-header .modal-close {{
-    font-size: 1.4rem;
+    font-size: 1.3em;
     cursor: pointer;
-    color: #c66;
     line-height: 1;
+    color: #999;
 }}
 #aiPoemModal .modal-header .modal-close:hover {{
-    color: #a33;
+    color: #333;
 }}
-#aiPoemModal .compact-row {{
+#aiPoemModal .form-row {{
     display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 15px;
 }}
-#aiPoemModal .compact-row .label {{
-    width: 60px;
-    flex-shrink: 0;
+#aiPoemModal .form-row .form-group {{
+    flex: 1;
+}}
+#aiPoemModal .form-group {{
+    margin-bottom: 15px;
+}}
+#aiPoemModal .form-group label {{
+    display: block;
+    margin-bottom: 5px;
     font-weight: bold;
-    font-size: 0.9rem;
-    color: #a33;
+    font-size: 0.9em;
 }}
-#aiPoemModal .compact-row .control {{
-    flex: 1;
-}}
-#aiPoemModal .compact-row select,
-#aiPoemModal .compact-row input {{
+#aiPoemModal .form-group select,
+#aiPoemModal .form-group input {{
     width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #e0c0c0;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: #fffef9;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
 }}
-#aiPoemModal .two-cols {{
-    display: flex;
-    gap: 20px;
-    margin-bottom: 16px;
-}}
-#aiPoemModal .two-cols .compact-row {{
-    flex: 1;
-    margin-bottom: 0;
-}}
-#aiPoemModal .ci-pai-group {{
-    margin-bottom: 16px;
-}}
+/* 关键词/描述区域：标签和按钮在左侧，描述框占满剩余空间 */
 #aiPoemModal .prompt-section {{
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 8px;
+    margin-bottom: 15px;
 }}
 #aiPoemModal .prompt-label {{
-    width: 60px;
+    width: 90px;
     flex-shrink: 0;
     padding-top: 8px;
     font-weight: bold;
-    font-size: 0.9rem;
-    color: #a33;
+    font-size: 0.9em;
 }}
 #aiPoemModal .prompt-textarea {{
     flex: 1;
 }}
 #aiPoemModal .prompt-textarea textarea {{
     width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #e0c0c0;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+    height: 120px;
     resize: vertical;
-    height: 110px;
-    background: #fffef9;
 }}
 #aiPoemModal .button-row {{
-    margin-top: 4px;
-    margin-bottom: 20px;
-    padding-left: 60px;
+    margin-top: 5px;
+    padding-left: 90px;
 }}
-#aiPoemModal .generate-btn {{
-    background-color: #a33;
+#aiPoemModal .search-btn {{
+    width: auto;
+    padding: 8px 20px;
+    background-color: #4caf50;
     color: white;
     border: none;
-    padding: 8px 20px;
-    border-radius: 30px;
-    font-size: 0.9rem;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background 0.2s;
+    font-size: 0.9em;
 }}
-#aiPoemModal .generate-btn:hover {{
-    background-color: #722;
+#aiPoemModal .search-btn:hover {{
+    background-color: #388e3c;
 }}
 #aiPoemModal .ai-poem-result {{
-    background: #fff8f0;
-    border-radius: 12px;
-    padding: 14px;
-    margin-top: 8px;
-    border: 1px solid #e8d0d0;
-    font-size: 0.9rem;
-    line-height: 1.65;
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    font-size: 0.9em;
+    line-height: 1.6;
     white-space: pre-wrap;
-    max-height: 260px;
+    max-height: 300px;
     overflow-y: auto;
-    display: none;
-}}
-#aiPoemModal .ai-poem-result.show {{
-    display: block;
-}}
-#aiPoemModal .copy-btn {{
-    background: #c96;
-    color: #fff;
-    border: none;
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    margin-top: 10px;
-    cursor: pointer;
 }}
 /* 评论区专家优化样式 */
 .tk-preview {{ display: none !important; }}
@@ -421,7 +388,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 [class*="OwO"],
 .tk-upload-btn,
 [class*="upload"] {{ display: none !important; }}
-/* 手机版适配 */
+/* ========== 手机端样式 ========== */
 @media screen and (max-width: 1024px) {{
     body {{ min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }}
     .header {{ padding: 8px 12px; gap: 4px; }}
@@ -472,45 +439,32 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     .footer {{ font-size: 0.7em; padding: 8px; gap: 10px; }}
     .footer .qrcode-container img {{ width: 60px; height: 60px; }}
     .back-to-top {{ bottom: 20px; right: 20px; width: 38px; height: 38px; font-size: 1em; }}
-    /* AI写诗手机版 */
+    /* AI写诗模态框手机版调整 */
     #aiPoemModal .guestbook-modal-content {{
         width: 95% !important;
         max-width: 95% !important;
     }}
-    #aiPoemModal .compact-row .label {{
-        width: 55px;
-        font-size: 0.85rem;
-    }}
     #aiPoemModal .prompt-label {{
-        width: 55px;
-        font-size: 0.85rem;
+        width: 80px;
     }}
     #aiPoemModal .button-row {{
-        padding-left: 55px;
-    }}
-    #aiPoemModal .two-cols {{
-        flex-direction: column;
-        gap: 12px;
+        padding-left: 80px;
     }}
 }}
 @media screen and (max-width: 480px) {{
     .header h1 {{ font-size: 1.1em; letter-spacing: 2px; }}
     .center-buttons button {{ font-size: 0.72em; padding: 6px 8px; }}
     .poem-body {{ font-size: 0.9em; }}
-    #aiPoemModal .compact-row .label {{
-        width: 50px;
-        font-size: 0.8rem;
-    }}
     #aiPoemModal .prompt-label {{
-        width: 50px;
-        font-size: 0.8rem;
+        width: 70px;
+        font-size: 0.85em;
     }}
     #aiPoemModal .button-row {{
-        padding-left: 50px;
+        padding-left: 70px;
     }}
-    #aiPoemModal .generate-btn {{
+    #aiPoemModal .search-btn {{
         padding: 6px 16px;
-        font-size: 0.85rem;
+        font-size: 0.85em;
     }}
 }}
 </style>
@@ -602,58 +556,49 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 </div>
 </div>
 
-<!-- AI写诗模态框（紧凑布局，四韵律） -->
+<!-- AI写诗模态框（重新布局） -->
 <div class="modal" id="aiPoemModal">
 <div class="guestbook-modal-content">
 <div class="modal-header">
-  <h3>🤖 AI写诗</h3>
+  <h3>AI写诗</h3>
   <span class="modal-close" onclick="closeAiPoem()">&times;</span>
 </div>
 <div>
-  <div class="two-cols">
-    <div class="compact-row">
-      <span class="label">韵律：</span>
-      <div class="control">
-        <select id="aiRhyme">
-          <option value="1">平水韵</option>
-          <option value="2">中华新韵</option>
-          <option value="3">中华通韵</option>
-          <option value="4">词林正韵</option>
-        </select>
-      </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>韵律：</label>
+      <select id="aiRhyme">
+        <option value="1">平水韵</option>
+        <option value="2">中华新韵</option>
+        <option value="3">词林正韵</option>
+      </select>
     </div>
-    <div class="compact-row">
-      <span class="label">体裁：</span>
-      <div class="control">
-        <select id="aiGenre">
-          <option value="1">五绝</option>
-          <option value="2">五律</option>
-          <option value="3">七绝</option>
-          <option value="4">七律</option>
-          <option value="5">其他词牌</option>
-        </select>
-      </div>
+    <div class="form-group">
+      <label>体裁：</label>
+      <select id="aiGenre">
+        <option value="1">五绝</option>
+        <option value="2">五律</option>
+        <option value="3">七绝</option>
+        <option value="4">七律</option>
+        <option value="5">其他词牌</option>
+      </select>
     </div>
   </div>
-  <div id="ciPaiGroup" class="compact-row ci-pai-group" style="display: none;">
-    <span class="label">词牌名：</span>
-    <div class="control">
-      <input type="text" id="aiCiPai" placeholder="例如：浣溪沙、清平乐">
-    </div>
+  <div id="ciPaiGroup" style="display:none; margin-bottom:15px;">
+    <label>词牌名：</label>
+    <input type="text" id="aiCiPai" placeholder="如：浣溪沙、清平乐">
   </div>
+  <!-- 关键词/描述区域：标签固定宽度，按钮在标签下方 -->
   <div class="prompt-section">
     <div class="prompt-label">关键词/描述：</div>
     <div class="prompt-textarea">
-      <textarea id="aiPrompt" placeholder="输入几个关键词或用一段话描述诗词内容，例如：春天 思乡 柳絮"></textarea>
+      <textarea id="aiPrompt" placeholder="输入几个关键词或用一段话描述您想要的诗词内容，例如：春天 花朵 思乡"></textarea>
     </div>
   </div>
   <div class="button-row">
-    <button class="generate-btn" id="generatePoemBtn">生成诗词</button>
+    <button class="search-btn" onclick="generatePoem()">生成诗词</button>
   </div>
-  <div id="aiPoemResult" class="ai-poem-result">
-    <div id="poemOutput"></div>
-    <button id="copyPoemBtn" class="copy-btn" style="display: none;">复制诗词</button>
-  </div>
+  <div id="aiPoemResult" class="ai-poem-result" style="display:none;"></div>
 </div>
 </div>
 </div>
@@ -668,7 +613,7 @@ const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲
 const FRIENDLY_LINKS = {links_json};
 
 // DeepSeek API 配置（使用独立的 AI Poem Worker 地址）
-const AI_POEM_WORKER_URL = 'https://poem.bingxue2026.com';  // 请替换为您的 AI 写诗 Worker 地址
+const AI_POEM_WORKER_URL = 'https://poem.冰雪2026.com';  // 请替换为您的 AI 写诗 Worker 地址
 
 // ========== 本地编辑管理 ==========
 let editedPoems = JSON.parse(localStorage.getItem('editedPoems') || '{{}}');
@@ -1020,10 +965,7 @@ function openAiPoem() {{
     document.getElementById('aiGenre').value = '1';
     document.getElementById('aiCiPai').value = '';
     document.getElementById('aiPrompt').value = '';
-    const resultDiv = document.getElementById('aiPoemResult');
-    resultDiv.classList.remove('show');
-    document.getElementById('poemOutput').innerHTML = '';
-    document.getElementById('copyPoemBtn').style.display = 'none';
+    document.getElementById('aiPoemResult').style.display = 'none';
     document.getElementById('ciPaiGroup').style.display = 'none';
 }}
 function closeAiPoem() {{
@@ -1034,11 +976,10 @@ document.addEventListener('DOMContentLoaded', function() {{
     if (genreSelect) {{
         genreSelect.addEventListener('change', function() {{
             const ciPaiGroup = document.getElementById('ciPaiGroup');
-            ciPaiGroup.style.display = this.value === '5' ? 'flex' : 'none';
+            ciPaiGroup.style.display = this.value === '5' ? 'block' : 'none';
         }});
     }}
 }});
-
 async function generatePoem() {{
     const rhyme = document.getElementById('aiRhyme').value;
     const genreVal = document.getElementById('aiGenre').value;
@@ -1064,15 +1005,11 @@ async function generatePoem() {{
     let rhymeText = '';
     if (rhyme === '1') rhymeText = '平水韵';
     else if (rhyme === '2') rhymeText = '中华新韵';
-    else if (rhyme === '3') rhymeText = '中华通韵';
     else rhymeText = '词林正韵';
     
     const resultDiv = document.getElementById('aiPoemResult');
-    const poemOutput = document.getElementById('poemOutput');
-    const copyBtn = document.getElementById('copyPoemBtn');
-    resultDiv.classList.add('show');
-    poemOutput.innerText = '✍️ AI 正在创作中，请稍候...';
-    copyBtn.style.display = 'none';
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '⏳ AI 正在创作中，请稍候...';
     try {{
         const response = await fetch(AI_POEM_WORKER_URL, {{
             method: 'POST',
@@ -1086,33 +1023,21 @@ async function generatePoem() {{
         }});
         const data = await response.json();
         if (data.poem) {{
-            poemOutput.innerText = data.poem;
-            copyBtn.style.display = 'inline-block';
+            resultDiv.innerHTML = `<strong>生成的诗词：</strong><br>${{data.poem.replace(/\\n/g, '<br>')}}<br><button class="search-btn" style="margin-top:10px;" onclick="copyPoem()">复制诗词</button>`;
+            window.lastGeneratedPoem = data.poem;
         }} else {{
-            poemOutput.innerText = '生成失败：' + (data.error || '未知错误');
+            resultDiv.innerHTML = `生成失败：${{data.error || '未知错误'}}`;
         }}
     }} catch (err) {{
-        poemOutput.innerText = '网络错误：' + err.message;
+        resultDiv.innerHTML = `网络错误：${{err.message}}`;
     }}
 }}
-
 function copyPoem() {{
-    const poemText = document.getElementById('poemOutput').innerText;
-    if (!poemText || poemText.includes('正在创作中') || poemText.includes('失败')) return;
-    navigator.clipboard.writeText(poemText).then(() => {{
-        alert('✅ 诗词已复制到剪贴板');
-    }}).catch(() => {{
-        alert('复制失败，请手动复制');
-    }});
+    if (window.lastGeneratedPoem) {{
+        navigator.clipboard.writeText(window.lastGeneratedPoem);
+        alert('已复制诗词到剪贴板');
+    }}
 }}
-
-// 绑定 AI 写诗按钮事件（需要在 DOM 加载后）
-document.addEventListener('DOMContentLoaded', function() {{
-    const genBtn = document.getElementById('generatePoemBtn');
-    if (genBtn) genBtn.addEventListener('click', generatePoem);
-    const copyBtn = document.getElementById('copyPoemBtn');
-    if (copyBtn) copyBtn.addEventListener('click', copyPoem);
-}});
 
 // ========== 每首诗词独立评论加载 ==========
 function loadPoemComment(poemId, containerId) {{
@@ -1313,9 +1238,12 @@ window.onload = init;
 <!-- ==================== Twikoo 评论区专家优化代码 ==================== -->
 <script>
 (function() {{
+  // 第一步：清除记忆数据，确保昵称框为空
   try {{
     localStorage.removeItem('twikoo');
   }} catch(e) {{}}
+
+  // 第二步：页面加载完成后，处理版权链接（去掉超链接，保留文字）
   window.addEventListener('load', function() {{
     setTimeout(function() {{
       var footerLinks = document.querySelectorAll('.tk-footer a');
@@ -1342,10 +1270,11 @@ window.onload = init;
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     print("✅ 本次修改完成：")
-    print("   1. AI写诗模块采用紧凑布局：韵律+体裁并排，按钮放在关键词标签正下方")
-    print("   2. 韵律下拉菜单增加“中华通韵”（共四项）")
-    print("   3. 窗口底色为浅粉色，整体风格统一")
-    print("   4. 保留所有原有功能（图片、检索、菜单、评论区优化等）")
+    print("   1. AI写诗窗口重新布局：标题行简化，韵律和体裁并排")
+    print("   2. 关键词/描述标签固定宽度，生成诗词按钮放在标签正下方，宽度与标签一致")
+    print("   3. 手机适配版全面修复（媒体查询补全）")
+    print("   4. 编辑按钮在手机端可正常弹出密码框")
+    print("   5. 评论区专家优化（昵称清空、按钮隐藏、版权去链接）")
     print("⚠️  请务必在脚本开头的 AI_POEM_WORKER_URL 中填入实际的 Worker 地址")
     os.system("pause")
 

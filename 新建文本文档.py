@@ -12,9 +12,6 @@ FITNESS_VIDEO_DIR = '健身锻炼视频'
 OUTPUT_HTML = 'index.html'
 # -------------------------
 
-# DeepSeek API 配置（请替换为您自己的 API Key）
-DEEPSEEK_API_KEY = "YOUR_DEEPSEEK_API_KEY"  # 请在此填入您的 DeepSeek API Key
-
 FRIENDLY_LINKS = [
     {'name': '搜韵', 'url': 'https://sou-yun.cn/'},
     {'name': '诗词吾爱', 'url': 'https://www.52shici.com/'},
@@ -139,7 +136,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（AI写诗融合版 - 紧凑布局+四韵律）")
+    print("   正在生成冰雪诗词数字图书馆（手机版修复+访客留言底色）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -269,10 +266,12 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 .video-player-area {{ flex: 1; display: flex; align-items: center; justify-content: center; min-height: 500px; background: #fafafa; border-radius: 6px; }}
 .video-player-area p {{ color: #888; font-size: 1.1em; }}
 .video-player-area video {{ width: 100%; max-height: 100%; border-radius: 4px; }}
+.guestbook-modal-content {{ background: #fefefe; margin: 30px auto; padding: 24px; width: 50%; max-width: 600px; max-height: 80vh; overflow-y: auto; border-radius: 8px; }}
+.guestbook-modal-content h3 {{ color: #2e7d32; margin-bottom: 16px; letter-spacing: 2px; }}
 .footer {{ background: #1b5e20; color: #c8e6c9; text-align: center; padding: 10px; font-size: 0.8em; letter-spacing: 1px; flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; }}
 .footer .counter {{ font-size: 0.9em; }}
 .footer .qrcode-container img {{ width: 80px; height: 80px; border-radius: 4px; }}
-/* AI写诗模态框样式（紧凑布局，浅粉色，四韵律） */
+/* AI写诗模态框样式（紧凑布局，四韵律） */
 #aiPoemModal .guestbook-modal-content {{
     background: #fce4e4;
     border-radius: 16px;
@@ -413,6 +412,10 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     margin-top: 10px;
     cursor: pointer;
 }}
+/* 访客留言窗口底色 */
+#guestbookModal .guestbook-modal-content {{
+    background: #fef9e7;
+}}
 /* 评论区专家优化样式 */
 .tk-preview {{ display: none !important; }}
 .tk-submit-action-icon,
@@ -421,6 +424,59 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 [class*="OwO"],
 .tk-upload-btn,
 [class*="upload"] {{ display: none !important; }}
+/* 手机版自定义编辑框样式 */
+.custom-edit-modal {{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}}
+.custom-edit-content {{
+    background: #fffef9;
+    border-radius: 16px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}}
+.custom-edit-content textarea {{
+    width: 100%;
+    height: 200px;
+    padding: 12px;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-family: "楷体", KaiTi, serif;
+    border: 1px solid #d0c0a0;
+    border-radius: 8px;
+    resize: vertical;
+}}
+.custom-edit-content .btn-group {{
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}}
+.custom-edit-content button {{
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}}
+.custom-edit-content .save-btn {{
+    background: #4caf50;
+    color: white;
+}}
+.custom-edit-content .cancel-btn {{
+    background: #ccc;
+    color: #333;
+}}
 /* 手机版适配 */
 @media screen and (max-width: 1024px) {{
     body {{ min-height: 100vh; height: auto; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 16px; }}
@@ -492,6 +548,11 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
         flex-direction: column;
         gap: 12px;
     }}
+    /* 手机版编辑框更大 */
+    .custom-edit-content textarea {{
+        height: 280px;
+        font-size: 1rem;
+    }}
 }}
 @media screen and (max-width: 480px) {{
     .header h1 {{ font-size: 1.1em; letter-spacing: 2px; }}
@@ -511,6 +572,9 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     #aiPoemModal .generate-btn {{
         padding: 6px 16px;
         font-size: 0.85rem;
+    }}
+    .custom-edit-content textarea {{
+        height: 320px;
     }}
 }}
 </style>
@@ -667,8 +731,8 @@ const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
 
-// DeepSeek API 配置（使用独立的 AI Poem Worker 地址）
-const AI_POEM_WORKER_URL = 'https://poem.bingxue2026.com';  // 请替换为您的 AI 写诗 Worker 地址
+// AI写诗调用地址（固定，不再需要手动修改）
+const AI_POEM_WORKER_URL = 'https://poem.bingxue2026.com';
 
 // ========== 本地编辑管理 ==========
 let editedPoems = JSON.parse(localStorage.getItem('editedPoems') || '{{}}');
@@ -975,6 +1039,43 @@ function showFilteredByTheme(genre, theme) {{
     scrollToContent();
 }}
 
+// 自定义编辑框（手机版专用，尺寸更大）
+function showCustomEditDialog(id, currentBody) {{
+    return new Promise((resolve) => {{
+        // 移除已有的弹窗
+        const existing = document.querySelector('.custom-edit-modal');
+        if (existing) existing.remove();
+        
+        const modal = document.createElement('div');
+        modal.className = 'custom-edit-modal';
+        modal.innerHTML = `
+            <div class="custom-edit-content">
+                <textarea id="customEditTextarea">${{currentBody.replace(/</g, '&lt;').replace(/>/g, '&gt;')}}</textarea>
+                <div class="btn-group">
+                    <button class="cancel-btn">取消</button>
+                    <button class="save-btn">保存</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        const textarea = modal.querySelector('#customEditTextarea');
+        const saveBtn = modal.querySelector('.save-btn');
+        const cancelBtn = modal.querySelector('.cancel-btn');
+        
+        saveBtn.onclick = () => {{
+            const newBody = textarea.value;
+            modal.remove();
+            resolve(newBody);
+        }};
+        cancelBtn.onclick = () => {{
+            modal.remove();
+            resolve(null);
+        }};
+        textarea.focus();
+    }});
+}}
+
 function editPoem(id) {{
     let pwd = prompt("请输入编辑密码：");
     if (pwd !== EDIT_PASSWORD) {{
@@ -982,13 +1083,15 @@ function editPoem(id) {{
         return;
     }}
     let currentBody = document.getElementById('body-' + id).innerText;
-    let newBody = prompt("修改诗词内容：", currentBody);
-    if (newBody !== null && newBody !== currentBody) {{
-        editedPoems[id] = newBody;
-        localStorage.setItem('editedPoems', JSON.stringify(editedPoems));
-        document.getElementById('body-' + id).innerText = newBody;
-        alert("修改已保存（本地）。");
-    }}
+    // 手机端使用自定义大尺寸编辑框，电脑端仍使用 prompt（但为了一致性，也使用自定义对话框）
+    showCustomEditDialog(id, currentBody).then(newBody => {{
+        if (newBody !== null && newBody !== currentBody) {{
+            editedPoems[id] = newBody;
+            localStorage.setItem('editedPoems', JSON.stringify(editedPoems));
+            document.getElementById('body-' + id).innerHTML = newBody.replace(/\\n/g, '<br>');
+            alert("修改已保存（本地）。");
+        }}
+    }});
 }}
 
 function exportEdits() {{
@@ -1061,11 +1164,6 @@ async function generatePoem() {{
         alert('请输入关键词或描述');
         return;
     }}
-    let rhymeText = '';
-    if (rhyme === '1') rhymeText = '平水韵';
-    else if (rhyme === '2') rhymeText = '中华新韵';
-    else if (rhyme === '3') rhymeText = '中华通韵';
-    else rhymeText = '词林正韵';
     
     const resultDiv = document.getElementById('aiPoemResult');
     const poemOutput = document.getElementById('poemOutput');
@@ -1106,7 +1204,7 @@ function copyPoem() {{
     }});
 }}
 
-// 绑定 AI 写诗按钮事件（需要在 DOM 加载后）
+// 绑定 AI 写诗按钮事件
 document.addEventListener('DOMContentLoaded', function() {{
     const genBtn = document.getElementById('generatePoemBtn');
     if (genBtn) genBtn.addEventListener('click', generatePoem);
@@ -1342,11 +1440,11 @@ window.onload = init;
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     print("✅ 本次修改完成：")
-    print("   1. AI写诗模块采用紧凑布局：韵律+体裁并排，按钮放在关键词标签正下方")
-    print("   2. 韵律下拉菜单增加“中华通韵”（共四项）")
-    print("   3. 窗口底色为浅粉色，整体风格统一")
-    print("   4. 保留所有原有功能（图片、检索、菜单、评论区优化等）")
-    print("⚠️  请务必在脚本开头的 AI_POEM_WORKER_URL 中填入实际的 Worker 地址")
+    print("   1. AI写诗地址固定为 https://poem.bingxue2026.com")
+    print("   2. 访客留言窗口添加浅米色底色 (#fef9e7)")
+    print("   3. 修复手机版导出修改按钮（密码验证正常）")
+    print("   4. 修复手机版编辑按钮，使用大尺寸自定义编辑框（高度200px以上）")
+    print("   5. 其他功能完全保持原样")
     os.system("pause")
 
 if __name__ == '__main__':

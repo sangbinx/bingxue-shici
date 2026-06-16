@@ -178,7 +178,7 @@ var _hmt = _hmt || [];
 }})();
 </script>
 -->
-<script>
+<!--<script>
 (function() {{
   // ==================== 统计引擎 ====================
   var STORAGE_KEY = 'site_visitor_stats';
@@ -265,6 +265,58 @@ var _hmt = _hmt || [];
 
 }})();
 </script>
+-->
+<!-- ==================== 访客统计模块 ==================== -->
+<script>
+(function() {{
+  // ========== 百度统计 ==========
+  var _hmt = _hmt || [];
+  (function() {{
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?a78c6d40062f7f473f651d5f5670fe85";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  }})();
+
+  // ========== 独立访客统计（D1数据库） ==========
+  const WORKER_URL = 'https://visitor-stats-worker.sangbinx.workers.dev';
+
+  function getSource() {{
+    var ref = document.referrer || '';
+    if (ref.indexOf('baidu.com') !== -1) return 'baidu';
+    if (ref.indexOf('toutiao.com') !== -1) return 'toutiao';
+    if (ref.indexOf('so.com') !== -1) return '360';
+    if (ref.indexOf('sogou.com') !== -1) return 'sogou';
+    return 'direct';
+  }}
+
+  async function reportVisit() {{
+    try {{
+      await fetch(WORKER_URL, {{
+        method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{ source: getSource() }})
+      }});
+    }} catch (e) {{}}
+  }}
+
+  async function loadStats() {{
+    try {{
+      var response = await fetch(WORKER_URL);
+      var data = await response.json();
+      var todayElem = document.getElementById('todayVisitorCount');
+      var totalElem = document.getElementById('totalVisitorCount');
+      if (todayElem) todayElem.innerText = data.today_visitors || 0;
+      if (totalElem) totalElem.innerText = data.total_visitors || 0;
+    }} catch (e) {{}}
+  }}
+
+  reportVisit().then(function() {{
+    setTimeout(loadStats, 1000);
+  }});
+}})();
+</script>
+<!-- ==================== 统计模块结束 ==================== -->
 <!-- 百度统计代码结束 -->
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
@@ -716,12 +768,15 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 
 <div class="footer">
   <span>冰雪诗词数字图书馆 © 2026 | 共收录 {len(poems)} 首诗词</span>
+<span class="counter">累计访问：<span id="totalVisitorCount">加载中</span> 次</span>
+<span class="counter">今日访客：<span id="todayVisitorCount">加载中</span> 人</span>
 <!--
   <span class="counter">累计访问：<span id="busuanzi_value_site_pv">加载中</span> 次</span>
   <span class="counter">今日访客：<span id="todayVisitorCount">加载中</span> 人</span>
--->
+
 <span class="counter">累计访问：<span id="visitor-total">加载中</span> 次</span>
   <span class="counter">今日访客：<span id="visitor-today">加载中</span> 人</span>
+-->
   <div class="qrcode-container" title="扫码访问冰雪诗词">
     <img src="qrcode.jpg" alt="网站二维码" onerror="this.parentElement.innerHTML='<span style=color:#a0c0a0;font-size:0.7em;>📷二维码</span>'">
   </div>
@@ -815,7 +870,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 </div>
 </div>
 
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!--<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>-->
 <script src="https://unpkg.com/twikoo@1.6.40/dist/twikoo.all.min.js"></script>
 <script>
 const POEMS = {poems_json};

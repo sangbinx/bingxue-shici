@@ -167,6 +167,7 @@ def main():
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <title>冰雪诗词 · 数字图书馆</title>
 <!-- 百度统计代码开始 -->
+<!--
 <script>
 var _hmt = _hmt || [];
 (function() {{
@@ -176,6 +177,138 @@ var _hmt = _hmt || [];
   s.parentNode.insertBefore(hm, s);
 }})();
 </script>
+-->
+<!--<script>
+(function() {{
+  // ==================== 统计引擎 ====================
+  var STORAGE_KEY = 'site_visitor_stats';
+
+  function getSource() {{
+    var ref = document.referrer || '';
+    if (ref.indexOf('baidu.com') > -1) return '百度';
+    if (ref.indexOf('toutiao.com') > -1 || ref.indexOf('byteurl.com') > -1) return '今日头条';
+    if (ref.indexOf('google.com') > -1) return 'Google';
+    if (ref.indexOf('bing.com') > -1) return 'Bing';
+    if (ref) return '其他外链';
+    return '直接访问';
+  }}
+
+  function getToday() {{
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+  }}
+
+  function getStats() {{
+    try {{
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{{}}');
+    }} catch(e) {{
+      return {{}};
+    }}
+  }}
+
+  function saveStats(data) {{
+    try {{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }} catch(e) {{}}
+  }}
+
+  function countVisitor() {{
+    var data = getStats();
+    var today = getToday();
+    var source = getSource();
+
+    if (!data.total) data.total = {{}};
+    if (!data.daily) data.daily = {{}};
+
+    if (data.lastDate !== today) {{
+      data.daily = {{}};
+      data.lastDate = today;
+    }}
+
+    data.total[source] = (data.total[source] || 0) + 1;
+    data.daily[source] = (data.daily[source] || 0) + 1;
+
+    saveStats(data);
+    return data;
+  }}
+
+  function getSum(obj) {{
+    var sum = 0;
+    for (var k in obj) {{
+      if (obj.hasOwnProperty(k)) sum += obj[k];
+    }}
+    return sum;
+  }}
+
+  // ==================== 执行统计 ====================
+  countVisitor();
+
+  // ==================== 更新页面显示 ====================
+  function updateDisplay() {{
+    var data = getStats();
+    var totalAll = getSum(data.total || {{}});
+    var dailyAll = getSum(data.daily || {{}});
+
+    var elTotal = document.getElementById('visitor-total');
+    var elToday = document.getElementById('visitor-today');
+
+    if (elTotal) elTotal.textContent = totalAll;
+    if (elToday) elToday.textContent = dailyAll;
+  }}
+
+  // 页面加载完成后执行显示
+  if (document.readyState === 'loading') {{
+    document.addEventListener('DOMContentLoaded', updateDisplay);
+  }} else {{
+    updateDisplay();
+  }}
+
+}})();
+</script>
+-->
+<!-- ==================== 访客统计模块 ==================== -->
+<!-- ==================== 访客统计模块 ==================== -->
+<script>
+(function() {{
+  const WORKER_URL = 'https://visitor.bingxue2026.com';
+
+  function getSource() {{
+    var ref = document.referrer || '';
+    if (ref.indexOf('baidu.com') !== -1) return 'baidu';
+    if (ref.indexOf('toutiao.com') !== -1) return 'toutiao';
+    if (ref.indexOf('so.com') !== -1) return '360';
+    if (ref.indexOf('sogou.com') !== -1) return 'sogou';
+    return 'direct';
+  }}
+
+  async function reportVisit() {{
+    try {{
+      await fetch(WORKER_URL, {{
+        method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{ source: getSource() }})
+      }});
+    }} catch (e) {{}}
+  }}
+
+  async function loadStats() {{
+    try {{
+      var response = await fetch(WORKER_URL);
+      var data = await response.json();
+      var todayElem = document.getElementById('todayVisitorCount');
+      var totalElem = document.getElementById('totalVisitorCount');
+      if (todayElem) todayElem.innerText = data.today_visitors || 0;
+      if (totalElem) totalElem.innerText = data.total_visitors || 0;
+    }} catch (e) {{}}
+  }}
+
+  reportVisit().then(function() {{
+    setTimeout(loadStats, 1000);
+  }});
+}})();
+</script>
+<!-- ==================== 统计模块结束 ==================== -->
+<!-- ==================== 统计模块结束 ==================== -->
 <!-- 百度统计代码结束 -->
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
@@ -627,8 +760,15 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 
 <div class="footer">
   <span>冰雪诗词数字图书馆 © 2026 | 共收录 {len(poems)} 首诗词</span>
+<span class="counter">累计访问：<span id="totalVisitorCount">加载中</span> 次</span>
+<span class="counter">今日访客：<span id="todayVisitorCount">加载中</span> 人</span>
+<!--
   <span class="counter">累计访问：<span id="busuanzi_value_site_pv">加载中</span> 次</span>
   <span class="counter">今日访客：<span id="todayVisitorCount">加载中</span> 人</span>
+
+<span class="counter">累计访问：<span id="visitor-total">加载中</span> 次</span>
+  <span class="counter">今日访客：<span id="visitor-today">加载中</span> 人</span>
+-->
   <div class="qrcode-container" title="扫码访问冰雪诗词">
     <img src="qrcode.jpg" alt="网站二维码" onerror="this.parentElement.innerHTML='<span style=color:#a0c0a0;font-size:0.7em;>📷二维码</span>'">
   </div>
@@ -722,7 +862,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
 </div>
 </div>
 
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!--<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>-->
 <script src="https://unpkg.com/twikoo@1.6.40/dist/twikoo.all.min.js"></script>
 <script>
 const POEMS = {poems_json};
@@ -739,6 +879,7 @@ let editedPoems = JSON.parse(localStorage.getItem('editedPoems') || '{{}}');
 const EDIT_PASSWORD = "bingxue2026";
 
 // ========== 今日访客独立计数 ==========
+<!--
 function initDailyVisitor() {{
     const today = new Date().toDateString();
     const lastVisitDate = localStorage.getItem('lastVisitDate');
@@ -773,7 +914,7 @@ window.addEventListener('scroll', function() {{
     if (window.scrollY > 300) btn.style.display = 'block';
     else btn.style.display = 'none';
 }});
-
+-->
 // ========== 全局关闭其他区域菜单 ==========
 function closeAllLeftAndRightAndLinks() {{
     document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));

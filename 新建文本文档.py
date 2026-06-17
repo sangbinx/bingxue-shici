@@ -136,7 +136,7 @@ def load_report(filepath):
 
 def main():
     print("=" * 60)
-    print("   正在生成冰雪诗词数字图书馆（手机版修复+访客留言底色）")
+    print("   正在生成冰雪诗词数字图书馆（编辑云端存储版）")
     print("=" * 60)
     print("[1/5] 正在读取诗词库...")
     poems = parse_poems_with_theme(POEM_FILE)
@@ -871,32 +871,18 @@ const GENRES = ['五绝', '五律', '七绝', '七律', '词牌诗词'];
 const THEMES = ['家国情怀与时代歌咏','山水田园与闲居雅趣','亲情友情与人间至爱','四时风光与节气流转','羁旅思乡与行吟纪游','感怀人生与自省述志','咏物寄意与比兴抒怀','怀古咏史与读文有感','节日庆典与民俗风情','唱和应酬与赠友之作'];
 const FRIENDLY_LINKS = {links_json};
 
-// AI写诗调用地址（固定，不再需要手动修改）
+// AI写诗调用地址（固定）
 const AI_POEM_WORKER_URL = 'https://poem.bingxue2026.com';
 
-// ========== 本地编辑管理 ==========
-let editedPoems = JSON.parse(localStorage.getItem('editedPoems') || '{{}}');
+// 诗词编辑云端存储 Worker 地址（自定义域名）
+const POEM_EDIT_WORKER_URL = 'https://poem-edit.bingxue2026.com';
+
+// ========== 本地编辑管理（已废弃，改用云端） ==========
+// 保留常量用于密码验证
 const EDIT_PASSWORD = "bingxue2026";
 
-// ========== 今日访客独立计数 ==========
-<!--
-function initDailyVisitor() {{
-    const today = new Date().toDateString();
-    const lastVisitDate = localStorage.getItem('lastVisitDate');
-    let todayCount = parseInt(localStorage.getItem('todayVisitorCount') || '0');
-    if (lastVisitDate !== today) {{
-        todayCount = 0;
-        localStorage.setItem('lastVisitDate', today);
-        localStorage.setItem('todayVisitorCount', '0');
-    }}
-    if (!sessionStorage.getItem('todayVisited')) {{
-        todayCount++;
-        localStorage.setItem('todayVisitorCount', todayCount);
-        sessionStorage.setItem('todayVisited', 'true');
-    }}
-    const todayElem = document.getElementById('todayVisitorCount');
-    if(todayElem) todayElem.innerText = localStorage.getItem('todayVisitorCount') || '0';
-}}
+// ========== 今日访客独立计数（已由独立统计系统替代） ==========
+// 功能已由 visitor.bingxue2026.com 实现，此处不再需要
 
 function scrollToContent() {{
     const content = document.getElementById('content');
@@ -914,7 +900,7 @@ window.addEventListener('scroll', function() {{
     if (window.scrollY > 300) btn.style.display = 'block';
     else btn.style.display = 'none';
 }});
--->
+
 // ========== 全局关闭其他区域菜单 ==========
 function closeAllLeftAndRightAndLinks() {{
     document.querySelectorAll('[id^="submenu-genre-"]').forEach(s => s.classList.remove('open'));
@@ -1217,6 +1203,7 @@ function showCustomEditDialog(id, currentBody) {{
     }});
 }}
 
+// ========== 诗词编辑功能（云端存储） ==========
 function editPoem(id) {{
     let pwd = prompt("请输入编辑密码：");
     if (pwd !== EDIT_PASSWORD) {{
@@ -1224,13 +1211,26 @@ function editPoem(id) {{
         return;
     }}
     let currentBody = document.getElementById('body-' + id).innerText;
-    // 手机端使用自定义大尺寸编辑框，电脑端仍使用 prompt（但为了一致性，也使用自定义对话框）
     showCustomEditDialog(id, currentBody).then(newBody => {{
         if (newBody !== null && newBody !== currentBody) {{
-            editedPoems[id] = newBody;
-            localStorage.setItem('editedPoems', JSON.stringify(editedPoems));
+            // 1. 立即更新页面显示
             document.getElementById('body-' + id).innerHTML = newBody.replace(/\\n/g, '<br>');
-            alert("修改已保存（本地）。");
+            // 2. 保存到云端 D1 数据库
+            fetch(POEM_EDIT_WORKER_URL, {{
+                method: 'POST',
+                headers: {{ 'Content-Type': 'application/json' }},
+                body: JSON.stringify({{ poem_id: id, edited_body: newBody }})
+            }}).then(function(response) {{
+                return response.json();
+            }}).then(function(data) {{
+                if (data.success) {{
+                    alert("✅ 修改已保存到云端，所有设备同步。");
+                }} else {{
+                    alert("❌ 云端保存失败，请检查网络。");
+                }}
+            }}).catch(function() {{
+                alert("⚠️ 云端保存失败，但页面已临时更新。");
+            }});
         }}
     }});
 }}
@@ -1241,20 +1241,30 @@ function exportEdits() {{
         if (pwd !== null) alert("密码错误，无法导出。");
         return;
     }}
-    if (Object.keys(editedPoems).length === 0) {{
-        alert('暂无修改记录。');
-        return;
-    }}
-    let lines = [];
-    for (let id in editedPoems) {{
-        lines.push(id + '|||' + editedPoems[id]);
-    }}
-    const output = lines.join('\\n');
-    navigator.clipboard.writeText(output).then(() => {{
-        alert('✅ 已复制 ' + Object.keys(editedPoems).length + ' 条修改记录到剪贴板！\\n\\n请运行 sync_poems.py 脚本，粘贴记录完成同步。');
-    }}).catch(() => {{
-        alert('📤 请复制以下内容：\\n\\n' + output + '\\n\\n然后运行 sync_poems.py 脚本，粘贴记录完成同步。');
-    }});
+    // 从云端获取所有编辑记录
+    fetch(POEM_EDIT_WORKER_URL)
+        .then(function(response) {{
+            return response.json();
+        }})
+        .then(function(data) {{
+            if (!data.edits || data.edits.length === 0) {{
+                alert('暂无修改记录。');
+                return;
+            }}
+            var lines = [];
+            data.edits.forEach(function(edit) {{
+                lines.push(edit.poem_id + '|||' + edit.edited_body);
+            }});
+            var output = lines.join('\\n');
+            navigator.clipboard.writeText(output).then(function() {{
+                alert('✅ 已复制 ' + data.edits.length + ' 条修改记录到剪贴板！\\n\\n请粘贴到 sync_poems.py 脚本中完成同步。');
+            }}).catch(function() {{
+                alert('📤 请复制以下内容：\\n\\n' + output + '\\n\\n然后运行 sync_poems.py 脚本，粘贴记录完成同步。');
+            }});
+        }})
+        .catch(function() {{
+            alert('❌ 获取编辑记录失败，请检查网络。');
+        }});
 }}
 
 // ========== AI写诗功能 ==========
@@ -1404,7 +1414,8 @@ function render(title, poems) {{
         h += '<div class="poem-title">'+p.title+'</div>';
         h += '<div class="poem-author">冰雪</div>';
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
-        let displayBody = editedPoems[p.id] || p.body;
+        // 直接从原始数据读取，云端编辑保存时已更新 DOM
+        let displayBody = p.body;
         h += '<div class="poem-body" id="body-'+p.id+'">'+displayBody.replace(/\\n/g, '<br>')+'</div>';
         if(imgCount > 0){{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">查看配图('+imgCount+')</button>';
@@ -1460,7 +1471,7 @@ function showTodayPoems() {{
         h += '<div class="poem-title">'+p.title+'</div>';
         h += '<div class="poem-author">冰雪</div>';
         if(p.date) h += '<div class="poem-date">'+p.date+'</div>';
-        let displayBody = editedPoems[p.id] || p.body;
+        let displayBody = p.body;
         h += '<div class="poem-body" id="body-'+p.id+'">'+displayBody.replace(/\\n/g, '<br>')+'</div>';
         if(imgCount > 0){{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\''+p.id+'\\')">收起配图('+imgCount+')</button>';
@@ -1535,7 +1546,7 @@ function initDrag() {{
 }}
 
 function init() {{
-    initDailyVisitor();
+    // 不调用 initDailyVisitor（已废弃）
     buildLeftSidebar();
     buildRightSidebar();
     buildLinksSubmenu();
@@ -1581,10 +1592,10 @@ window.onload = init;
     print(f"📄 文件：{os.path.abspath(OUTPUT_HTML)}")
     print(f"{'=' * 60}")
     print("✅ 本次修改完成：")
-    print("   1. AI写诗地址固定为 https://poem.bingxue2026.com")
-    print("   2. 访客留言窗口添加浅米色底色 (#fef9e7)")
-    print("   3. 修复手机版导出修改按钮（密码验证正常）")
-    print("   4. 修复手机版编辑按钮，使用大尺寸自定义编辑框（高度200px以上）")
+    print("   1. 诗词编辑功能迁移至 D1 云端存储（poem-edit.bingxue2026.com）")
+    print("   2. editPoem 函数改为保存到云端，多设备同步")
+    print("   3. exportEdits 函数改为从云端导出所有编辑记录")
+    print("   4. 移除 localStorage 依赖，数据完全自主可控")
     print("   5. 其他功能完全保持原样")
     os.system("pause")
 

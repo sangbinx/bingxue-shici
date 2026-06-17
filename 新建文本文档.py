@@ -267,19 +267,10 @@ var _hmt = _hmt || [];
 </script>
 -->
 <!-- ==================== 访客统计模块 ==================== -->
+<!-- ==================== 访客统计模块 ==================== -->
 <script>
 (function() {{
-  // ========== 百度统计 ==========
-  var _hmt = _hmt || [];
-  (function() {{
-    var hm = document.createElement("script");
-    hm.src = "https://hm.baidu.com/hm.js?a78c6d40062f7f473f651d5f5670fe85";
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(hm, s);
-  }})();
-
-  // ========== 独立访客统计（D1数据库） ==========
-  const WORKER_URL = 'https://visitor-stats-worker.sangbinx.workers.dev';
+  const WORKER_URL = 'https://visitor.bingxue2026.com';
 
   function getSource() {{
     var ref = document.referrer || '';
@@ -316,6 +307,7 @@ var _hmt = _hmt || [];
   }});
 }})();
 </script>
+<!-- ==================== 统计模块结束 ==================== -->
 <!-- ==================== 统计模块结束 ==================== -->
 <!-- 百度统计代码结束 -->
 <style>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>视频播放</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  body {
+    font-family: 'Microsoft YaHei', sans-serif;
+    background: #000;
+    color: #fff;
+    min-height: 100vh;
+    padding: 10px;
+    padding-bottom: 300px;
+  }
+  .header { text-align: center; padding: 15px 0; }
+  .header h1 { font-size: 22px; letter-spacing: 4px; }
+  .header .count { color: #aaa; font-size: 13px; margin-top: 5px; }
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    background: #111;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+  video {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #000;
+    object-fit: contain;
+  }
+
+  .fullscreen-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #c0392b;
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* ★ 竖屏全屏样式 */
+  .fullscreen-active {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    height: 100dvh;
+    z-index: 9999;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0;
+    border-radius: 0;
+  }
+  .fullscreen-active video {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* 全屏状态下的退出按钮：右上角小叉号 */
+  .fullscreen-active .fullscreen-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 20px;
+    line-height: 36px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 10000;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    font-family: inherit;
+  }
+  .btn-play { background: #c0392b; }
+  .btn-random { background: #2980b9; }
+  .btn-pause { background: #e67e22; }
+  .btn-stop { background: #888; }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    justify-content: center;
+    align-items: center;
+  }
+  .input-row input {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+    border: none;
+    width: 180px;
+    font-family: inherit;
+  }
+
+  .status {
+    text-align: center;
+    color: #aaa;
+    font-size: 14px;
+    margin-top: 8px;
+    min-height: 20px;
+    padding-bottom: 20px;
+  }
+  .hint {
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 id="pageTitle">🎬 视频播放</h1>
+  <div class="count" id="videoCount"></div>
+</div>
+
+<div class="video-wrapper" id="videoContainer">
+  <video id="mainVideo" controls playsinline webkit-playsinline></video>
+  <button class="fullscreen-btn" onclick="toggleFullscreen()">📺 竖屏全屏</button>
+</div>
+
+<div class="controls">
+  <button class="btn btn-play" onclick="playSequential()">▶ 顺序播放</button>
+  <button class="btn btn-random" onclick="playRandom(3)">🎲 随机3首</button>
+  <button class="btn btn-random" onclick="playRandom(5)">🎲 随机5首</button>
+  <button class="btn btn-random" onclick="playRandom(8)">🎲 随机8首</button>
+</div>
+
+<div class="input-row">
+  <input type="text" id="rangeInput" placeholder="如：3 或 2-10 或 3,6,7" onfocus="this.scrollIntoView({behavior: 'smooth', block: 'start'})">
+  <button class="btn btn-play" onclick="playByInput()">指定播放</button>
+</div>
+<span class="hint">支持：单号(3)、范围(2-10)、逗号或空格分隔(3,6,7)</span>
+
+<div class="controls">
+  <button class="btn btn-pause" id="btnPause" onclick="togglePause()">⏸ 暂停</button>
+  <button class="btn btn-stop" id="btnStop" onclick="stopAll()">⏹ 停止</button>
+</div>
+<div class="status" id="status"></div>
+
+<script>
+  var R2_PUBLIC_URL = 'https://pub-1f89bdd823e748d3b468bb1566f0c2a5.r2.dev';
+  var FILE_LISTS = {"videos": ["TG-2026-03-14-191913800.mp4", "TG-2026-03-15-201228635.mp4", "TG-2026-03-17-191503328.mp4", "TG-2026-03-18-191352442.mp4", "TG-2026-03-23-200838275.mp4", "TG-2026-03-24-193835525.mp4", "TG-2026-03-26-191558947.mp4", "TG-2026-03-27-205126954.mp4", "TG-2026-03-29-214542936.mp4", "TG-2026-04-04-194214394.mp4", "TG-2026-04-09-193513288.mp4", "TG-2026-04-10-194028392.mp4", "VID_20260420_180633.mp4", "lv_0_20260306130357.mp4", "lv_0_20260313094101.mp4", "lv_0_20260316091948.mp4", "lv_0_20260316164612.mp4", "lv_0_20260317162457.mp4", "lv_0_20260320200115.mp4", "lv_0_20260331204840.mp4", "lv_0_20260401183035.mp4", "lv_0_20260410174617.mp4", "lv_7556144250854051096_20260307072129.mp4", "lv_7557339875649801497_20260306104205.mp4", "lv_7606994262634302744_20260306104611.mp4"], "fitness": ["5c977daf3091320531d2e890d76c03cb.mp4", "754b8a71dfaa0a2383b4883393f43bd0.mp4", "9fa5e3370af2e09a4b63ff0e58bd7ef1.mp4", "VID_20220401_192226.mp4", "VID_20230530_111543.mp4", "VID_20230830_093815.mp4", "VID_20231119_112754(1).mp4", "VID_20231119_113540(1).mp4", "VID_20231119_113800(1).mp4", "VID_20240611_100908.mp4", "VID_20250716_090903.mp4", "VID_20250716_091202.mp4", "VID_20250718_195045.mp4", "VID_20260714_093234.mp4", "VID_20260714_093748.mp4", "a1dd6bdeac9cd32167d9a15040c09748.mp4", "a568feaaae22c0ea19c392b9e2ecfa68.mp4", "a6dd2c3f578ced3ab4485984291ea602.mp4", "ad2f1b0e2997ec41fdd95f50dad108ad.mp4", "b5602a2d46bdf177c2aad7db2eea24a3.mp4", "lv_0_20260711075429.mp4", "lv_0_20260711085848.mp4", "lv_0_20260711091354.mp4", "lv_0_20260711091800.mp4", "lv_0_20260711092333.mp4", "lv_0_20260714095617.mp4", "lv_0_20260714095944.mp4", "lv_0_20260714100126.mp4", "lv_0_20260715175751.mp4", "lv_0_20260715180123.mp4", "lv_0_20260715180353.mp4", "lv_0_20260715181045.mp4", "lv_0_20260715181446.mp4", "lv_0_20260715182005.mp4"]};
+  
+  var type = new URLSearchParams(window.location.search).get('type') || 'videos';
+  var fileList = FILE_LISTS[type] || [];
+  var totalCount = fileList.length;
+
+  var playlist = [];
+  var currentIndex = 0;
+  var isStopped = false;
+  var isPaused = false;
+
+  function getVideoUrl(number) {
+    if (number < 1 || number > totalCount) return null;
+    var filename = fileList[number - 1];
+    return R2_PUBLIC_URL + '/' + type + '/' + filename;
+  }
+
+  document.getElementById('pageTitle').textContent = type === 'fitness' ? '💪 爷孙健身' : '🎬 爷孙诗语';
+  document.getElementById('videoCount').textContent = '共 ' + totalCount + ' 个视频（编号 1-' + totalCount + '）';
+
+  // 全屏控制
+  function toggleFullscreen() {
+    var container = document.getElementById('videoContainer');
+    var video = document.getElementById('mainVideo');
+    var btn = container.querySelector('.fullscreen-btn');
+    
+    if (container.classList.contains('fullscreen-active')) {
+      container.classList.remove('fullscreen-active');
+      video.style.objectFit = '';
+      video.style.width = '';
+      video.style.height = '';
+      btn.textContent = '📺 竖屏全屏';
+    } else {
+      container.classList.add('fullscreen-active');
+      btn.textContent = '✕';
+      video.play();
+    }
+  }
+
+  function playVideo(index) {
+    if (index < 0 || index >= playlist.length) {
+      document.getElementById('status').textContent = '✅ 播放完毕';
+      return;
+    }
+    currentIndex = index;
+    var number = playlist[index];
+    var url = getVideoUrl(number);
+    var video = document.getElementById('mainVideo');
+    video.src = url;
+    video.load();
+    video.play();
+    document.getElementById('status').textContent = '正在播放：第 ' + (index+1) + '/' + playlist.length + ' 个（编号 ' + number + '）';
+  }
+
+  document.getElementById('mainVideo').onended = function() {
+    if (!isStopped) {
+      currentIndex++;
+      playVideo(currentIndex);
+    }
+  };
+
+  function togglePause() {
+    var video = document.getElementById('mainVideo');
+    var btn = document.getElementById('btnPause');
+    if (isPaused) {
+      video.play();
+      btn.textContent = '⏸ 暂停';
+      isPaused = false;
+    } else {
+      video.pause();
+      btn.textContent = '▶ 继续';
+      isPaused = true;
+    }
+  }
+
+  function stopAll() {
+    var video = document.getElementById('mainVideo');
+    video.pause();
+    video.src = '';
+    isStopped = true;
+    isPaused = false;
+    document.getElementById('btnPause').textContent = '⏸ 暂停';
+    document.getElementById('status').textContent = '⏹ 已停止';
+    var container = document.getElementById('videoContainer');
+    container.classList.remove('fullscreen-active');
+    video.style.objectFit = '';
+    video.style.width = '';
+    video.style.height = '';
+    container.querySelector('.fullscreen-btn').textContent = '📺 竖屏全屏';
+  }
+
+  function buildPlaylist(indices) {
+    playlist = indices;
+    currentIndex = 0;
+    isStopped = false;
+    playVideo(0);
+  }
+
+  function playSequential() {
+    var indices = [];
+    for (var i = 1; i <= totalCount; i++) { indices.push(i); }
+    buildPlaylist(indices);
+  }
+
+  function playRandom(count) {
+    var indices = [];
+    var pool = [];
+    for (var i = 1; i <= totalCount; i++) { pool.push(i); }
+    for (var i = pool.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+    }
+    for (var i = 0; i < Math.min(count, pool.length); i++) { indices.push(pool[i]); }
+    buildPlaylist(indices);
+  }
+
+  function playByInput() {
+    var input = document.getElementById('rangeInput').value.trim();
+    if (!input) return;
+    var indices = [];
+    input = input.replace(/，/g, ',');
+    var parts = input.split(/[,\s]+/).filter(function(p) { return p.length > 0; });
+    
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i];
+      if (part.indexOf('-') > 0) {
+        var range = part.split('-');
+        var start = parseInt(range[0]);
+        var end = parseInt(range[1]);
+        if (!isNaN(start) && !isNaN(end)) {
+          for (var j = Math.min(start, end); j <= Math.max(start, end); j++) {
+            if (j >= 1 && j <= totalCount) {
+              indices.push(j);
+            }
+          }
+        }
+      } else {
+        var num = parseInt(part);
+        if (!isNaN(num) && num >= 1 && num <= totalCount) {
+          indices.push(num);
+        }
+      }
+    }
+    
+    if (indices.length > 0) {
+      buildPlaylist(indices);
+    } else {
+      document.getElementById('status').textContent = '❌ 请检查输入格式（编号范围 1-' + totalCount + '）';
+    }
+  }
+</script>
+
+</body>
+</html>

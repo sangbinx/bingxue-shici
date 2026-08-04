@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bingxue2026.com/sitemap.xml

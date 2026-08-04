@@ -1,0 +1,15 @@
+{
+  "name": "冰雪诗词 · 数字图书馆",
+  "short_name": "冰雪诗词",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8f0e3",
+  "theme_color": "#2e7d32",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

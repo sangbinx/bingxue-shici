@@ -778,6 +778,11 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 </head>
 <body>
 
+<div id="installTip" style="display:none; background:#2e7d32; color:#fff; text-align:center; padding:8px 16px; font-size:0.85rem; letter-spacing:1px; position:relative;">
+  📱 点击这里安装冰雪诗词到桌面
+  <span onclick="document.getElementById('installTip').style.display='none'" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.2rem;">×</span>
+</div>
+
 <div class="header">
   <h1>冰雪诗词 · 数字图书馆</h1>
   <div class="header-info">
@@ -811,6 +816,9 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
     <!--<div class="links-wrapper">-->
       <button onclick="toggleLinks()">🔗 相关链接</button>
       <div class="links-submenu" id="linksSubmenu"></div>
+      <button onclick="showJinRiHeJi()">📋 往日今朝</button>
+      <button onclick="openJianSuoLiuCun()">📋 检索留存</button>
+
     <!--</div>-->
   </div>
 </div>
@@ -888,7 +896,8 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 </div>
 <div class="search-row"><div class="hint">时间范围（月 日）</div><input type="text" id="searchStart" class="short" placeholder="起始 如 03 15"><span class="between">至</span><input type="text" id="searchEnd" class="short" placeholder="截止 如 05 20"></div>
 <div class="search-row"><div class="hint">关键词（多个用空格隔开）</div><input type="text" id="searchKeywords" placeholder="如：人间 山川"></div>
-<button class="search-btn" onclick="doSearch()">开始检索</button>
+<button class="search-btn" id="searchBtnNormal" onclick="doSearch()">开始检索</button>
+<button class="search-btn" id="searchBtnLiuCun" onclick="doSearchLiuCun()" style="display:none; background:#8bc34a;">检索留存</button>
 </div>
 </div>
 
@@ -2145,6 +2154,246 @@ function showTodayPoems() {
     }
 }
 
+// ★★★ 往日今朝：纯文本合辑 + 一键复制 ★★★
+function showJinRiHeJi() {
+    var today = new Date();
+    var month = String(today.getMonth() + 1).padStart(2, '0');
+    var day = String(today.getDate()).padStart(2, '0');
+    var matched = POEMS.filter(function(p) {
+        if (!p.date) return false;
+        var parts = p.date.split('.');
+        return parts[1] === month && parts[2] === day;
+    });
+
+    var c = document.getElementById('content');
+    if (matched.length === 0) {
+        c.innerHTML = '<p style="text-align:center;color:#888;margin-top:60px;">今日暂无历史诗词。</p>';
+        return;
+    }
+
+    // 按日期从晚到早排序
+    matched.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+    });
+
+    var h = '<h3 style="margin-bottom:15px;color:#2e7d32;">📋 往日今朝（共' + matched.length + '首）</h3>';
+    var fullText = '';
+
+    matched.forEach(function(p, index) {
+        h += '<div class="poem-card">';
+        h += '<div class="poem-title">' + p.title + '</div>';
+        h += '<br>';
+        h += '<div class="poem-author">冰雪</div>';
+        if (p.date) h += '<div class="poem-date">' + p.date + '</div>';
+        h += '<br>';
+        h += '<div class="poem-body">' + (p.body || '').replace(/\n/g, '<br>') + '</div>';
+        h += '</div>';
+
+        // 构建纯文本内容用于复制
+        fullText += p.title + '\n冰雪\n' + (p.date || '') + '\n' + (p.body || '');
+        if (index < matched.length - 1) fullText += '\n\n';
+    });
+
+    // 一键复制按钮
+    h += '<div style="text-align:center; margin-top:10px;">';
+    h += '<button onclick="copyJinRiHeJi()" style="background:#4caf50; color:#fff; border:none; padding:8px 24px; border-radius:20px; cursor:pointer; font-size:0.9rem; letter-spacing:1px;">📋 一键复制全部</button>';
+    h += '</div>';
+
+    // 把纯文本内容存到全局变量，方便复制函数使用
+    window._jinriheji_text = fullText;
+
+    c.innerHTML = h;
+    c.scrollTop = 0;
+}
+
+// ★★★ 复制往日今朝全部内容 ★★★
+function copyJinRiHeJi() {
+    var text = window._jinriheji_text || '';
+    if (!text) return;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function() {
+            var btn = document.querySelector('button[onclick="copyJinRiHeJi()"]');
+            if (btn) {
+                btn.textContent = '✅ 已复制';
+                setTimeout(function() { btn.textContent = '📋 一键复制全部'; }, 1500);
+            }
+        }).catch(function() {
+            fallbackCopyJinRiHeJi(text);
+        });
+    } else {
+        fallbackCopyJinRiHeJi(text);
+    }
+    function fallbackCopyJinRiHeJi(t) {
+        var dummy = document.createElement('textarea');
+        document.body.appendChild(dummy);
+        dummy.value = t;
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        var btn = document.querySelector('button[onclick="copyJinRiHeJi()"]');
+        if (btn) {
+            btn.textContent = '✅ 已复制';
+            setTimeout(function() { btn.textContent = '📋 一键复制全部'; }, 1500);
+        }
+    }
+}
+
+// ★★★ 检索留存：打开弹窗（隐藏普通检索按钮，显示检索留存按钮） ★★★
+function openJianSuoLiuCun() {
+    beforeCenterAction();
+    document.getElementById('searchModal').style.display = 'block';
+    const select = document.getElementById('searchGenreSelect');
+    select.value = '';
+    document.getElementById('searchGenreCiPai').style.display = 'none';
+    document.getElementById('searchGenreCiPai').value = '';
+    document.getElementById('searchStart').value = '';
+    document.getElementById('searchEnd').value = '';
+    document.getElementById('searchKeywords').value = '';
+    // 隐藏普通“开始检索”按钮，显示“检索留存”按钮
+    document.getElementById('searchBtnNormal').style.display = 'none';
+    document.getElementById('searchBtnLiuCun').style.display = 'inline-block';
+}
+
+// ★★★ 检索留存：执行检索并以合辑形式展示 ★★★
+function doSearchLiuCun() {
+    const select = document.getElementById('searchGenreSelect');
+    const ciPaiSelect = document.getElementById('searchGenreCiPai');
+    let gStr = '';
+    if (select.value === '其他词牌') {
+        gStr = ciPaiSelect.value;
+        if (!gStr) {
+            gStr = '其他词牌';
+        }
+    } else if (select.value) {
+        gStr = select.value;
+    }
+    const sStr = document.getElementById('searchStart').value.trim();
+    const eStr = document.getElementById('searchEnd').value.trim();
+    const kStr = document.getElementById('searchKeywords').value.trim();
+    let r = POEMS;
+
+    // 体裁匹配（与 doSearch 完全相同）
+    if (gStr) {
+        if (gStr === '其他词牌') {
+            var standard = ['五绝', '五律', '七绝', '七律'];
+            r = r.filter(function(p) {
+                return !standard.includes(p.genre);
+            });
+        } else if (gStr === '其他') {
+            var excludeList = [
+                '五绝', '五律', '七绝', '七律',
+                '踏莎行', '鹧鸪天', '浣溪沙', '临江仙', '蝶恋花',
+                '清平乐', '西江月', '菩萨蛮', '虞美人', '南乡子',
+                '长相思', '卜算子', '采桑子', '减字木兰花', '沁园春',
+                '水调歌头', '念奴娇', '满江红', '苏幕遮', '定风波'
+            ];
+            r = r.filter(function(p) {
+                var genre = p.genre || '';
+                for (var j = 0; j < excludeList.length; j++) {
+                    if (genre.indexOf(excludeList[j]) !== -1) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        } else {
+            if (gStr === '七绝' || gStr === '五绝' || gStr === '七律' || gStr === '五律') {
+                r = r.filter(function(p) {
+                    return p.genre === gStr;
+                });
+            } else {
+                r = r.filter(function(p) {
+                    return p.genre.indexOf(gStr) !== -1;
+                });
+            }
+        }
+    }
+
+    // 日期范围（与 doSearch 完全相同）
+    let sm = null, em = null;
+    if (sStr) { const ps = sStr.split(/\s+/); if (ps.length === 2) sm = [parseInt(ps[0]), parseInt(ps[1])]; }
+    if (eStr) { const pe = eStr.split(/\s+/); if (pe.length === 2) em = [parseInt(pe[0]), parseInt(pe[1])]; }
+    if (sm || em) { r = r.filter(p => { if (!p.date) return false; const pts = p.date.split('.'); const m = parseInt(pts[1]), d = parseInt(pts[2]); if (sm && (m < sm[0] || (m === sm[0] && d < sm[1]))) return false; if (em && (m > em[0] || (m === em[0] && d > em[1]))) return false; return true; }); }
+
+    // 关键词（与 doSearch 完全相同）
+    if (kStr) { const ks = kStr.split(/\s+/); r = r.filter(p => ks.some(k => (p.title + ' ' + p.body).includes(k))); }
+
+    closeSearch();
+
+    // 按日期从晚到早排序
+    r.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+    });
+
+    const c = document.getElementById('content');
+    if (r.length === 0) {
+        c.innerHTML = '<p style="text-align:center;color:#888;margin-top:60px;">该检索条件下暂无诗词。</p>';
+        return;
+    }
+
+    let h = '<h3 style="margin-bottom:15px;color:#2e7d32;">📋 检索留存（共' + r.length + '首）</h3>';
+    let fullText = '';
+
+    r.forEach(function(p, index) {
+        h += '<div class="poem-card">';
+        h += '<div class="poem-title">' + p.title + '</div>';
+        h += '<br>';
+        h += '<div class="poem-author">冰雪</div>';
+        if (p.date) h += '<div class="poem-date">' + p.date + '</div>';
+        h += '<br>';
+        h += '<div class="poem-body">' + (p.body || '').replace(/\n/g, '<br>') + '</div>';
+        h += '</div>';
+
+        fullText += p.title + '\n冰雪\n' + (p.date || '') + '\n' + (p.body || '');
+        if (index < r.length - 1) fullText += '\n\n';
+    });
+
+    h += '<div style="text-align:center; margin-top:10px;">';
+    h += '<button onclick="copyLiuCunText()" style="background:#4caf50; color:#fff; border:none; padding:8px 24px; border-radius:20px; cursor:pointer; font-size:0.9rem; letter-spacing:1px;">📋 一键复制全部</button>';
+    h += '</div>';
+
+    window._liucun_text = fullText;
+    c.innerHTML = h;
+    c.scrollTop = 0;
+
+    // 清空检索条件
+    document.getElementById('searchStart').value = '';
+    document.getElementById('searchEnd').value = '';
+}
+
+// ★★★ 复制检索留存全部内容 ★★★
+function copyLiuCunText() {
+    var text = window._liucun_text || '';
+    if (!text) return;
+    var btn = document.querySelector('button[onclick="copyLiuCunText()"]');
+    var doCopy = function(t) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(t).then(function() {
+                if (btn) {
+                    btn.textContent = '✅ 已复制';
+                    setTimeout(function() { btn.textContent = '📋 一键复制全部'; }, 1500);
+                }
+            }).catch(function() {
+                fallbackCopy(t);
+            });
+        } else {
+            fallbackCopy(t);
+        }
+    };
+    function fallbackCopy(t) {
+        var dummy = document.createElement('textarea');
+        document.body.appendChild(dummy);
+        dummy.value = t;
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        if (btn) {
+            btn.textContent = '✅ 已复制';
+            setTimeout(function() { btn.textContent = '📋 一键复制全部'; }, 1500);
+        }
+    }
+    doCopy(text);
+}
 // ============================================================
 // 诗词编辑
 // ============================================================
@@ -2735,6 +2984,12 @@ function openSearch() {
     select.value = '';
     document.getElementById('searchGenreCiPai').style.display = 'none';
     document.getElementById('searchGenreCiPai').value = '';
+    document.getElementById('searchStart').value = '';
+    document.getElementById('searchEnd').value = '';
+    document.getElementById('searchKeywords').value = '';
+    // 显示普通“开始检索”按钮，隐藏“检索留存”按钮
+    document.getElementById('searchBtnNormal').style.display = 'inline-block';
+    document.getElementById('searchBtnLiuCun').style.display = 'none';
 }
 
 function closeSearch() {
@@ -3519,6 +3774,42 @@ window.onload = init;
       });
     }, 600);
   });
+})();
+</script>
+
+<script>
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installTip').style.display = 'block';
+});
+document.getElementById('installTip').addEventListener('click', function() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choiceResult) {
+      deferredPrompt = null;
+      document.getElementById('installTip').style.display = 'none';
+    });
+  }
+});
+</script>
+
+<script>
+(function() {
+  var ua = navigator.userAgent;
+  var isWechat = /MicroMessenger/i.test(ua);
+  var isBaiduApp = /baiduboxapp|BaiduBrowser/i.test(ua);
+  var isToutiaoApp = /NewsArticle|BytedanceWebview|ttwebview/i.test(ua);
+
+  if (isWechat || isBaiduApp || isToutiaoApp) {
+    var platformName = isWechat ? '微信' : (isBaiduApp ? '百度' : '今日头条');
+    var tip = document.createElement('div');
+    tip.id = 'browserTip';
+    tip.style.cssText = 'position:fixed; top:0; left:0; width:100%; background:#fff3cd; color:#856404; padding:12px 16px; font-size:0.9rem; text-align:center; z-index:99999; border-bottom:2px solid #ffc107; letter-spacing:0.5px;';
+    tip.innerHTML = '📱 您正在' + platformName + '内浏览，安装到桌面请在右上角选择“在浏览器打开”，然后点击“添加到主屏幕” <span onclick="this.parentElement.style.display='none'" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.4rem;">×</span>';
+    document.body.insertBefore(tip, document.body.firstChild);
+  }
 })();
 </script>
 

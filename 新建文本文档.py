@@ -2422,7 +2422,7 @@ function showJinRiHeJi() {{
         h += '</div>';
 
         // 构建纯文本内容用于复制
-        fullText += p.title + '\\n冰雪\\n' + (p.date || '') + '\\n' + (p.body || '');
+        fullText += p.title + '\\n\\n冰雪\\n' + (p.date || '') + '\\n\\n' + (p.body || '');
         if (index < matched.length - 1) fullText += '\\n\\n';
     }});
 
@@ -2576,7 +2576,7 @@ function doSearchLiuCun() {{
         h += '<div class="poem-body">' + (p.body || '').replace(/\\n/g, '<br>') + '</div>';
         h += '</div>';
 
-        fullText += p.title + '\\n冰雪\\n' + (p.date || '') + '\\n' + (p.body || '');
+        fullText += p.title + '\\n\\n冰雪\\n' + (p.date || '') + '\\n\\n' + (p.body || '');
         if (index < r.length - 1) fullText += '\\n\\n';
     }});
 

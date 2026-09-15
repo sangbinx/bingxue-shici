@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>诗词优选 · 冰雪诗词</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Microsoft YaHei", "楷体", KaiTi, serif;
+  background: #e8f0e3;
+  color: #2c2c2c;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #f5fbe8;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+header { text-align: center; margin-bottom: 20px; }
+header h1 {
+  color: #2e7d32;
+  font-size: 1.6em;
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+header .subtitle {
+  color: #6b7b8d;
+  font-size: 0.85em;
+  letter-spacing: 1px;
+}
+.breadcrumb {
+  background: #fef9e7;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+  color: #a08030;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.breadcrumb span.crumb {
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #2e7d32;
+}
+.breadcrumb span.crumb:hover { background: #e8f5e9; }
+.breadcrumb span.sep { color: #ccc; }
+.breadcrumb span.current { color: #a08030; font-weight: bold; }
+.panel { display: none; }
+.panel.active { display: block; }
+.panel h3 {
+  color: #2e7d32;
+  margin-bottom: 16px;
+  font-size: 1em;
+  letter-spacing: 2px;
+  font-weight: normal;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+}
+.grid button {
+  padding: 12px 8px;
+  background: #fffef9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  letter-spacing: 1px;
+  transition: 0.2s;
+  font-family: inherit;
+}
+.grid button:hover {
+  background: #e8f5e9;
+  border-color: #8bc34a;
+  transform: translateY(-1px);
+}
+.grid button.selected {
+  background: #8bc34a;
+  color: #fff;
+  border-color: #8bc34a;
+}
+.grid button.premium-btn {
+  background: #fff8e1;
+  border-color: #ffc107;
+  color: #a67c00;
+}
+.grid button.premium-btn:hover {
+  background: #ffecb3;
+}
+.grid button.excellent-btn {
+  background: #f0f8ff;
+  border-color: #64b5f6;
+  color: #1565c0;
+}
+.grid button.excellent-btn:hover {
+  background: #e1f0ff;
+}
+.copy-container {
+  background: #fffef9;
+  border-radius: 8px;
+  padding: 16px 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 14px;
+  border: 1px solid #e8e0d0;
+}
+.copy-container .stat {
+  color: #888;
+  font-size: 0.85em;
+  margin-bottom: 12px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.copy-container .poem-item {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed #e8e0d0;
+}
+.copy-container .poem-item:last-child {
+  border-bottom: none;
+}
+.copy-container .poem-item .t {
+  color: #2e7d32;
+  font-size: 1.05em;
+  margin-bottom: 8px;
+}
+.copy-container .poem-item .a {
+  color: #4a5568;
+  font-size: 0.9em;
+  margin-bottom: 2px;
+}
+.copy-container .poem-item .d {
+  color: #6b7b8d;
+  font-size: 0.85em;
+  margin-bottom: 10px;
+}
+.copy-container .poem-item .b {
+  font-family: "楷体", KaiTi, serif;
+  font-size: 1em;
+  line-height: 2;
+  white-space: pre-wrap;
+  color: #2c2c2c;
+}
+.action-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.action-row button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 0.9em;
+  letter-spacing: 1px;
+  font-family: inherit;
+  transition: 0.2s;
+}
+.btn-copy { background: #4caf50; color: #fff; }
+.btn-copy:hover { background: #388e3c; }
+.btn-back { background: #e0e0e0; color: #333; }
+.btn-back:hover { background: #ccc; }
+.loading {
+  text-align: center;
+  color: #888;
+  padding: 40px 0;
+  font-size: 1em;
+  letter-spacing: 1px;
+}
+@media (max-width: 600px) {
+  .container { padding: 16px 14px; }
+  header h1 { font-size: 1.2em; letter-spacing: 2px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+  .grid button { padding: 10px 4px; font-size: 0.82em; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>✨ 诗词优选</h1>
+    <div class="subtitle" id="statLine">正在加载...</div>
+  </header>
+
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <div class="loading" id="loading">正在加载榜单数据...</div>
+
+  <!-- 第一层：体裁 -->
+  <div class="panel" id="panel-level1">
+    <h3>第一步 · 选择体裁</h3>
+    <div class="grid" id="genreGrid"></div>
+  </div>
+
+  <!-- 第二层：类别（仅四种标准体裁） -->
+  <div class="panel" id="panel-level2">
+    <h3>第二步 · 选择类别</h3>
+    <div class="grid" id="categoryGrid"></div>
+  </div>
+
+  <!-- 第三层：榜单层级 -->
+  <div class="panel" id="panel-level3">
+    <h3>第三步 · 选择榜单</h3>
+    <div class="grid" id="levelGrid"></div>
+  </div>
+
+  <!-- 第四层：展示模式 -->
+  <div class="panel" id="panel-level4">
+    <h3>第四步 · 选择展示方式</h3>
+    <div class="grid" id="modeGrid"></div>
+  </div>
+
+  <!-- 复制保存页面 -->
+  <div class="panel" id="panel-copy">
+    <div class="copy-container" id="copyContent"></div>
+    <div class="action-row">
+      <button class="btn-copy" onclick="copyAll()" id="copyBtn">📋 一键复制全部</button>
+      <button class="btn-back" onclick="backToLevel4()">← 返回</button>
+    </div>
+  </div>
+</div>
+
+<script src="data_poems.js"></script>
+<script src="youxuan.js"></script>
+</body>
+</html>

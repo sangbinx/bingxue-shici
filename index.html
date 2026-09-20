@@ -819,6 +819,7 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
       <div class="links-submenu" id="linksSubmenu"></div>
       <button onclick="showJinRiHeJi()">📋 往日今朝</button>
       <button onclick="openJianSuoLiuCun()">📋 检索留存</button>
+      <button onclick="openManage()">📁 资料整理</button>
 
     <!--</div>-->
   </div>
@@ -3984,6 +3985,31 @@ function yxBackToCategory() {
     yxState.level = null;
     yxState.key = yxState.genre + '|' + yxState.category;
     yxShowLevel3();
+}
+// ★★★ 资料整理入口（密码验证后打开独立页面） ★★★
+function openManage() {
+    var pwd = prompt("请输入整理密码：");
+    if (!pwd) return;
+
+    fetch('https://clipbox.bingxue2026.com/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pwd })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.valid) {
+            // 保存密码到 sessionStorage，供 manage.html 使用
+            try { sessionStorage.setItem('manage_pwd', pwd); } catch(e) {}
+            // 打开独立管理页面
+            window.open('manage.html', '_blank');
+        } else {
+            alert("密码错误，无法进入整理工作台。");
+        }
+    })
+    .catch(function() {
+        alert("验证失败，请稍后重试。");
+    });
 }
 window.onload = init;
 </script>

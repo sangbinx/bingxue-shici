@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>资料整理工作台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Microsoft YaHei", "楷体", KaiTi, serif;
+  background: #e8f0e3;
+  color: #2c2c2c;
+  min-height: 100vh;
+  padding: 20px;
+}
+.loading {
+  text-align: center;
+  padding: 100px 20px;
+  color: #888;
+  font-size: 1.1em;
+  letter-spacing: 2px;
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: none;
+}
+header {
+  background: #2e7d32;
+  color: #f0f7e6;
+  padding: 16px 24px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header h1 {
+  font-size: 1.3em;
+  letter-spacing: 3px;
+  font-weight: normal;
+}
+header .logout-btn {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-family: inherit;
+}
+.tabs {
+  display: flex;
+  background: #f5fbe8;
+  border-bottom: 1px solid #d0e0c8;
+}
+.tab-btn {
+  flex: 1;
+  padding: 14px 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95em;
+  letter-spacing: 2px;
+  color: #666;
+  font-family: inherit;
+  transition: 0.2s;
+}
+.tab-btn.active {
+  background: #fffef9;
+  color: #2e7d32;
+  font-weight: bold;
+  border-bottom: 3px solid #4caf50;
+}
+.tab-content {
+  background: #fffef9;
+  padding: 24px;
+  border-radius: 0 0 12px 12px;
+  min-height: 500px;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.placeholder {
+  text-align: center;
+  color: #aaa;
+  padding: 60px 20px;
+  font-size: 1em;
+  letter-spacing: 1px;
+}
+/* 收集箱样式 */
+.clip-layout { display: flex; gap: 20px; flex-wrap: wrap; min-height: 500px; }
+.clip-list-box {
+  flex: 1; min-width: 280px; background: #f9fcf5; border-radius: 8px;
+  padding: 12px; overflow-y: auto; max-height: 70vh;
+}
+.clip-edit-box {
+  flex: 1.5; min-width: 350px; background: #f9fcf5; border-radius: 8px; padding: 16px;
+}
+.clip-list-item {
+  padding: 10px; margin-bottom: 6px; background: #fff;
+  border-radius: 6px; cursor: pointer; border-left: 3px solid #ccc; transition: 0.2s;
+}
+.clip-list-item.active { border-left: 3px solid #4caf50; }
+.clip-list-item:hover { background: #f0f7eb; }
+.clip-list-meta { font-size: 0.85em; color: #888; margin-bottom: 4px; }
+.clip-list-title { font-size: 0.8em; color: #555; word-break: break-all; }
+textarea {
+  width: 100%; height: 350px; padding: 12px; border: 1px solid #d0c0a0;
+  border-radius: 8px; font-family: "楷体", KaiTi, serif; font-size: 1em;
+  line-height: 1.8; resize: vertical; background: #fff;
+}
+.btn-row { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-row button {
+  padding: 10px 24px; border: none; border-radius: 8px;
+  cursor: pointer; font-family: inherit; font-size: 0.9em; letter-spacing: 1px;
+}
+.btn-save { background: #4caf50; color: #fff; }
+.btn-copy { background: #64b5f6; color: #fff; }
+.btn-done { background: #f0ad4e; color: #fff; }
+.btn-del { background: #e57373; color: #fff; }
+.refresh-btn {
+  padding: 4px 12px; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9;
+  border-radius: 12px; cursor: pointer; font-size: 0.8em; font-family: inherit;
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">⏳ 正在验证身份...</div>
+
+<div class="container" id="mainContent">
+  <header>
+    <h1>📁 资料整理工作台</h1>
+    <button class="logout-btn" onclick="logout()">退出</button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="clip" onclick="switchTab('clip')">📋 资料收集箱</button>
+    <button class="tab-btn" data-tab="family" onclick="switchTab('family')">🏠 家庭相册</button>
+  </div>
+
+  <div class="tab-content">
+    <!-- 收集箱面板 -->
+    <div class="tab-panel active" id="panel-clip">
+      <div class="clip-layout">
+        <!-- 左侧列表 -->
+        <div class="clip-list-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:0.9em; color:#888;">待整理内容</span>
+            <button class="refresh-btn" onclick="loadClipList()">🔄 刷新</button>
+          </div>
+          <div id="clipListContainer" style="font-size:0.9em; color:#666;">加载中...</div>
+        </div>
+        <!-- 右侧编辑区 -->
+        <div class="clip-edit-box">
+          <div style="font-size:0.9em; color:#888; margin-bottom:8px;" id="editStatus">请选择左侧列表中的一项开始编辑</div>
+          <div id="editArea" style="display:none;">
+            <div style="font-size:0.85em; color:#2e7d32; margin-bottom:8px;" id="editKeyInfo"></div>
+            <textarea id="editTextarea"></textarea>
+            <div class="btn-row">
+              <button class="btn-save" onclick="saveClipEdit()">💾 保存修改</button>
+              <button class="btn-copy" onclick="copyClipContent()">📋 复制内容</button>
+              <button class="btn-done" onclick="markClipDone()">✅ 标记已整理</button>
+              <button class="btn-del" onclick="deleteClip()">🗑 删除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 相册面板 -->
+    <div class="tab-panel" id="panel-family">
+      <div class="placeholder">🏠 家庭相册（待开发）</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== 全局变量 ==========
+var clipCurrentKey = '';
+var clipCurrentItems = [];
+
+// ========== 工具函数 ==========
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelector('.tab-btn[data-tab="' + name + '"]').classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+function logout() {
+  try { sessionStorage.removeItem('manage_pwd'); } catch(e) {}
+  window.close();
+}
+
+// ========== 收集箱逻辑 ==========
+function loadClipList() {
+  var container = document.getElementById('clipListContainer');
+  container.innerHTML = '加载中...';
+  
+  fetch('https://clipbox.bingxue2026.com/api/list?status=pending')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      clipCurrentItems = data.items || [];
+      if (clipCurrentItems.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">暂无待整理内容</div>';
+        return;
+      }
+      
+      var typeNames = { poem: '📜 诗词', doc: '📄 文档', image: '🖼 图片', video: '🎬 视频', other: '📦 其他' };
+      var html = '';
+      clipCurrentItems.forEach(function(it) {
+        var activeClass = (clipCurrentKey === it.key) ? ' active' : '';
+        html += '<div class="clip-list-item' + activeClass + '" onclick="selectClipItem(\'' + it.key + '\')">';
+        html += '<div class="clip-list-meta">' + (typeNames[it.type] || it.type) + ' · ' + it.date + '</div>';
+        html += '<div class="clip-list-title">' + it.filename + '</div>';
+        html += '</div>';
+      });
+      container.innerHTML = html;
+    })
+    .catch(function(err) {
+      container.innerHTML = '<div style="color:#c33; padding:20px; text-align:center;">加载失败：' + err.message + '</div>';
+    });
+}
+
+function selectClipItem(key) {
+  clipCurrentKey = key;
+  document.getElementById('editStatus').textContent = '正在加载内容...';
+  document.getElementById('editArea').style.display = 'none';
+  loadClipList(); // 刷新列表以高亮当前项
+  
+  fetch('https://clipbox.bingxue2026.com/api/get?key=' + encodeURIComponent(key))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) { alert(data.error); return; }
+      
+      // 剥离元信息，只保留正文
+      var text = data.content;
+      var parts = text.split('\n\n');
+      var body = parts.length > 1 ? parts.slice(1).join('\n\n') : text;
+      
+      document.getElementById('editStatus').textContent = '正在编辑：';
+      document.getElementById('editKeyInfo').textContent = key;
+      document.getElementById('editTextarea').value = body;
+      document.getElementById('editArea').style.display = 'block';
+    })
+    .catch(function(err) {
+      document.getElementById('editStatus').textContent = '加载失败：' + err.message;
+    });
+}
+
+function copyClipContent() {
+  var text = document.getElementById('editTextarea').value;
+  if (!text) { alert('没有可复制的内容'); return; }
+
+  var done = function() {
+    var btn = document.querySelector('.btn-copy');
+    if (btn) {
+      btn.textContent = '✅ 已复制';
+      setTimeout(function() { btn.textContent = '📋 复制内容'; }, 1500);
+    }
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(function() {
+      fallbackCopy(text, done);
+    });
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+
+function fallbackCopy(text, callback) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    if (callback) callback();
+  } catch (e) {
+    alert('复制失败，请手动选择文本复制');
+  }
+  document.body.removeChild(ta);
+}
+
+function saveClipEdit() {
+  if (!clipCurrentKey) return;
+  var newContent = document.getElementById('editTextarea').value;
+  var btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '保存中...';
+  
+  fetch('https://clipbox.bingxue2026.com/api/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: clipCurrentKey, content: newContent })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        alert('✅ 保存成功');
+        loadClipList();
+      } else {
+        alert('❌ ' + (data.error || '保存失败'));
+      }
+      btn.disabled = false;
+      btn.textContent = '💾 保存修改';
+    })
+    .catch(function() {
+      alert('❌ 网络错误');
+      btn.disabled = false;
+      btn.textContent = '💾 保存修改';
+    });
+}
+
+function markClipDone() {
+  if (!clipCurrentKey || !confirm('确定标记为已整理？')) return;
+  
+  fetch('https://clipbox.bingxue2026.com/api/mark-done', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: clipCurrentKey })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        alert('✅ 已标记为已整理');
+        clipCurrentKey = '';
+        document.getElementById('editArea').style.display = 'none';
+        document.getElementById('editStatus').textContent = '请选择左侧列表中的一项开始编辑';
+        loadClipList();
+      } else {
+        alert('❌ ' + (data.error || '操作失败'));
+      }
+    });
+}
+
+function deleteClip() {
+  if (!clipCurrentKey || !confirm('确定删除此项？此操作不可恢复！')) return;
+  
+  fetch('https://clipbox.bingxue2026.com/api/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: clipCurrentKey })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        alert('✅ 已删除');
+        clipCurrentKey = '';
+        document.getElementById('editArea').style.display = 'none';
+        document.getElementById('editStatus').textContent = '请选择左侧列表中的一项开始编辑';
+        loadClipList();
+      } else {
+        alert('❌ ' + (data.error || '删除失败'));
+      }
+    });
+}
+
+// ========== 身份验证（独立执行，不与其他代码混淆） ==========
+(function verifyAuth() {
+  var pwd = null;
+  try { pwd = sessionStorage.getItem('manage_pwd'); } catch(e) {}
+
+  if (!pwd) {
+    document.getElementById('loading').innerHTML = '❌ 未经授权，请从主站点击“资料整理”进入。';
+    return;
+  }
+
+  fetch('https://clipbox.bingxue2026.com/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.valid) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      // 验证通过后，开始加载收集箱列表
+      loadClipList();
+    } else {
+      document.getElementById('loading').innerHTML = '❌ 身份验证失效，请从主站重新进入。';
+      try { sessionStorage.removeItem('manage_pwd'); } catch(e) {}
+    }
+  })
+  .catch(function() {
+    document.getElementById('loading').innerHTML = '❌ 网络错误，请稍后重试。';
+  });
+})();
+</script>
+</body>
+</html>

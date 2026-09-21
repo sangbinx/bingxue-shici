@@ -56,28 +56,20 @@ header .logout-btn {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
 }
-.clip-status-tabs {
-  display: flex; gap: 4px;
-}
+.clip-status-tabs { display: flex; gap: 4px; }
 .clip-status-btn {
   padding: 5px 12px; background: #e8f5e9; color: #2e7d32;
   border: 1px solid #c8e6c9; border-radius: 12px; cursor: pointer;
   font-size: 0.8em; font-family: inherit;
 }
-.clip-status-btn.active {
-  background: #4caf50; color: #fff; border-color: #4caf50;
-}
-.clip-list-tools {
-  display: flex; gap: 6px;
-}
+.clip-status-btn.active { background: #4caf50; color: #fff; border-color: #4caf50; }
+.clip-list-tools { display: flex; gap: 6px; }
 .clip-tool-btn {
   padding: 5px 12px; background: #e8f5e9; color: #2e7d32;
   border: 1px solid #c8e6c9; border-radius: 12px; cursor: pointer;
   font-size: 0.8em; font-family: inherit;
 }
-.clip-tool-btn.active {
-  background: #f0ad4e; color: #fff; border-color: #f0ad4e;
-}
+.clip-tool-btn.active { background: #f0ad4e; color: #fff; border-color: #f0ad4e; }
 .clip-list-item {
   padding: 10px; margin-bottom: 6px; background: #fff;
   border-radius: 6px; cursor: pointer; border-left: 3px solid #ccc;
@@ -95,9 +87,7 @@ header .logout-btn {
   font-size: 12px; color: #fff;
 }
 .clip-multiselect .clip-select-box { display: flex; }
-.clip-list-item.selected .clip-select-box {
-  background: #4caf50; border-color: #4caf50;
-}
+.clip-list-item.selected .clip-select-box { background: #4caf50; border-color: #4caf50; }
 .clip-list-item.selected .clip-select-box::after { content: '✓'; }
 .clip-merge-bar {
   display: none; padding: 10px; background: #fef9e7;
@@ -111,6 +101,19 @@ header .logout-btn {
 }
 .btn-merge { background: #64b5f6; color: #fff; }
 .btn-merge-cancel { background: #e0e0e0; color: #333; }
+.file-name-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; padding: 6px 10px; background: #fffef0;
+  border-radius: 6px; border: 1px solid #e8e0d0;
+}
+.file-name-display {
+  font-size: 0.85em; color: #2e7d32; word-break: break-all; flex: 1;
+}
+.rename-btn {
+  padding: 4px 12px; background: #64b5f6; color: #fff;
+  border: none; border-radius: 12px; cursor: pointer;
+  font-size: 0.78em; font-family: inherit; flex-shrink: 0; margin-left: 8px;
+}
 textarea {
   width: 100%; height: 350px; padding: 12px; border: 1px solid #d0c0a0;
   border-radius: 8px; font-family: "楷体", KaiTi, serif; font-size: 1em;
@@ -131,6 +134,74 @@ textarea {
   font-size: 0.8em; font-family: inherit;
 }
 
+/* 上传浮层 */
+.upload-modal {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6); z-index: 999;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.upload-modal.active { display: flex; }
+.upload-modal-content {
+  background: #fffef9; border-radius: 12px; padding: 24px;
+  width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto;
+  position: relative;
+}
+.upload-modal-content .modal-close {
+  position: absolute; top: 12px; right: 18px; font-size: 1.8em;
+  cursor: pointer; color: #999; line-height: 1;
+}
+.upload-modal-content h3 {
+  color: #2e7d32; margin-bottom: 16px; letter-spacing: 2px;
+  font-weight: normal;
+}
+.upload-section-label {
+  font-size: 0.85em; color: #888; margin-bottom: 8px; letter-spacing: 1px;
+}
+.upload-type-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px; margin-bottom: 16px;
+}
+.upload-type-btn {
+  padding: 10px 4px; background: #f5fbe8; color: #2e7d32;
+  border: 1px solid #c8e6c9; border-radius: 8px; cursor: pointer;
+  font-size: 0.85em; font-family: inherit; text-align: center;
+}
+.upload-type-btn.selected {
+  background: #4caf50; color: #fff; border-color: #4caf50;
+}
+.upload-modal textarea {
+  height: 180px; margin-bottom: 12px;
+}
+.upload-modal input[type="file"] {
+  width: 100%; padding: 8px; border: 1px solid #d0c0a0;
+  border-radius: 6px; font-size: 0.9em; margin-bottom: 12px;
+  font-family: inherit;
+}
+.upload-modal .btn-upload {
+  width: 100%; padding: 12px; background: #4caf50; color: #fff;
+  border: none; border-radius: 8px; cursor: pointer;
+  font-size: 1em; font-family: inherit; letter-spacing: 2px;
+}
+.upload-modal .btn-upload:disabled {
+  background: #ccc; cursor: not-allowed;
+}
+.upload-modal .upload-msg {
+  text-align: center; font-size: 0.85em; margin-top: 10px;
+  min-height: 20px; color: #666;
+}
+.member-grid-upload {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+  gap: 8px; margin-bottom: 16px;
+}
+.member-grid-upload button {
+  padding: 10px 4px; background: #f5fbe8; color: #2e7d32;
+  border: 1px solid #c8e6c9; border-radius: 8px; cursor: pointer;
+  font-size: 0.85em; font-family: inherit; text-align: center;
+}
+.member-grid-upload button.selected {
+  background: #4caf50; color: #fff; border-color: #4caf50;
+}
+
 /* 相册样式 */
 .photo-toolbar {
   background: #f9fcf5; border-radius: 8px; padding: 12px 16px;
@@ -147,9 +218,7 @@ textarea {
   border: 1px solid #c8e6c9; border-radius: 14px; cursor: pointer;
   font-size: 0.82em; font-family: inherit;
 }
-.filter-btn.active {
-  background: #4caf50; color: #fff; border-color: #4caf50;
-}
+.filter-btn.active { background: #4caf50; color: #fff; border-color: #4caf50; }
 .photo-stats {
   text-align: center; font-size: 0.85em; color: #888;
   padding: 8px; margin-bottom: 8px;
@@ -164,9 +233,7 @@ textarea {
   overflow: hidden; cursor: pointer; aspect-ratio: 1;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-.photo-card img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-}
+.photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .photo-card .video-thumb {
   width: 100%; height: 100%; display: flex; align-items: center;
   justify-content: center; background: #1a1a2e; color: #fff; font-size: 2.5em;
@@ -211,9 +278,7 @@ textarea {
   border: 1px solid #c8e6c9; border-radius: 16px; cursor: pointer;
   font-size: 0.85em; font-family: inherit;
 }
-.photo-actions button.active {
-  background: #f0ad4e; color: #fff; border-color: #f0ad4e;
-}
+.photo-actions button.active { background: #f0ad4e; color: #fff; border-color: #f0ad4e; }
 .batch-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: #fff; padding: 12px 16px; display: none;
@@ -332,8 +397,9 @@ textarea {
               <button class="clip-status-btn" data-clip-status="done" onclick="switchClipStatus('done')">📦 已整理</button>
             </div>
             <div class="clip-list-tools">
+              <button class="clip-tool-btn" onclick="openClipUpload()">📤 上传</button>
               <button class="clip-tool-btn" id="clipSelectModeBtn" onclick="toggleClipSelectMode()">☑ 多选</button>
-              <button class="clip-tool-btn" onclick="loadClipList()">🔄 刷新</button>
+              <button class="clip-tool-btn" onclick="loadClipList()">🔄</button>
             </div>
           </div>
           <div id="clipListContainer" style="font-size:0.9em; color:#666;">加载中...</div>
@@ -346,7 +412,10 @@ textarea {
         <div class="clip-edit-box" id="clipEditBox">
           <div style="font-size:0.9em; color:#888; margin-bottom:8px;" id="editStatus">请选择左侧列表中的一项开始编辑</div>
           <div id="editArea" style="display:none;">
-            <div style="font-size:0.85em; color:#2e7d32; margin-bottom:8px;" id="editKeyInfo"></div>
+            <div class="file-name-row">
+              <span class="file-name-display" id="editKeyInfo"></span>
+              <button class="rename-btn" onclick="renameClipFile()">✏️ 重命名</button>
+            </div>
             <textarea id="editTextarea"></textarea>
             <div class="btn-row" id="editBtnRow">
               <button class="btn-save" onclick="saveClipEdit()">💾 保存修改</button>
@@ -387,6 +456,7 @@ textarea {
       </div>
 
       <div class="photo-actions">
+        <button onclick="openPhotoUpload()">📤 上传照片/视频</button>
         <button id="photoSelectModeBtn" onclick="togglePhotoSelectMode()">☑ 选择模式</button>
         <button onclick="loadPhotoList()">🔄 刷新</button>
       </div>
@@ -446,6 +516,45 @@ textarea {
   </div>
 </div>
 
+<!-- 收集箱上传浮层 -->
+<div class="upload-modal" id="clipUploadModal">
+  <div class="upload-modal-content">
+    <span class="modal-close" onclick="closeClipUpload()">&times;</span>
+    <h3>📤 上传资料</h3>
+    <div class="upload-section-label">① 选择类型</div>
+    <div class="upload-type-grid" id="clipUploadTypeGrid">
+      <button class="upload-type-btn selected" data-type="poem">📜 诗词</button>
+      <button class="upload-type-btn" data-type="doc">📄 文档</button>
+      <button class="upload-type-btn" data-type="image">🖼 图片</button>
+      <button class="upload-type-btn" data-type="video">🎬 短视频</button>
+      <button class="upload-type-btn" data-type="other">📦 其他</button>
+    </div>
+    <div class="upload-section-label">② 粘贴内容</div>
+    <div id="clipUploadTextWrap">
+      <textarea id="clipUploadText" placeholder="长按此处粘贴内容..."></textarea>
+    </div>
+    <div id="clipUploadFileWrap" style="display:none;">
+      <input type="file" id="clipUploadFile">
+    </div>
+    <button class="btn-upload" id="clipUploadBtn" onclick="doClipUpload()">保存</button>
+    <div class="upload-msg" id="clipUploadMsg"></div>
+  </div>
+</div>
+
+<!-- 相册上传浮层 -->
+<div class="upload-modal" id="photoUploadModal">
+  <div class="upload-modal-content">
+    <span class="modal-close" onclick="closePhotoUpload()">&times;</span>
+    <h3>📤 上传照片/视频</h3>
+    <div class="upload-section-label">① 选择成员</div>
+    <div class="member-grid-upload" id="photoUploadMemberGrid"></div>
+    <div class="upload-section-label">② 选择文件（可多选）</div>
+    <input type="file" id="photoUploadFile" accept="image/*,video/*" multiple>
+    <button class="btn-upload" id="photoUploadBtn" onclick="doPhotoUpload()">上传</button>
+    <div class="upload-msg" id="photoUploadMsg"></div>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // 全局变量
@@ -455,6 +564,7 @@ var clipCurrentItems = [];
 var clipCurrentStatus = 'pending';
 var clipSelectMode = false;
 var clipSelectedKeys = new Set();
+var clipUploadType = 'poem';
 
 var MEMBERS = {
   husband: '丈夫', wife: '妻子', couple: '夫妻',
@@ -472,6 +582,7 @@ var photoCurrentSort = 'new';
 var photoSelectMode = false;
 var photoSelectedKeys = new Set();
 var photoDetailIndex = -1;
+var photoUploadMember = '';
 
 // ============================================================
 // 工具函数
@@ -496,6 +607,11 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function basename(key) {
+  var parts = key.split('/');
+  return parts[parts.length - 1] || key;
+}
+
 // ============================================================
 // 收集箱
 // ============================================================
@@ -510,7 +626,6 @@ function switchClipStatus(status) {
   } else {
     document.getElementById('clipSelectModeBtn').style.display = 'inline-block';
   }
-  // 退出多选模式
   if (clipSelectMode) toggleClipSelectMode();
   loadClipList();
 }
@@ -525,7 +640,6 @@ function toggleClipSelectMode() {
     btn.classList.add('active');
     bar.classList.add('active');
     container.classList.add('clip-multiselect');
-    // 隐藏编辑区
     document.getElementById('clipEditBox').style.display = 'none';
   } else {
     btn.textContent = '☑ 多选';
@@ -586,7 +700,7 @@ function renderClipList() {
     html += '<div class="clip-list-item' + activeClass + '" onclick="' + clickFn + '(\'' + it.key + '\')">';
     html += '<div class="clip-select-box"></div>';
     html += '<div class="clip-list-meta">' + (typeNames[it.type] || it.type) + ' · ' + it.date + '</div>';
-    html += '<div class="clip-list-title">' + escapeHtml(it.filename) + '</div>';
+    html += '<div class="clip-list-title">' + escapeHtml(basename(it.key)) + '</div>';
     html += '</div>';
   });
   container.innerHTML = html;
@@ -605,10 +719,9 @@ function selectClipItem(key) {
       var parts = text.split('\n\n');
       var body = parts.length > 1 ? parts.slice(1).join('\n\n') : text;
       document.getElementById('editStatus').textContent = '正在编辑：';
-      document.getElementById('editKeyInfo').textContent = key;
+      document.getElementById('editKeyInfo').textContent = basename(key);
       document.getElementById('editTextarea').value = body;
       document.getElementById('editArea').style.display = 'block';
-      // 已整理模式下隐藏"标记已整理"按钮
       if (clipCurrentStatus === 'done') {
         document.getElementById('editMarkDoneBtn').style.display = 'none';
       } else {
@@ -718,7 +831,37 @@ function deleteClip() {
     });
 }
 
-// 合并选中项
+function renameClipFile() {
+  if (!clipCurrentKey) return;
+  var oldName = basename(clipCurrentKey).replace(/\.txt$/i, '');
+  var newName = prompt('请输入新文件名（不需要输入 .txt）：', oldName);
+  if (!newName || newName === oldName) return;
+  newName = newName.trim();
+  if (!newName) return;
+  if (/[\/\\:*?"<>|]/.test(newName)) {
+    alert('文件名不能包含 / \\ : * ? " < > |');
+    return;
+  }
+  fetch('https://clipbox.bingxue2026.com/api/rename', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ oldKey: clipCurrentKey, newName: newName })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        alert('✅ 重命名成功');
+        clipCurrentKey = data.newKey || clipCurrentKey;
+        document.getElementById('editKeyInfo').textContent = basename(clipCurrentKey);
+        loadClipList();
+      } else {
+        alert('❌ ' + (data.error || '重命名失败'));
+      }
+    })
+    .catch(function() { alert('❌ 网络错误'); });
+}
+
+// 合并：宿主模式
 function mergeSelectedClips() {
   if (clipSelectedKeys.size === 0) {
     alert('请先选择要合并的条目');
@@ -729,18 +872,19 @@ function mergeSelectedClips() {
     return;
   }
 
-  // 按列表顺序取出选中的项
+  // 按列表顺序取出选中的项，第一条为宿主
   var selectedItems = clipCurrentItems.filter(function(it) {
     return clipSelectedKeys.has(it.key);
   });
 
-  if (!confirm('将合并 ' + selectedItems.length + ' 条为新条目，原条目将归档到"已整理"，确定吗？')) return;
+  var host = selectedItems[0];
+  var others = selectedItems.slice(1);
 
-  // 读取第一条的类型（用于新条目）
-  var newType = selectedItems[0].type;
+  if (!confirm('将以「' + basename(host.key) + '」为宿主，把其余 ' + others.length + ' 条内容追加进去。\n其他条目将归档到"已整理"，确定吗？')) return;
 
-  // 依次读取每条内容并拼接
-  var promises = selectedItems.map(function(it) {
+  // 读取所有内容（宿主的 + 其他的）
+  var allItems = [host].concat(others);
+  var promises = allItems.map(function(it) {
     return fetch('https://clipbox.bingxue2026.com/api/get?key=' + encodeURIComponent(it.key))
       .then(function(r) { return r.json(); })
       .then(function(data) {
@@ -753,31 +897,27 @@ function mergeSelectedClips() {
   });
 
   Promise.all(promises).then(function(contents) {
-    // 过滤失败的，按顺序拼接
     var validContents = contents.filter(function(c) { return c !== null; });
-    if (validContents.length === 0) {
+    if (validContents.length < 2) {
       alert('❌ 读取内容失败');
       return;
     }
     var mergedContent = validContents.join('\n\n');
 
-    // 第一步：保存新条目
-    var fd = new FormData();
-    fd.append('type', newType);
-    fd.append('content', mergedContent);
-
-    fetch('https://clipbox.bingxue2026.com/api/save', {
+    // 第一步：更新宿主内容
+    fetch('https://clipbox.bingxue2026.com/api/update', {
       method: 'POST',
-      body: fd
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: host.key, content: mergedContent })
     })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (!data.success) {
-          alert('❌ 合并失败：' + (data.error || '保存新条目出错'));
+          alert('❌ 合并失败：' + (data.error || '更新宿主出错'));
           return;
         }
-        // 第二步：把原条目归档到已整理
-        var markPromises = selectedItems.map(function(it) {
+        // 第二步：把"其他"条目归档
+        var markPromises = others.map(function(it) {
           return fetch('https://clipbox.bingxue2026.com/api/mark-done', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -785,8 +925,7 @@ function mergeSelectedClips() {
           }).then(function(r) { return r.json(); }).catch(function() { return null; });
         });
         Promise.all(markPromises).then(function() {
-          alert('✅ 合并成功！新条目已生成，原 ' + selectedItems.length + ' 条已归档到"已整理"。');
-          // 退出多选模式
+          alert('✅ 合并成功！' + others.length + ' 条内容已追加到宿主，其他条目已归档。');
           toggleClipSelectMode();
           loadClipList();
         });
@@ -795,6 +934,104 @@ function mergeSelectedClips() {
         alert('❌ 网络错误：' + err.message);
       });
   });
+}
+
+// ============================================================
+// 收集箱上传浮层
+// ============================================================
+function openClipUpload() {
+  document.getElementById('clipUploadModal').classList.add('active');
+  document.getElementById('clipUploadText').value = '';
+  document.getElementById('clipUploadFile').value = '';
+  document.getElementById('clipUploadMsg').textContent = '';
+  clipUploadType = 'poem';
+  document.querySelectorAll('#clipUploadTypeGrid .upload-type-btn').forEach(function(b) {
+    b.classList.toggle('selected', b.dataset.type === 'poem');
+  });
+  document.getElementById('clipUploadTextWrap').style.display = 'block';
+  document.getElementById('clipUploadFileWrap').style.display = 'none';
+  document.getElementById('clipUploadFile').accept = '';
+}
+
+function closeClipUpload() {
+  document.getElementById('clipUploadModal').classList.remove('active');
+}
+
+document.querySelectorAll('#clipUploadTypeGrid .upload-type-btn').forEach(function(btn) {
+  btn.onclick = function() {
+    document.querySelectorAll('#clipUploadTypeGrid .upload-type-btn').forEach(function(b) {
+      b.classList.remove('selected');
+    });
+    btn.classList.add('selected');
+    clipUploadType = btn.dataset.type;
+    var isText = (clipUploadType === 'poem' || clipUploadType === 'doc' || clipUploadType === 'other');
+    if (isText) {
+      document.getElementById('clipUploadTextWrap').style.display = 'block';
+      document.getElementById('clipUploadFileWrap').style.display = 'none';
+    } else {
+      document.getElementById('clipUploadTextWrap').style.display = 'none';
+      document.getElementById('clipUploadFileWrap').style.display = 'block';
+      document.getElementById('clipUploadFile').accept = (clipUploadType === 'image') ? 'image/*' : 'video/*';
+    }
+  };
+});
+
+function doClipUpload() {
+  var btn = document.getElementById('clipUploadBtn');
+  var msg = document.getElementById('clipUploadMsg');
+  btn.disabled = true;
+  btn.textContent = '保存中...';
+  msg.textContent = '';
+
+  var isText = (clipUploadType === 'poem' || clipUploadType === 'doc' || clipUploadType === 'other');
+  var fd = new FormData();
+  fd.append('type', clipUploadType);
+
+  if (isText) {
+    var content = document.getElementById('clipUploadText').value;
+    if (!content.trim()) {
+      msg.style.color = '#c33';
+      msg.textContent = '内容不能为空';
+      btn.disabled = false;
+      btn.textContent = '保存';
+      return;
+    }
+    fd.append('content', content);
+  } else {
+    var fileInput = document.getElementById('clipUploadFile');
+    if (!fileInput.files[0]) {
+      msg.style.color = '#c33';
+      msg.textContent = '请先选择文件';
+      btn.disabled = false;
+      btn.textContent = '保存';
+      return;
+    }
+    fd.append('file', fileInput.files[0]);
+  }
+
+  fetch('https://clipbox.bingxue2026.com/api/save', { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        msg.style.color = '#4caf50';
+        msg.textContent = '✅ 上传成功';
+        setTimeout(function() {
+          closeClipUpload();
+          loadClipList();
+        }, 800);
+      } else {
+        msg.style.color = '#c33';
+        msg.textContent = '❌ ' + (data.error || '上传失败');
+      }
+    })
+    .catch(function() {
+      msg.style.color = '#c33';
+      msg.textContent = '❌ 网络错误';
+    })
+    .then(function() {
+      btn.disabled = false;
+      btn.textContent = '保存';
+    });
 }
 
 // ============================================================
@@ -850,6 +1087,21 @@ function mergeSelectedClips() {
     thtml += '<button class="tag-item" data-tag="' + t + '" onclick="toggleTag(this)">' + t + '</button>';
   });
   tl.innerHTML = thtml;
+
+  // 相册上传浮层的成员按钮
+  var pu = document.getElementById('photoUploadMemberGrid');
+  var puhtml = '';
+  for (var k3 in MEMBERS) {
+    puhtml += '<button data-member="' + k3 + '">' + MEMBERS[k3] + '</button>';
+  }
+  pu.innerHTML = puhtml;
+  pu.querySelectorAll('button').forEach(function(btn) {
+    btn.onclick = function() {
+      pu.querySelectorAll('button').forEach(function(b) { b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      photoUploadMember = btn.dataset.member;
+    };
+  });
 })();
 
 function loadPhotoList() {
@@ -1173,6 +1425,74 @@ function formatSize(bytes) {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
   if (bytes < 1024 * 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + 'MB';
   return (bytes / 1024 / 1024 / 1024).toFixed(2) + 'GB';
+}
+
+// ============================================================
+// 相册上传浮层
+// ============================================================
+function openPhotoUpload() {
+  document.getElementById('photoUploadModal').classList.add('active');
+  document.getElementById('photoUploadFile').value = '';
+  document.getElementById('photoUploadMsg').textContent = '';
+  photoUploadMember = '';
+  document.querySelectorAll('#photoUploadMemberGrid button').forEach(function(b) {
+    b.classList.remove('selected');
+  });
+}
+
+function closePhotoUpload() {
+  document.getElementById('photoUploadModal').classList.remove('active');
+}
+
+function doPhotoUpload() {
+  if (!photoUploadMember) {
+    document.getElementById('photoUploadMsg').textContent = '❌ 请先选择成员';
+    document.getElementById('photoUploadMsg').style.color = '#c33';
+    return;
+  }
+  var fileInput = document.getElementById('photoUploadFile');
+  if (!fileInput.files || fileInput.files.length === 0) {
+    document.getElementById('photoUploadMsg').textContent = '❌ 请先选择文件';
+    document.getElementById('photoUploadMsg').style.color = '#c33';
+    return;
+  }
+
+  var btn = document.getElementById('photoUploadBtn');
+  var msg = document.getElementById('photoUploadMsg');
+  btn.disabled = true;
+  btn.textContent = '上传中...';
+
+  var fd = new FormData();
+  fd.append('member', photoUploadMember);
+  for (var i = 0; i < fileInput.files.length; i++) {
+    fd.append('files', fileInput.files[i]);
+  }
+
+  fetch('https://family.bingxue2026.com/api/upload', { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.results) {
+        var ok = data.results.filter(function(r) { return r.success; }).length;
+        var fail = data.results.length - ok;
+        msg.textContent = '✅ 成功 ' + ok + ' 个' + (fail > 0 ? '，失败 ' + fail + ' 个' : '');
+        msg.style.color = fail > 0 ? '#f0ad4e' : '#4caf50';
+        setTimeout(function() {
+          closePhotoUpload();
+          loadPhotoList();
+        }, 1000);
+      } else {
+        msg.textContent = '❌ ' + (data.error || '上传失败');
+        msg.style.color = '#c33';
+      }
+    })
+    .catch(function() {
+      msg.textContent = '❌ 网络错误';
+      msg.style.color = '#c33';
+    })
+    .then(function() {
+      btn.disabled = false;
+      btn.textContent = '上传';
+    });
 }
 
 // ============================================================

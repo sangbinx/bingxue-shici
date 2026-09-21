@@ -8,85 +8,41 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: "Microsoft YaHei", "楷体", KaiTi, serif;
-  background: #e8f0e3;
-  color: #2c2c2c;
-  min-height: 100vh;
-  padding: 20px;
+  background: #e8f0e3; color: #2c2c2c; min-height: 100vh; padding: 20px;
 }
 .loading {
-  text-align: center;
-  padding: 100px 20px;
-  color: #888;
-  font-size: 1.1em;
-  letter-spacing: 2px;
+  text-align: center; padding: 100px 20px; color: #888;
+  font-size: 1.1em; letter-spacing: 2px;
 }
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: none;
-}
+.container { max-width: 1100px; margin: 0 auto; display: none; }
 header {
-  background: #2e7d32;
-  color: #f0f7e6;
-  padding: 16px 24px;
-  border-radius: 12px 12px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background: #2e7d32; color: #f0f7e6; padding: 16px 24px;
+  border-radius: 12px 12px 0 0; display: flex;
+  justify-content: space-between; align-items: center;
 }
-header h1 {
-  font-size: 1.3em;
-  letter-spacing: 3px;
-  font-weight: normal;
-}
+header h1 { font-size: 1.3em; letter-spacing: 3px; font-weight: normal; }
 header .logout-btn {
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  border: none;
-  padding: 6px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.85em;
-  font-family: inherit;
+  background: rgba(255,255,255,0.2); color: #fff; border: none;
+  padding: 6px 16px; border-radius: 20px; cursor: pointer;
+  font-size: 0.85em; font-family: inherit;
 }
-.tabs {
-  display: flex;
-  background: #f5fbe8;
-  border-bottom: 1px solid #d0e0c8;
-}
+.tabs { display: flex; background: #f5fbe8; border-bottom: 1px solid #d0e0c8; }
 .tab-btn {
-  flex: 1;
-  padding: 14px 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 0.95em;
-  letter-spacing: 2px;
-  color: #666;
-  font-family: inherit;
-  transition: 0.2s;
+  flex: 1; padding: 14px 10px; background: transparent; border: none;
+  cursor: pointer; font-size: 0.95em; letter-spacing: 2px; color: #666;
+  font-family: inherit; transition: 0.2s;
 }
 .tab-btn.active {
-  background: #fffef9;
-  color: #2e7d32;
-  font-weight: bold;
+  background: #fffef9; color: #2e7d32; font-weight: bold;
   border-bottom: 3px solid #4caf50;
 }
 .tab-content {
-  background: #fffef9;
-  padding: 24px;
-  border-radius: 0 0 12px 12px;
-  min-height: 500px;
+  background: #fffef9; padding: 24px;
+  border-radius: 0 0 12px 12px; min-height: 500px;
 }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
-.placeholder {
-  text-align: center;
-  color: #aaa;
-  padding: 60px 20px;
-  font-size: 1em;
-  letter-spacing: 1px;
-}
+
 /* 收集箱样式 */
 .clip-layout { display: flex; gap: 20px; flex-wrap: wrap; min-height: 500px; }
 .clip-list-box {
@@ -96,14 +52,65 @@ header .logout-btn {
 .clip-edit-box {
   flex: 1.5; min-width: 350px; background: #f9fcf5; border-radius: 8px; padding: 16px;
 }
+.clip-list-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+}
+.clip-status-tabs {
+  display: flex; gap: 4px;
+}
+.clip-status-btn {
+  padding: 5px 12px; background: #e8f5e9; color: #2e7d32;
+  border: 1px solid #c8e6c9; border-radius: 12px; cursor: pointer;
+  font-size: 0.8em; font-family: inherit;
+}
+.clip-status-btn.active {
+  background: #4caf50; color: #fff; border-color: #4caf50;
+}
+.clip-list-tools {
+  display: flex; gap: 6px;
+}
+.clip-tool-btn {
+  padding: 5px 12px; background: #e8f5e9; color: #2e7d32;
+  border: 1px solid #c8e6c9; border-radius: 12px; cursor: pointer;
+  font-size: 0.8em; font-family: inherit;
+}
+.clip-tool-btn.active {
+  background: #f0ad4e; color: #fff; border-color: #f0ad4e;
+}
 .clip-list-item {
   padding: 10px; margin-bottom: 6px; background: #fff;
-  border-radius: 6px; cursor: pointer; border-left: 3px solid #ccc; transition: 0.2s;
+  border-radius: 6px; cursor: pointer; border-left: 3px solid #ccc;
+  position: relative;
 }
 .clip-list-item.active { border-left: 3px solid #4caf50; }
 .clip-list-item:hover { background: #f0f7eb; }
+.clip-list-item.selected { background: #e8f5e9; border-left: 3px solid #f0ad4e; }
 .clip-list-meta { font-size: 0.85em; color: #888; margin-bottom: 4px; }
 .clip-list-title { font-size: 0.8em; color: #555; word-break: break-all; }
+.clip-select-box {
+  position: absolute; top: 8px; right: 8px; width: 20px; height: 20px;
+  border-radius: 50%; border: 2px solid #ccc; background: #fff;
+  display: none; align-items: center; justify-content: center;
+  font-size: 12px; color: #fff;
+}
+.clip-multiselect .clip-select-box { display: flex; }
+.clip-list-item.selected .clip-select-box {
+  background: #4caf50; border-color: #4caf50;
+}
+.clip-list-item.selected .clip-select-box::after { content: '✓'; }
+.clip-merge-bar {
+  display: none; padding: 10px; background: #fef9e7;
+  border-radius: 6px; margin-top: 8px; text-align: center;
+}
+.clip-merge-bar.active { display: block; }
+.clip-merge-bar button {
+  padding: 8px 16px; border: none; border-radius: 8px;
+  cursor: pointer; font-family: inherit; font-size: 0.85em;
+  margin: 0 4px; letter-spacing: 1px;
+}
+.btn-merge { background: #64b5f6; color: #fff; }
+.btn-merge-cancel { background: #e0e0e0; color: #333; }
 textarea {
   width: 100%; height: 350px; padding: 12px; border: 1px solid #d0c0a0;
   border-radius: 8px; font-family: "楷体", KaiTi, serif; font-size: 1em;
@@ -119,8 +126,183 @@ textarea {
 .btn-done { background: #f0ad4e; color: #fff; }
 .btn-del { background: #e57373; color: #fff; }
 .refresh-btn {
-  padding: 4px 12px; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9;
-  border-radius: 12px; cursor: pointer; font-size: 0.8em; font-family: inherit;
+  padding: 4px 12px; background: #e8f5e9; color: #2e7d32;
+  border: 1px solid #c8e6c9; border-radius: 12px; cursor: pointer;
+  font-size: 0.8em; font-family: inherit;
+}
+
+/* 相册样式 */
+.photo-toolbar {
+  background: #f9fcf5; border-radius: 8px; padding: 12px 16px;
+  margin-bottom: 12px;
+}
+.toolbar-row {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  margin-bottom: 8px;
+}
+.toolbar-row:last-child { margin-bottom: 0; }
+.toolbar-label { font-size: 0.85em; color: #666; letter-spacing: 1px; }
+.filter-btn {
+  padding: 5px 12px; background: #fff; color: #2e7d32;
+  border: 1px solid #c8e6c9; border-radius: 14px; cursor: pointer;
+  font-size: 0.82em; font-family: inherit;
+}
+.filter-btn.active {
+  background: #4caf50; color: #fff; border-color: #4caf50;
+}
+.photo-stats {
+  text-align: center; font-size: 0.85em; color: #888;
+  padding: 8px; margin-bottom: 8px;
+}
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px; margin-bottom: 12px; min-height: 200px;
+}
+.photo-card {
+  position: relative; background: #fffef9; border-radius: 8px;
+  overflow: hidden; cursor: pointer; aspect-ratio: 1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.photo-card img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.photo-card .video-thumb {
+  width: 100%; height: 100%; display: flex; align-items: center;
+  justify-content: center; background: #1a1a2e; color: #fff; font-size: 2.5em;
+}
+.photo-card .card-meta {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: #fff; padding: 16px 6px 4px 6px; font-size: 0.7em; text-align: right;
+}
+.photo-card .select-box {
+  position: absolute; top: 6px; left: 6px; width: 24px; height: 24px;
+  border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,0.3);
+  display: none; z-index: 2;
+}
+.photo-card.selected .select-box {
+  background: #4caf50; display: flex; align-items: center;
+  justify-content: center; color: #fff; font-size: 16px;
+}
+.photo-card.selected .select-box::after { content: '✓'; }
+.select-mode .photo-card .select-box { display: flex; }
+.photo-card .tag-mark {
+  position: absolute; top: 6px; right: 6px;
+  background: rgba(255,193,7,0.9); color: #fff; font-size: 0.7em;
+  padding: 2px 6px; border-radius: 8px; z-index: 2;
+}
+.pager {
+  display: flex; justify-content: center; align-items: center;
+  gap: 12px; padding: 10px; margin-bottom: 12px;
+}
+.pager button {
+  padding: 6px 14px; background: #e8f5e9; color: #2e7d32;
+  border: 1px solid #c8e6c9; border-radius: 14px; cursor: pointer;
+  font-size: 0.85em; font-family: inherit;
+}
+.pager button:disabled { opacity: 0.4; cursor: not-allowed; }
+.pager span { font-size: 0.85em; color: #666; }
+.photo-actions {
+  display: flex; justify-content: center; gap: 10px; padding: 8px;
+}
+.photo-actions button {
+  padding: 8px 18px; background: #fffef9; color: #2e7d32;
+  border: 1px solid #c8e6c9; border-radius: 16px; cursor: pointer;
+  font-size: 0.85em; font-family: inherit;
+}
+.photo-actions button.active {
+  background: #f0ad4e; color: #fff; border-color: #f0ad4e;
+}
+.batch-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; padding: 12px 16px; display: none;
+  justify-content: center; gap: 12px; z-index: 100;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.1); flex-wrap: wrap;
+}
+.batch-bar.active { display: flex; }
+.batch-bar button {
+  padding: 10px 18px; border: none; border-radius: 8px;
+  cursor: pointer; font-size: 0.9em; font-family: inherit;
+}
+.batch-bar span { align-self: center; color: #666; font-size: 0.9em; }
+.btn-batch-move { background: #64b5f6; color: #fff; }
+.btn-batch-del { background: #e57373; color: #fff; }
+.btn-batch-cancel { background: #e0e0e0; color: #333; }
+
+/* 详情弹窗 */
+.photo-detail-modal {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6); z-index: 999;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.photo-detail-modal.active { display: flex; }
+.photo-detail-content {
+  background: #fffef9; border-radius: 12px; padding: 20px;
+  width: 100%; max-width: 700px; max-height: 92vh; overflow-y: auto;
+  position: relative;
+}
+.photo-detail-content .modal-close {
+  position: absolute; top: 10px; right: 16px; font-size: 1.8em;
+  cursor: pointer; color: #999; z-index: 10; line-height: 1;
+}
+.photo-detail-media {
+  background: #000; border-radius: 8px; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 200px; max-height: 50vh; overflow: hidden;
+}
+.photo-detail-media img, .photo-detail-media video {
+  max-width: 100%; max-height: 50vh; display: block;
+}
+.photo-detail-info {
+  font-size: 0.85em; color: #666; line-height: 1.8;
+  margin-bottom: 12px; padding: 10px; background: #f9fcf5;
+  border-radius: 8px; word-break: break-all; white-space: pre-wrap;
+}
+.photo-detail-edit { margin-bottom: 12px; }
+.edit-row {
+  display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;
+}
+.edit-row label {
+  width: 50px; font-size: 0.9em; color: #666; padding-top: 8px; flex-shrink: 0;
+}
+.edit-row select {
+  flex: 1; padding: 8px 10px; border: 1px solid #d0c0a0;
+  border-radius: 6px; font-family: inherit; font-size: 0.9em;
+  background: #fff;
+}
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+.tag-item {
+  padding: 6px 10px; background: #fff; border: 1px solid #c8e6c9;
+  border-radius: 14px; cursor: pointer; font-size: 0.8em;
+  color: #666; font-family: inherit;
+}
+.tag-item.selected { background: #4caf50; color: #fff; border-color: #4caf50; }
+.photo-detail-btns {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 10px;
+}
+.photo-detail-btns button {
+  padding: 9px 20px; border: none; border-radius: 8px;
+  cursor: pointer; font-size: 0.9em; font-family: inherit;
+}
+.btn-download { background: #64b5f6; color: #fff; }
+.photo-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 10px; border-top: 1px solid #eee;
+  font-size: 0.85em; color: #666;
+}
+.photo-nav button {
+  padding: 6px 14px; background: #f5f5f5; color: #333;
+  border: 1px solid #ddd; border-radius: 8px; cursor: pointer;
+  font-size: 0.85em; font-family: inherit;
+}
+@media (max-width: 600px) {
+  body { padding: 10px; }
+  .photo-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; }
+  .photo-detail-content { padding: 14px; }
+  .photo-detail-media { min-height: 150px; }
+  .photo-detail-media img, .photo-detail-media video { max-height: 35vh; }
 }
 </style>
 </head>
@@ -143,24 +325,33 @@ textarea {
     <!-- 收集箱面板 -->
     <div class="tab-panel active" id="panel-clip">
       <div class="clip-layout">
-        <!-- 左侧列表 -->
         <div class="clip-list-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span style="font-size:0.9em; color:#888;">待整理内容</span>
-            <button class="refresh-btn" onclick="loadClipList()">🔄 刷新</button>
+          <div class="clip-list-header">
+            <div class="clip-status-tabs">
+              <button class="clip-status-btn active" data-clip-status="pending" onclick="switchClipStatus('pending')">📥 待整理</button>
+              <button class="clip-status-btn" data-clip-status="done" onclick="switchClipStatus('done')">📦 已整理</button>
+            </div>
+            <div class="clip-list-tools">
+              <button class="clip-tool-btn" id="clipSelectModeBtn" onclick="toggleClipSelectMode()">☑ 多选</button>
+              <button class="clip-tool-btn" onclick="loadClipList()">🔄 刷新</button>
+            </div>
           </div>
           <div id="clipListContainer" style="font-size:0.9em; color:#666;">加载中...</div>
+          <div class="clip-merge-bar" id="clipMergeBar">
+            <span id="clipSelectedCount" style="font-size:0.85em; color:#666; margin-right:8px;">已选 0 条</span>
+            <button class="btn-merge" onclick="mergeSelectedClips()">🔗 合并选中项</button>
+            <button class="btn-merge-cancel" onclick="toggleClipSelectMode()">取消</button>
+          </div>
         </div>
-        <!-- 右侧编辑区 -->
-        <div class="clip-edit-box">
+        <div class="clip-edit-box" id="clipEditBox">
           <div style="font-size:0.9em; color:#888; margin-bottom:8px;" id="editStatus">请选择左侧列表中的一项开始编辑</div>
           <div id="editArea" style="display:none;">
             <div style="font-size:0.85em; color:#2e7d32; margin-bottom:8px;" id="editKeyInfo"></div>
             <textarea id="editTextarea"></textarea>
-            <div class="btn-row">
+            <div class="btn-row" id="editBtnRow">
               <button class="btn-save" onclick="saveClipEdit()">💾 保存修改</button>
               <button class="btn-copy" onclick="copyClipContent()">📋 复制内容</button>
-              <button class="btn-done" onclick="markClipDone()">✅ 标记已整理</button>
+              <button class="btn-done" onclick="markClipDone()" id="editMarkDoneBtn">✅ 标记已整理</button>
               <button class="btn-del" onclick="deleteClip()">🗑 删除</button>
             </div>
           </div>
@@ -170,89 +361,293 @@ textarea {
 
     <!-- 相册面板 -->
     <div class="tab-panel" id="panel-family">
-      <div class="placeholder">🏠 家庭相册（待开发）</div>
+      <div class="photo-toolbar">
+        <div class="toolbar-row">
+          <span class="toolbar-label">成员：</span>
+          <div id="photoMemberFilter" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+        </div>
+        <div class="toolbar-row">
+          <span class="toolbar-label">类型：</span>
+          <button class="filter-btn active" data-photo-type="">全部</button>
+          <button class="filter-btn" data-photo-type="photo">📷 照片</button>
+          <button class="filter-btn" data-photo-type="video">🎬 视频</button>
+          <span class="toolbar-label" style="margin-left:16px;">排序：</span>
+          <button class="filter-btn active" data-photo-sort="new">最新</button>
+          <button class="filter-btn" data-photo-sort="old">最早</button>
+        </div>
+      </div>
+
+      <div class="photo-stats" id="photoStats">加载中...</div>
+      <div class="photo-grid" id="photoGrid"></div>
+
+      <div class="pager">
+        <button id="photoPrevBtn" onclick="goPhotoPage(-1)">← 上一页</button>
+        <span id="photoPageInfo">第 1 / 1 页</span>
+        <button id="photoNextBtn" onclick="goPhotoPage(1)">下一页 →</button>
+      </div>
+
+      <div class="photo-actions">
+        <button id="photoSelectModeBtn" onclick="togglePhotoSelectMode()">☑ 选择模式</button>
+        <button onclick="loadPhotoList()">🔄 刷新</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 批量操作栏 -->
+<div class="batch-bar" id="photoBatchBar">
+  <span id="photoSelectedCount">已选 0 张</span>
+  <button class="btn-batch-move" onclick="moveSelectedPhotos()">📦 移动到...</button>
+  <button class="btn-batch-del" onclick="deleteSelectedPhotos()">🗑 删除</button>
+  <button class="btn-batch-cancel" onclick="togglePhotoSelectMode()">取消</button>
+</div>
+
+<!-- 照片详情弹窗 -->
+<div class="photo-detail-modal" id="photoDetailModal">
+  <div class="photo-detail-content">
+    <span class="modal-close" onclick="closePhotoDetail()">&times;</span>
+    <div class="photo-detail-media" id="photoDetailMedia"></div>
+    <div class="photo-detail-info" id="photoDetailInfo"></div>
+    <div class="photo-detail-edit">
+      <div class="edit-row">
+        <label>归属：</label>
+        <select id="photoEditMember"></select>
+      </div>
+      <div class="edit-row">
+        <label>备注：</label>
+        <select id="photoEditNote">
+          <option value="">（无）</option>
+          <option value="生日">生日</option>
+          <option value="节日">节日</option>
+          <option value="聚会">聚会</option>
+          <option value="旅游">旅游</option>
+          <option value="毕业">毕业</option>
+          <option value="日常">日常</option>
+          <option value="工作">工作</option>
+          <option value="值得珍藏">值得珍藏</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="edit-row">
+        <label>标签：</label>
+        <div class="tag-list" id="photoEditTags"></div>
+      </div>
+    </div>
+    <div class="photo-detail-btns">
+      <button class="btn-save" onclick="savePhotoMeta()">💾 保存</button>
+      <button class="btn-download" onclick="downloadCurrentPhoto()">📥 下载</button>
+      <button class="btn-del" onclick="deleteCurrentPhoto()">🗑 删除</button>
+    </div>
+    <div class="photo-nav">
+      <button onclick="photoDetailNav(-1)">← 上一张</button>
+      <span id="photoNavInfo"></span>
+      <button onclick="photoDetailNav(1)">下一张 →</button>
     </div>
   </div>
 </div>
 
 <script>
-// ========== 全局变量 ==========
+// ============================================================
+// 全局变量
+// ============================================================
 var clipCurrentKey = '';
 var clipCurrentItems = [];
+var clipCurrentStatus = 'pending';
+var clipSelectMode = false;
+var clipSelectedKeys = new Set();
 
-// ========== 工具函数 ==========
+var MEMBERS = {
+  husband: '丈夫', wife: '妻子', couple: '夫妻',
+  granddaughter: '孙女', son: '儿子', family: '家庭', other: '其他'
+};
+var PRESET_TAGS = ['生日', '节日', '聚会', '旅游', '户外', '美食', '钢琴', '学习', '玩耍', '合影'];
+var PAGE_SIZE = 60;
+
+var photoAllItems = [];
+var photoFilteredItems = [];
+var photoCurrentPage = 0;
+var photoCurrentMember = '';
+var photoCurrentType = '';
+var photoCurrentSort = 'new';
+var photoSelectMode = false;
+var photoSelectedKeys = new Set();
+var photoDetailIndex = -1;
+
+// ============================================================
+// 工具函数
+// ============================================================
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
   document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
   document.querySelector('.tab-btn[data-tab="' + name + '"]').classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'family' && photoAllItems.length === 0) {
+    loadPhotoList();
+  }
 }
 
 function logout() {
   try { sessionStorage.removeItem('manage_pwd'); } catch(e) {}
-  window.close();
+  window.location.href = 'index.html';
 }
 
-// ========== 收集箱逻辑 ==========
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ============================================================
+// 收集箱
+// ============================================================
+function switchClipStatus(status) {
+  clipCurrentStatus = status;
+  document.querySelectorAll('.clip-status-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  document.querySelector('.clip-status-btn[data-clip-status="' + status + '"]').classList.add('active');
+  if (status === 'done') {
+    document.getElementById('clipSelectModeBtn').style.display = 'none';
+  } else {
+    document.getElementById('clipSelectModeBtn').style.display = 'inline-block';
+  }
+  // 退出多选模式
+  if (clipSelectMode) toggleClipSelectMode();
+  loadClipList();
+}
+
+function toggleClipSelectMode() {
+  clipSelectMode = !clipSelectMode;
+  var btn = document.getElementById('clipSelectModeBtn');
+  var bar = document.getElementById('clipMergeBar');
+  var container = document.getElementById('clipListContainer');
+  if (clipSelectMode) {
+    btn.textContent = '☒ 退出多选';
+    btn.classList.add('active');
+    bar.classList.add('active');
+    container.classList.add('clip-multiselect');
+    // 隐藏编辑区
+    document.getElementById('clipEditBox').style.display = 'none';
+  } else {
+    btn.textContent = '☑ 多选';
+    btn.classList.remove('active');
+    bar.classList.remove('active');
+    container.classList.remove('clip-multiselect');
+    document.getElementById('clipEditBox').style.display = 'block';
+    clipSelectedKeys.clear();
+    updateClipSelectedCount();
+  }
+  renderClipList();
+}
+
+function toggleClipSelectItem(key) {
+  if (clipSelectedKeys.has(key)) {
+    clipSelectedKeys.delete(key);
+  } else {
+    clipSelectedKeys.add(key);
+  }
+  updateClipSelectedCount();
+  renderClipList();
+}
+
+function updateClipSelectedCount() {
+  var el = document.getElementById('clipSelectedCount');
+  if (el) el.textContent = '已选 ' + clipSelectedKeys.size + ' 条';
+}
+
 function loadClipList() {
   var container = document.getElementById('clipListContainer');
   container.innerHTML = '加载中...';
-  
-  fetch('https://clipbox.bingxue2026.com/api/list?status=pending')
+  var url = 'https://clipbox.bingxue2026.com/api/list?status=' + clipCurrentStatus;
+  fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(data) {
       clipCurrentItems = data.items || [];
-      if (clipCurrentItems.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">暂无待整理内容</div>';
-        return;
-      }
-      
-      var typeNames = { poem: '📜 诗词', doc: '📄 文档', image: '🖼 图片', video: '🎬 视频', other: '📦 其他' };
-      var html = '';
-      clipCurrentItems.forEach(function(it) {
-        var activeClass = (clipCurrentKey === it.key) ? ' active' : '';
-        html += '<div class="clip-list-item' + activeClass + '" onclick="selectClipItem(\'' + it.key + '\')">';
-        html += '<div class="clip-list-meta">' + (typeNames[it.type] || it.type) + ' · ' + it.date + '</div>';
-        html += '<div class="clip-list-title">' + it.filename + '</div>';
-        html += '</div>';
-      });
-      container.innerHTML = html;
+      renderClipList();
     })
     .catch(function(err) {
       container.innerHTML = '<div style="color:#c33; padding:20px; text-align:center;">加载失败：' + err.message + '</div>';
     });
 }
 
+function renderClipList() {
+  var container = document.getElementById('clipListContainer');
+  if (clipCurrentItems.length === 0) {
+    var emptyText = clipCurrentStatus === 'done' ? '暂无已整理内容' : '暂无待整理内容';
+    container.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">' + emptyText + '</div>';
+    return;
+  }
+  var typeNames = { poem: '📜 诗词', doc: '📄 文档', image: '🖼 图片', video: '🎬 视频', other: '📦 其他' };
+  var html = '';
+  clipCurrentItems.forEach(function(it) {
+    var activeClass = '';
+    if (!clipSelectMode && clipCurrentKey === it.key) activeClass = ' active';
+    if (clipSelectMode && clipSelectedKeys.has(it.key)) activeClass = ' selected';
+    var clickFn = clipSelectMode ? 'toggleClipSelectItem' : 'selectClipItem';
+    html += '<div class="clip-list-item' + activeClass + '" onclick="' + clickFn + '(\'' + it.key + '\')">';
+    html += '<div class="clip-select-box"></div>';
+    html += '<div class="clip-list-meta">' + (typeNames[it.type] || it.type) + ' · ' + it.date + '</div>';
+    html += '<div class="clip-list-title">' + escapeHtml(it.filename) + '</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
 function selectClipItem(key) {
   clipCurrentKey = key;
   document.getElementById('editStatus').textContent = '正在加载内容...';
   document.getElementById('editArea').style.display = 'none';
-  loadClipList(); // 刷新列表以高亮当前项
-  
+  renderClipList();
   fetch('https://clipbox.bingxue2026.com/api/get?key=' + encodeURIComponent(key))
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (data.error) { alert(data.error); return; }
-      
-      // 剥离元信息，只保留正文
       var text = data.content;
       var parts = text.split('\n\n');
       var body = parts.length > 1 ? parts.slice(1).join('\n\n') : text;
-      
       document.getElementById('editStatus').textContent = '正在编辑：';
       document.getElementById('editKeyInfo').textContent = key;
       document.getElementById('editTextarea').value = body;
       document.getElementById('editArea').style.display = 'block';
+      // 已整理模式下隐藏"标记已整理"按钮
+      if (clipCurrentStatus === 'done') {
+        document.getElementById('editMarkDoneBtn').style.display = 'none';
+      } else {
+        document.getElementById('editMarkDoneBtn').style.display = 'inline-block';
+      }
     })
     .catch(function(err) {
       document.getElementById('editStatus').textContent = '加载失败：' + err.message;
     });
 }
 
+function saveClipEdit() {
+  if (!clipCurrentKey) return;
+  var newContent = document.getElementById('editTextarea').value;
+  var btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '保存中...';
+  fetch('https://clipbox.bingxue2026.com/api/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: clipCurrentKey, content: newContent })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) { alert('✅ 保存成功'); loadClipList(); }
+      else { alert('❌ ' + (data.error || '保存失败')); }
+      btn.disabled = false;
+      btn.textContent = '💾 保存修改';
+    })
+    .catch(function() {
+      alert('❌ 网络错误');
+      btn.disabled = false;
+      btn.textContent = '💾 保存修改';
+    });
+}
+
 function copyClipContent() {
   var text = document.getElementById('editTextarea').value;
   if (!text) { alert('没有可复制的内容'); return; }
-
   var done = function() {
     var btn = document.querySelector('.btn-copy');
     if (btn) {
@@ -260,7 +655,6 @@ function copyClipContent() {
       setTimeout(function() { btn.textContent = '📋 复制内容'; }, 1500);
     }
   };
-
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(function() {
       fallbackCopy(text, done);
@@ -286,39 +680,8 @@ function fallbackCopy(text, callback) {
   document.body.removeChild(ta);
 }
 
-function saveClipEdit() {
-  if (!clipCurrentKey) return;
-  var newContent = document.getElementById('editTextarea').value;
-  var btn = event.target;
-  btn.disabled = true;
-  btn.textContent = '保存中...';
-  
-  fetch('https://clipbox.bingxue2026.com/api/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key: clipCurrentKey, content: newContent })
-  })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.success) {
-        alert('✅ 保存成功');
-        loadClipList();
-      } else {
-        alert('❌ ' + (data.error || '保存失败'));
-      }
-      btn.disabled = false;
-      btn.textContent = '💾 保存修改';
-    })
-    .catch(function() {
-      alert('❌ 网络错误');
-      btn.disabled = false;
-      btn.textContent = '💾 保存修改';
-    });
-}
-
 function markClipDone() {
   if (!clipCurrentKey || !confirm('确定标记为已整理？')) return;
-  
   fetch('https://clipbox.bingxue2026.com/api/mark-done', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -332,15 +695,12 @@ function markClipDone() {
         document.getElementById('editArea').style.display = 'none';
         document.getElementById('editStatus').textContent = '请选择左侧列表中的一项开始编辑';
         loadClipList();
-      } else {
-        alert('❌ ' + (data.error || '操作失败'));
-      }
+      } else { alert('❌ ' + (data.error || '操作失败')); }
     });
 }
 
 function deleteClip() {
   if (!clipCurrentKey || !confirm('确定删除此项？此操作不可恢复！')) return;
-  
   fetch('https://clipbox.bingxue2026.com/api/delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -354,13 +714,470 @@ function deleteClip() {
         document.getElementById('editArea').style.display = 'none';
         document.getElementById('editStatus').textContent = '请选择左侧列表中的一项开始编辑';
         loadClipList();
+      } else { alert('❌ ' + (data.error || '删除失败')); }
+    });
+}
+
+// 合并选中项
+function mergeSelectedClips() {
+  if (clipSelectedKeys.size === 0) {
+    alert('请先选择要合并的条目');
+    return;
+  }
+  if (clipSelectedKeys.size < 2) {
+    alert('至少选择两条才能合并');
+    return;
+  }
+
+  // 按列表顺序取出选中的项
+  var selectedItems = clipCurrentItems.filter(function(it) {
+    return clipSelectedKeys.has(it.key);
+  });
+
+  if (!confirm('将合并 ' + selectedItems.length + ' 条为新条目，原条目将归档到"已整理"，确定吗？')) return;
+
+  // 读取第一条的类型（用于新条目）
+  var newType = selectedItems[0].type;
+
+  // 依次读取每条内容并拼接
+  var promises = selectedItems.map(function(it) {
+    return fetch('https://clipbox.bingxue2026.com/api/get?key=' + encodeURIComponent(it.key))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.error) return null;
+        var text = data.content;
+        var parts = text.split('\n\n');
+        return parts.length > 1 ? parts.slice(1).join('\n\n') : text;
+      })
+      .catch(function() { return null; });
+  });
+
+  Promise.all(promises).then(function(contents) {
+    // 过滤失败的，按顺序拼接
+    var validContents = contents.filter(function(c) { return c !== null; });
+    if (validContents.length === 0) {
+      alert('❌ 读取内容失败');
+      return;
+    }
+    var mergedContent = validContents.join('\n\n');
+
+    // 第一步：保存新条目
+    var fd = new FormData();
+    fd.append('type', newType);
+    fd.append('content', mergedContent);
+
+    fetch('https://clipbox.bingxue2026.com/api/save', {
+      method: 'POST',
+      body: fd
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success) {
+          alert('❌ 合并失败：' + (data.error || '保存新条目出错'));
+          return;
+        }
+        // 第二步：把原条目归档到已整理
+        var markPromises = selectedItems.map(function(it) {
+          return fetch('https://clipbox.bingxue2026.com/api/mark-done', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: it.key })
+          }).then(function(r) { return r.json(); }).catch(function() { return null; });
+        });
+        Promise.all(markPromises).then(function() {
+          alert('✅ 合并成功！新条目已生成，原 ' + selectedItems.length + ' 条已归档到"已整理"。');
+          // 退出多选模式
+          toggleClipSelectMode();
+          loadClipList();
+        });
+      })
+      .catch(function(err) {
+        alert('❌ 网络错误：' + err.message);
+      });
+  });
+}
+
+// ============================================================
+// 相册模块
+// ============================================================
+(function initPhotoFilters() {
+  var mf = document.getElementById('photoMemberFilter');
+  var html = '<button class="filter-btn active" data-photo-member="">全部</button>';
+  for (var k in MEMBERS) {
+    html += '<button class="filter-btn" data-photo-member="' + k + '">' + MEMBERS[k] + '</button>';
+  }
+  mf.innerHTML = html;
+  mf.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.onclick = function() {
+      mf.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      photoCurrentMember = btn.dataset.photoMember;
+      photoCurrentPage = 0;
+      applyPhotoFilter();
+    };
+  });
+
+  document.querySelectorAll('[data-photo-type]').forEach(function(btn) {
+    btn.onclick = function() {
+      document.querySelectorAll('[data-photo-type]').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      photoCurrentType = btn.dataset.photoType;
+      photoCurrentPage = 0;
+      applyPhotoFilter();
+    };
+  });
+
+  document.querySelectorAll('[data-photo-sort]').forEach(function(btn) {
+    btn.onclick = function() {
+      document.querySelectorAll('[data-photo-sort]').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      photoCurrentSort = btn.dataset.photoSort;
+      photoCurrentPage = 0;
+      applyPhotoFilter();
+    };
+  });
+
+  var ms = document.getElementById('photoEditMember');
+  var mhtml = '';
+  for (var k2 in MEMBERS) {
+    mhtml += '<option value="' + k2 + '">' + MEMBERS[k2] + '</option>';
+  }
+  ms.innerHTML = mhtml;
+
+  var tl = document.getElementById('photoEditTags');
+  var thtml = '';
+  PRESET_TAGS.forEach(function(t) {
+    thtml += '<button class="tag-item" data-tag="' + t + '" onclick="toggleTag(this)">' + t + '</button>';
+  });
+  tl.innerHTML = thtml;
+})();
+
+function loadPhotoList() {
+  document.getElementById('photoGrid').innerHTML = '<div style="text-align:center; padding:40px; color:#aaa;">加载中...</div>';
+  fetch('https://family.bingxue2026.com/api/list?meta=1')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      photoAllItems = data.items || [];
+      photoCurrentPage = 0;
+      applyPhotoFilter();
+    })
+    .catch(function(err) {
+      document.getElementById('photoGrid').innerHTML = '<div style="text-align:center; padding:40px; color:#c33;">加载失败：' + err.message + '</div>';
+    });
+}
+
+function applyPhotoFilter() {
+  photoFilteredItems = photoAllItems.filter(function(it) {
+    if (photoCurrentMember && it.member !== photoCurrentMember) return false;
+    if (photoCurrentType && it.type !== photoCurrentType) return false;
+    return true;
+  });
+  if (photoCurrentSort === 'old') {
+    photoFilteredItems = photoFilteredItems.slice().reverse();
+  }
+  renderPhotoGrid();
+}
+
+function renderPhotoGrid() {
+  var grid = document.getElementById('photoGrid');
+  var stats = document.getElementById('photoStats');
+
+  if (photoFilteredItems.length === 0) {
+    grid.innerHTML = '<div style="text-align:center; padding:40px; color:#aaa; grid-column:1/-1;">暂无内容</div>';
+    stats.textContent = '共 0 项';
+    document.getElementById('photoPageInfo').textContent = '第 1 / 1 页';
+    return;
+  }
+
+  var total = photoFilteredItems.length;
+  var totalPages = Math.ceil(total / PAGE_SIZE);
+  if (photoCurrentPage >= totalPages) photoCurrentPage = totalPages - 1;
+  if (photoCurrentPage < 0) photoCurrentPage = 0;
+
+  var start = photoCurrentPage * PAGE_SIZE;
+  var end = Math.min(start + PAGE_SIZE, total);
+  var pageItems = photoFilteredItems.slice(start, end);
+
+  var photos = 0, videos = 0;
+  photoFilteredItems.forEach(function(it) {
+    if (it.type === 'photo') photos++; else videos++;
+  });
+  stats.textContent = '共 ' + total + ' 项（📷 ' + photos + ' · 🎬 ' + videos + '）';
+
+  var html = '';
+  pageItems.forEach(function(it, idx) {
+    var realIdx = start + idx;
+    var selected = photoSelectedKeys.has(it.key) ? ' selected' : '';
+    html += '<div class="photo-card' + selected + '" data-idx="' + realIdx + '" data-key="' + escapeHtml(it.key) + '">';
+    if (it.type === 'photo') {
+      html += '<img src="' + it.url + '" loading="lazy" alt="">';
+    } else {
+      html += '<div class="video-thumb">🎬</div>';
+    }
+    if (it.note) {
+      html += '<div class="tag-mark">' + escapeHtml(it.note) + '</div>';
+    }
+    html += '<div class="select-box"></div>';
+    var t = it.filename.split('_')[0];
+    var hh = t.substring(0, 2), mm = t.substring(2, 4);
+    html += '<div class="card-meta">' + it.memberName + ' · ' + hh + ':' + mm + '</div>';
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+
+  grid.querySelectorAll('.photo-card').forEach(function(card) {
+    card.onclick = function() {
+      var key = card.dataset.key;
+      var idx = parseInt(card.dataset.idx);
+      if (photoSelectMode) {
+        if (photoSelectedKeys.has(key)) {
+          photoSelectedKeys.delete(key);
+          card.classList.remove('selected');
+        } else {
+          photoSelectedKeys.add(key);
+          card.classList.add('selected');
+        }
+        updatePhotoSelectedCount();
+      } else {
+        openPhotoDetail(idx);
+      }
+    };
+  });
+
+  document.getElementById('photoPageInfo').textContent = '第 ' + (photoCurrentPage + 1) + ' / ' + totalPages + ' 页';
+  document.getElementById('photoPrevBtn').disabled = (photoCurrentPage === 0);
+  document.getElementById('photoNextBtn').disabled = (photoCurrentPage >= totalPages - 1);
+}
+
+function goPhotoPage(dir) {
+  var total = photoFilteredItems.length;
+  var totalPages = Math.ceil(total / PAGE_SIZE);
+  var np = photoCurrentPage + dir;
+  if (np < 0 || np >= totalPages) return;
+  photoCurrentPage = np;
+  renderPhotoGrid();
+  document.getElementById('photoGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function togglePhotoSelectMode() {
+  photoSelectMode = !photoSelectMode;
+  var btn = document.getElementById('photoSelectModeBtn');
+  var bar = document.getElementById('photoBatchBar');
+  var grid = document.getElementById('photoGrid');
+  if (photoSelectMode) {
+    btn.textContent = '☒ 退出选择';
+    btn.classList.add('active');
+    bar.classList.add('active');
+    grid.classList.add('select-mode');
+  } else {
+    btn.textContent = '☑ 选择模式';
+    btn.classList.remove('active');
+    bar.classList.remove('active');
+    grid.classList.remove('select-mode');
+    photoSelectedKeys.clear();
+    updatePhotoSelectedCount();
+    renderPhotoGrid();
+  }
+}
+
+function updatePhotoSelectedCount() {
+  document.getElementById('photoSelectedCount').textContent = '已选 ' + photoSelectedKeys.size + ' 张';
+}
+
+function moveSelectedPhotos() {
+  if (photoSelectedKeys.size === 0) { alert('请先选择要移动的照片'); return; }
+  var opts = [];
+  for (var k in MEMBERS) {
+    opts.push(k + ':' + MEMBERS[k]);
+  }
+  var input = prompt('请输入目标成员：\n' + opts.join('\n'), 'granddaughter');
+  if (!input) return;
+  if (!MEMBERS[input]) { alert('无效的成员代号'); return; }
+  var keys = Array.from(photoSelectedKeys);
+  if (!confirm('确定把 ' + keys.length + ' 张照片移动到「' + MEMBERS[input] + '」？')) return;
+
+  fetch('https://family.bingxue2026.com/api/move', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keys: keys, newMember: input })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.results) {
+        var ok = data.results.filter(function(r) { return r.success; }).length;
+        alert('✅ 成功移动 ' + ok + ' 张');
+        photoSelectedKeys.clear();
+        updatePhotoSelectedCount();
+        togglePhotoSelectMode();
+        loadPhotoList();
+      } else {
+        alert('❌ ' + (data.error || '操作失败'));
+      }
+    });
+}
+
+function deleteSelectedPhotos() {
+  if (photoSelectedKeys.size === 0) { alert('请先选择要删除的照片'); return; }
+  if (!confirm('确定删除 ' + photoSelectedKeys.size + ' 张？此操作不可恢复！')) return;
+  var keys = Array.from(photoSelectedKeys);
+  fetch('https://family.bingxue2026.com/api/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keys: keys })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        alert('✅ 已删除 ' + data.count + ' 张');
+        photoSelectedKeys.clear();
+        updatePhotoSelectedCount();
+        togglePhotoSelectMode();
+        loadPhotoList();
       } else {
         alert('❌ ' + (data.error || '删除失败'));
       }
     });
 }
 
-// ========== 身份验证（独立执行，不与其他代码混淆） ==========
+function openPhotoDetail(idx) {
+  if (idx < 0 || idx >= photoFilteredItems.length) return;
+  photoDetailIndex = idx;
+  var it = photoFilteredItems[idx];
+  var media = document.getElementById('photoDetailMedia');
+  if (it.type === 'photo') {
+    media.innerHTML = '<img src="' + it.url + '" alt="">';
+  } else {
+    media.innerHTML = '<video src="' + it.url + '" controls autoplay playsinline></video>';
+  }
+
+  var info = '成员：' + it.memberName + '\n日期：' + it.date + '\n大小：' + formatSize(it.size) + '\n路径：' + it.key;
+  document.getElementById('photoDetailInfo').textContent = info;
+
+  document.getElementById('photoEditMember').value = it.member;
+  document.getElementById('photoEditNote').value = it.note || '';
+
+  var tags = (it.tags || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  document.querySelectorAll('#photoEditTags .tag-item').forEach(function(b) {
+    if (tags.indexOf(b.dataset.tag) >= 0) b.classList.add('selected');
+    else b.classList.remove('selected');
+  });
+
+  document.getElementById('photoNavInfo').textContent = (idx + 1) + ' / ' + photoFilteredItems.length;
+  document.getElementById('photoDetailModal').classList.add('active');
+}
+
+function closePhotoDetail() {
+  document.getElementById('photoDetailModal').classList.remove('active');
+  document.getElementById('photoDetailMedia').innerHTML = '';
+  photoDetailIndex = -1;
+}
+
+function photoDetailNav(dir) {
+  if (photoDetailIndex < 0) return;
+  var np = photoDetailIndex + dir;
+  if (np < 0 || np >= photoFilteredItems.length) return;
+  openPhotoDetail(np);
+}
+
+function toggleTag(btn) {
+  btn.classList.toggle('selected');
+}
+
+function savePhotoMeta() {
+  if (photoDetailIndex < 0) return;
+  var it = photoFilteredItems[photoDetailIndex];
+  var newMember = document.getElementById('photoEditMember').value;
+  var newNote = document.getElementById('photoEditNote').value;
+  var tags = [];
+  document.querySelectorAll('#photoEditTags .tag-item.selected').forEach(function(b) {
+    tags.push(b.dataset.tag);
+  });
+  var tagsStr = tags.join(',');
+
+  var doSave = function() {
+    fetch('https://family.bingxue2026.com/api/update-meta', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: it.key, tags: tagsStr, note: newNote })
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          alert('✅ 保存成功');
+          loadPhotoList();
+          closePhotoDetail();
+        } else {
+          alert('❌ ' + (data.error || '保存失败'));
+        }
+      })
+      .catch(function() { alert('❌ 网络错误'); });
+  };
+
+  if (newMember !== it.member) {
+    if (!confirm('归属从「' + it.memberName + '」改为「' + MEMBERS[newMember] + '」？照片会被移动。')) return;
+    fetch('https://family.bingxue2026.com/api/move', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ keys: [it.key], newMember: newMember })
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.results && data.results[0] && data.results[0].success) {
+          it.key = data.results[0].newKey || it.key;
+          doSave();
+        } else {
+          alert('❌ 移动失败');
+        }
+      });
+  } else {
+    doSave();
+  }
+}
+
+function downloadCurrentPhoto() {
+  if (photoDetailIndex < 0) return;
+  var it = photoFilteredItems[photoDetailIndex];
+  var a = document.createElement('a');
+  a.href = it.url;
+  a.download = it.filename;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function deleteCurrentPhoto() {
+  if (photoDetailIndex < 0) return;
+  var it = photoFilteredItems[photoDetailIndex];
+  if (!confirm('确定删除此文件？此操作不可恢复！')) return;
+  fetch('https://family.bingxue2026.com/api/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keys: [it.key] })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        alert('✅ 已删除');
+        closePhotoDetail();
+        loadPhotoList();
+      } else {
+        alert('❌ ' + (data.error || '删除失败'));
+      }
+    });
+}
+
+function formatSize(bytes) {
+  if (!bytes) return '未知';
+  if (bytes < 1024) return bytes + 'B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
+  if (bytes < 1024 * 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + 'MB';
+  return (bytes / 1024 / 1024 / 1024).toFixed(2) + 'GB';
+}
+
+// ============================================================
+// 身份验证 + 启动
+// ============================================================
 (function verifyAuth() {
   var pwd = null;
   try { pwd = sessionStorage.getItem('manage_pwd'); } catch(e) {}
@@ -380,7 +1197,6 @@ function deleteClip() {
     if (data.valid) {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
-      // 验证通过后，开始加载收集箱列表
       loadClipList();
     } else {
       document.getElementById('loading').innerHTML = '❌ 身份验证失效，请从主站重新进入。';

@@ -78,7 +78,7 @@ def parse_poems(filepath, image_dir):
         genre = ''
         if '·' in title:
             genre = title.split('·')[0].strip()
-                # 如果 genre 为空，检查是否属于标准体裁
+            # 如果 genre 为空，检查是否属于标准体裁
         if not genre:
             if title in ['五绝', '五律', '七绝', '七律']:
                 genre = title
@@ -1194,7 +1194,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
   </div>
   <div id="aiPoemResult" class="ai-poem-result">
     <div id="poemOutput"></div>
-   # <button id="copyPoemBtn" class="copy-btn" style="display: none;">复制诗词</button>
     <button id="copyPoemBtn" class="copy-btn" style="display: none;">复制诗词</button>
   </div>
 </div>
@@ -1410,6 +1409,16 @@ const EDIT_PASSWORD = "bingxue2026";
 
 const editedPoems = {{}};
 
+// ★ 新增：统一取显示数据（优先用编辑后的，无编辑则用原始）
+function getDisplayPoem(p) {{
+    var ed = editedPoems[p.poem_id];
+    return {{
+        title: (ed && ed.title) ? ed.title : p.title,
+        date:  (ed && ed.date)  ? ed.date  : p.date,
+        body:  (ed && ed.body)  ? ed.body  : (p.body || '')
+    }};
+}}
+
 // ============================================================
 // 工具函数
 // ============================================================
@@ -1477,7 +1486,7 @@ function shareWebsite() {{
     if (navigator.share) {{
         navigator.share({{
             title: '冰雪诗词·数字图书馆',
-            text: '发现一个超赞的诗词网站，收录了2042首冰雪原创诗词，还可以AI朗诵！',
+            text: '发现一个超赞的诗词网站，收录了' + POEMS.length + '首冰雪原创诗词，还可以AI朗诵！',
             url: url
         }}).catch(function(err) {{
             var dummy = document.createElement('textarea');
@@ -1633,6 +1642,36 @@ function fetchLikesForPoems(poemIds) {{
             }}
         }})
         .catch(function(err) {{ /* 静默忽略网络错误 */ }});
+}}
+
+// ★★★ 分批加载点赞数（避免一次请求太多导致500错误） ★★★
+function fetchLikesBatch(ids) {{
+    if (!ids || ids.length === 0) return;
+    var batchSize = 50;
+    var index = 0;
+    function processBatch() {{
+        var end = Math.min(index + batchSize, ids.length);
+        var batch = ids.slice(index, end);
+        fetch('https://poem-ai-explanations.bingxue2026.com/api/likes?ids=' + batch.join(','))
+            .then(function(r) {{ return r.json(); }})
+            .then(function(data) {{
+                for (var id in data) {{
+                    var span = document.getElementById('like-count-' + id);
+                    if (span) span.textContent = data[id] || 0;
+                }}
+                index += batchSize;
+                if (index < ids.length) {{
+                    setTimeout(processBatch, 100);
+                }}
+            }})
+            .catch(function() {{
+                index += batchSize;
+                if (index < ids.length) {{
+                    setTimeout(processBatch, 100);
+                }}
+            }});
+    }}
+    processBatch();
 }}
 // ========== 点赞功能（修复：改为 POST + JSON Body） ==========
 function likePoem(poemId) {{
@@ -2245,15 +2284,15 @@ function render(title, poems) {{
             // ★★★ 直接迭代真实文件名列表，不再硬编码 ★★★
             imgFiles.forEach(function(fileName) {{
                 const imgUrl = R2_BASE + '/images/' + pid + '/' + fileName;
-                h += '<img src="' + imgUrl + '" loading="lazy" onerror="this.style.display= none" alt="配图" onclick="window.open(this.src)">';
+                h += '<img src="' + imgUrl + '" loading="lazy" onerror="hideBrokenImg(this)" alt="配图" onclick="window.open(this.src)">';
             }});
             h += '</div>';
         }}
-        h += '<div class="poem-title">' + p.title + '</div>';
+        var d = getDisplayPoem(p);
+        h += '<div class="poem-title" id="title-' + pid + '">' + d.title + '</div>';
         h += '<div class="poem-author">冰雪</div>';
-        if (p.date) h += '<div class="poem-date">' + p.date + '</div>';
-        var displayBody = (editedPoems[pid] || p.body || '');
-        h += '<div class="poem-body" id="body-' + pid + '">' + displayBody.replace(/\\n/g, '<br>') + '</div>';
+        if (d.date) h += '<div class="poem-date" id="date-' + pid + '">' + d.date + '</div>';
+        h += '<div class="poem-body" id="body-' + pid + '">' + d.body.replace(/\\n/g, '<br>') + '</div>';
         if (imgFiles.length > 0) {{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\'' + pid + '\\')">查看配图(' + imgFiles.length + ')</button>';
         }} else {{
@@ -2277,7 +2316,18 @@ function render(title, poems) {{
     }});
     c.innerHTML = h;
     c.scrollTop = 0;
-    setTimeout(function() {{ loadLikeCounts(); }}, 300);
+    setTimeout(function() {{
+        var ids = poems.map(function(p) {{ return p.poem_id; }});
+        if (ids.length > 0) fetchLikesBatch(ids);
+    }}, 300);
+}}
+
+function hideBrokenImg(img) {{
+    img.style.display = 'none';
+}}
+
+function hideParent(el) {{
+    el.parentElement.style.display = 'none';
 }}
 
 function toggleImgs(btn, poemId) {{
@@ -2350,16 +2400,16 @@ function showTodayPoems() {{
             // ★★★ 直接迭代真实文件名列表，不再硬编码 ★★★
             imgFiles.forEach(function(fileName) {{
                 const imgUrl = R2_BASE + '/images/' + pid + '/' + fileName;
-                h += '<img src="' + imgUrl + '" loading="lazy" onerror="this.style.display= none" alt="配图" onclick="window.open(this.src)">';
+                h += '<img src="' + imgUrl + '" loading="lazy" onerror="hideBrokenImg(this)" alt="配图" onclick="window.open(this.src)">';
             }});
             h += '</div>';
         }}
-        h += '<div class="poem-title">' + p.title + '</div>';
+        var d = getDisplayPoem(p);
+        h += '<div class="poem-title" id="title-' + pid + '">' + d.title + '</div>';
         h += '<div class="poem-author">冰雪</div>';
-        if (p.date) h += '<div class="poem-date">' + p.date + '</div>';
-        var displayBody = (editedPoems[pid] || p.body || '');
-        h += '<div class="poem-body" id="body-' + pid + '">' + displayBody.replace(/\\n/g, '<br>') + '</div>';
-       if (imgFiles.length > 0) {{
+        if (d.date) h += '<div class="poem-date" id="date-' + pid + '">' + d.date + '</div>';
+        h += '<div class="poem-body" id="body-' + pid + '">' + d.body.replace(/\\n/g, '<br>') + '</div>';
+        if (imgFiles.length > 0) {{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\'' + pid + '\\')">查看配图(' + imgFiles.length + ')</button>';
         }} else {{
             h += '<span style="display:inline-block;margin-top:8px;margin-right:8px;padding:5px 10px;background:#e0e0e0;color:#888;border-radius:4px;font-size:0.8em;letter-spacing:1px;">没有配图</span>';
@@ -2631,71 +2681,130 @@ function copyLiuCunText() {{
 // ============================================================
 // 诗词编辑
 // ============================================================
-function showCustomEditDialog(id, currentBody) {{
+function showCustomEditDialog(id, current) {{
     return new Promise((resolve) => {{
         const existing = document.querySelector('.custom-edit-modal');
         if (existing) existing.remove();
+
+        const escapeHtml = function(s) {{
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }};
+
         const modal = document.createElement('div');
         modal.className = 'custom-edit-modal';
         modal.innerHTML = `
-            <div class="custom-edit-content">
-                <textarea id="customEditTextarea">${{currentBody.replace(/</g, '&lt;').replace(/>/g, '&gt;')}}</textarea>
-                <div class="btn-group">
+            <div class="custom-edit-content" style="max-width:600px;">
+                <div style="margin-bottom:12px;padding:8px 12px;background:#f0f0f0;color:#666;border-radius:6px;font-size:0.9rem;letter-spacing:1px;">
+                    诗词${{escapeHtml(id)}}
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:0.85rem;color:#666;margin-bottom:4px;">标题</div>
+                    <input id="customEditTitle" type="text" value="${{escapeHtml(current.title)}}"
+                           style="width:100%;padding:8px 10px;font-size:1rem;border:1px solid #4caf50;border-radius:6px;background:#f0fff4;font-family:inherit;">
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:0.85rem;color:#666;margin-bottom:4px;">日期</div>
+                    <input id="customEditDate" type="text" value="${{escapeHtml(current.date)}}"
+                           style="width:100%;padding:8px 10px;font-size:1rem;border:1px solid #4caf50;border-radius:6px;background:#f0fff4;font-family:inherit;">
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:0.85rem;color:#666;margin-bottom:4px;">正文</div>
+                    <textarea id="customEditTextarea"
+                              style="width:100%;height:220px;padding:10px;font-size:1rem;line-height:1.7;font-family:'楷体',KaiTi,serif;border:1px solid #4caf50;border-radius:6px;background:#f0fff4;resize:vertical;">${{escapeHtml(current.body)}}</textarea>
+                </div>
+                <div class="btn-group" style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
                     <button class="cancel-btn">取消</button>
                     <button class="save-btn">保存</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
-        const textarea = modal.querySelector('#customEditTextarea');
-        const saveBtn = modal.querySelector('.save-btn');
-        const cancelBtn = modal.querySelector('.cancel-btn');
+
+        const titleInput = modal.querySelector('#customEditTitle');
+        const dateInput  = modal.querySelector('#customEditDate');
+        const textarea   = modal.querySelector('#customEditTextarea');
+        const saveBtn    = modal.querySelector('.save-btn');
+        const cancelBtn  = modal.querySelector('.cancel-btn');
+
         saveBtn.onclick = () => {{
-            const newBody = textarea.value;
+            const newTitle = titleInput.value;
+            const newDate  = dateInput.value;
+            const newBody  = textarea.value;
             modal.remove();
-            resolve(newBody);
+            resolve({{ title: newTitle, date: newDate, body: newBody }});
         }};
         cancelBtn.onclick = () => {{
             modal.remove();
             resolve(null);
         }};
-        textarea.focus();
+
+        titleInput.focus();
         setTimeout(() => {{
-            textarea.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
-        }}, 300);
+            modal.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+        }}, 200);
+    }});
+}}
+
+    function proceedEditPoem(id) {{
+    var poem = getPoemById(id);
+    if (!poem) {{ alert('未找到诗词'); return; }}
+
+    var currentTitle = (editedPoems[id] && editedPoems[id].title) ? editedPoems[id].title : poem.title;
+    var currentDate  = (editedPoems[id] && editedPoems[id].date)  ? editedPoems[id].date  : poem.date;
+    var currentBody  = (editedPoems[id] && editedPoems[id].body)  ? editedPoems[id].body  : poem.body;
+
+    showCustomEditDialog(id, {{
+        title: currentTitle,
+        date:  currentDate,
+        body:  currentBody
+    }}).then(function(result) {{
+        if (result === null) return;
+
+        var newTitle = result.title;
+        var newDate  = result.date;
+        var newBody  = result.body;
+
+        if (newTitle === currentTitle && newDate === currentDate && newBody === currentBody) return;
+
+        editedPoems[id] = {{
+            title: newTitle,
+            date:  newDate,
+            body:  newBody
+        }};
+
+        var titleEl = document.getElementById('title-' + id);
+        var dateEl  = document.getElementById('date-' + id);
+        var bodyEl  = document.getElementById('body-' + id);
+        if (titleEl && newTitle !== currentTitle) titleEl.innerText = newTitle;
+        if (dateEl  && newDate  !== currentDate)  dateEl.innerText  = newDate;
+        if (bodyEl  && newBody  !== currentBody)  bodyEl.innerHTML  = newBody.replace(/\\n/g, '<br>');
+
+        var payload = {{
+            poem_id: id,
+            edited_body: JSON.stringify({{
+                title: newTitle,
+                date:  newDate,
+                body:  newBody
+            }})
+        }};
+
+        fetch(POEM_EDIT_WORKER_URL + '/edit', {{
+            method: 'POST',
+            headers: {{ 'Content-Type': 'application/json' }},
+            body: JSON.stringify(payload)
+        }}).then(function(r) {{ return r.json(); }})
+        .then(function(data) {{
+            if (data.success) alert('✅ 修改已同步到云端');
+        }}).catch(function() {{
+            alert('⚠️ 云端同步失败，但本地缓存已更新');
+        }});
     }});
 }}
 
 function editPoem(id) {{
-    // 判断是否为手机端（简单宽高判定）
     var isMobile = window.innerWidth <= 1024;
-    
-    // 定义一个密码验证后调用的逻辑
-    function proceedEdit() {{
-        var currentBody = document.getElementById('body-' + id).innerText;
-        showCustomEditDialog(id, currentBody).then(function(newBody) {{
-            if (newBody !== null && newBody !== currentBody) {{
-                document.getElementById('body-' + id).innerHTML = newBody.replace(/\\n/g, '<br>');
-                // 更新本地缓存
-                editedPoems[id] = newBody;
-                // 同步到云端（完全保留原有逻辑）
-                fetch(POEM_EDIT_WORKER_URL + '/edit', {{
-                    method: 'POST',
-                    headers: {{ 'Content-Type': 'application/json' }},
-                    body: JSON.stringify({{ poem_id: id, edited_body: newBody }})
-                }}).then(function(response) {{ return response.json(); }})
-                .then(function(data) {{
-                    if (data.success) alert('✅ 修改已同步到云端');
-                }}).catch(function() {{
-                    alert('⚠️ 云端同步失败，但本地缓存已更新');
-                }});
-            }}
-        }});
-    }}
 
-    // 手机端处理逻辑
     if (isMobile) {{
-        // 避免重复生成弹窗
         var existingModal = document.getElementById('mobile-pwd-modal');
         if (existingModal) existingModal.remove();
 
@@ -2712,7 +2821,7 @@ function editPoem(id) {{
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
+
         var modal = document.getElementById('mobile-pwd-modal');
         var input = document.getElementById('mobile-pwd-input');
         var confirmBtn = document.getElementById('mobile-pwd-confirm');
@@ -2722,7 +2831,7 @@ function editPoem(id) {{
         var checkPwd = function() {{
             if (input.value === EDIT_PASSWORD) {{
                 closeModal();
-                proceedEdit();
+                proceedEditPoem(id);
             }} else {{
                 alert('密码错误，无法编辑。');
             }}
@@ -2730,17 +2839,15 @@ function editPoem(id) {{
 
         confirmBtn.onclick = checkPwd;
         cancelBtn.onclick = closeModal;
-        // 支持回车提交
         input.onkeydown = function(e) {{ if (e.key === 'Enter') checkPwd(); }};
         input.focus();
     }} else {{
-        // 电脑端保持原有 prompt 逻辑
         var pwd = prompt("请输入编辑密码：");
         if (pwd !== EDIT_PASSWORD) {{
             if (pwd !== null) alert("密码错误，无法编辑。");
             return;
         }}
-        proceedEdit();
+        proceedEditPoem(id);
     }}
 }}
 
@@ -3339,6 +3446,10 @@ function initDrag() {{
 // ============================================================
 // ★★★ 增强版 fetchWithRetry（针对手机端彻底禁用缓存） ★★★
 // ============================================================
+function hideParent(el) {{
+    el.parentElement.style.display = 'none';
+}}
+
 function fetchWithRetry(url, options, retries, timeout) {{
     retries = retries || 3;
     timeout = timeout || 5000;
@@ -3881,6 +3992,31 @@ function xianlaiPrev() {{
 // ============================================================
 // 导出/备份修改后的诗词数据
 // ============================================================
+// ★ 新增：从 D1 拉取全部编辑记录，填充 editedPoems
+function fetchEditedPoems() {{
+    return fetch(POEM_EDIT_WORKER_URL + '/')
+        .then(function(r) {{ return r.json(); }})
+        .then(function(data) {{
+            var edits = data.edits || [];
+            edits.forEach(function(item) {{
+                try {{
+                    var obj = JSON.parse(item.edited_body);
+                    editedPoems[item.poem_id] = {{
+                        title: obj.title || '',
+                        date:  obj.date  || '',
+                        body:  obj.body  || ''
+                    }};
+                }} catch (e) {{
+                    // 旧数据或格式异常，忽略
+                }}
+            }});
+            console.log('✅ 已加载 ' + Object.keys(editedPoems).length + ' 条云端编辑');
+        }})
+        .catch(function(err) {{
+            console.warn('⚠️ 加载云端编辑失败：', err);
+        }});
+}}
+
 function exportEditedData() {{
     var keys = Object.keys(editedPoems);
     if (keys.length === 0) {{
@@ -3926,8 +4062,6 @@ function init() {{
     initDrag();
     initMobileMenuToggle();
     initDesktopPanelToggle();
-    // 修改首页为“今日诗词”
-    showTodayPoems();
 
     const analysisContent = document.getElementById('analysisModalContent');
     if (analysisContent) {{
@@ -3938,8 +4072,12 @@ function init() {{
     if (recitePlayer) {{
         makeDraggable(recitePlayer);
     }}
-}}
 
+    // ★ 先拉 D1 编辑数据，再渲染首页
+    fetchEditedPoems().then(function() {{
+        showTodayPoems();
+    }});
+}}
 window.onclick = function(e) {{
     if (e.target.classList.contains('modal')) {{
         e.target.classList.remove('active');
@@ -4339,7 +4477,7 @@ document.getElementById('installTip').addEventListener('click', function() {{
     var tip = document.createElement('div');
     tip.id = 'browserTip';
     tip.style.cssText = 'position:fixed; top:0; left:0; width:100%; background:#fff3cd; color:#856404; padding:12px 16px; font-size:0.9rem; text-align:center; z-index:99999; border-bottom:2px solid #ffc107; letter-spacing:0.5px;';
-    tip.innerHTML = '📱 您正在' + platformName + '内浏览，安装到桌面请在右上角选择“在浏览器打开”，然后点击“添加到主屏幕” <span onclick="this.parentElement.style.display=\'none\'" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.4rem;">×</span>';
+    tip.innerHTML = '📱 您正在' + platformName + '内浏览，安装到桌面请在右上角选择“在浏览器打开”，然后点击“添加到主屏幕” <span onclick="hideParent(this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.4rem;">×</span>';
     document.body.insertBefore(tip, document.body.firstChild);
   }}
 }})();

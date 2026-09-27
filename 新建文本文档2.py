@@ -78,7 +78,7 @@ def parse_poems(filepath, image_dir):
         genre = ''
         if '·' in title:
             genre = title.split('·')[0].strip()
-                # 如果 genre 为空，检查是否属于标准体裁
+            # 如果 genre 为空，检查是否属于标准体裁
         if not genre:
             if title in ['五绝', '五律', '七绝', '七律']:
                 genre = title
@@ -1036,6 +1036,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     <button onclick="openSearch()">🔍 三重检索</button>
     <button onclick="showTodayPoems()">📅 今日诗词</button>
     <button onclick="showTopPoems()">🔥 热门诗词</button>
+    <button onclick="openYouXuan()">✨ 诗词优选</button>
     <!--<button onclick="openVideoPlayer('video')">👴👧 爷孙诗语</button>
     <button onclick="openVideoPlayer('fitness')">💪 爷孙健身</button>
     -->
@@ -1050,6 +1051,7 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
       <div class="links-submenu" id="linksSubmenu"></div>
       <button onclick="showJinRiHeJi()">📋 往日今朝</button>
       <button onclick="openJianSuoLiuCun()">📋 检索留存</button>
+      <button onclick="openManage()">📁 资料整理</button>
 
     <!--</div>-->
   </div>
@@ -1192,7 +1194,6 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
   </div>
   <div id="aiPoemResult" class="ai-poem-result">
     <div id="poemOutput"></div>
-   # <button id="copyPoemBtn" class="copy-btn" style="display: none;">复制诗词</button>
     <button id="copyPoemBtn" class="copy-btn" style="display: none;">复制诗词</button>
   </div>
 </div>
@@ -1408,6 +1409,16 @@ const EDIT_PASSWORD = "bingxue2026";
 
 const editedPoems = {{}};
 
+// ★ 新增：统一取显示数据（优先用编辑后的，无编辑则用原始）
+function getDisplayPoem(p) {{
+    var ed = editedPoems[p.poem_id];
+    return {{
+        title: (ed && ed.title) ? ed.title : p.title,
+        date:  (ed && ed.date)  ? ed.date  : p.date,
+        body:  (ed && ed.body)  ? ed.body  : (p.body || '')
+    }};
+}}
+
 // ============================================================
 // 工具函数
 // ============================================================
@@ -1475,7 +1486,7 @@ function shareWebsite() {{
     if (navigator.share) {{
         navigator.share({{
             title: '冰雪诗词·数字图书馆',
-            text: '发现一个超赞的诗词网站，收录了2042首冰雪原创诗词，还可以AI朗诵！',
+            text: '发现一个超赞的诗词网站，收录了' + POEMS.length + '首冰雪原创诗词，还可以AI朗诵！',
             url: url
         }}).catch(function(err) {{
             var dummy = document.createElement('textarea');
@@ -1545,12 +1556,13 @@ function copyPoemContent(poemId) {{
 function sharePoem(poemId) {{
     var poem = getPoemById(poemId);
     if (!poem) return;
+    var d = getDisplayPoem(poem);
     var url = window.location.href.split('?')[0] + '?poem=' + poemId;
-    var fullContent = poem.title + '\\n冰雪\\n' + (poem.date || '') + '\\n' + poem.body + '\\n\\n🔗 更多欣赏请点击：' + url;
+    var fullContent = d.title + '\\n冰雪\\n' + (d.date || '') + '\\n' + d.body + '\\n\\n🔗 更多欣赏请点击：' + url;
     if (navigator.share) {{
         navigator.share({{
-            title: '分享一首好诗：' + poem.title + ' · 冰雪',
-            text: poem.title + '\\n' + poem.body.substring(0, 80) + (poem.body.length > 80 ? '...' : '') + '\\n\\n来自：冰雪诗词·数字图书馆',
+            title: '分享一首好诗：' + d.title + ' · 冰雪',
+            text: d.title + '\\n' + d.body.substring(0, 80) + (d.body.length > 80 ? '...' : '') + '\\n\\n来自：冰雪诗词·数字图书馆',
             url: url
         }}).catch(function(err) {{
             var dummy = document.createElement('textarea');
@@ -1575,14 +1587,13 @@ function sharePoem(poemId) {{
 // ★★★ 分享单首诗词 ★★★
 
 function sharePoemAction(poemId) {{
-    // 从全局诗词数据中根据ID查找当前诗词
-    var poem = POEMS[poemId];
+    var poem = getPoemById(poemId);
     if (!poem) return;
 
-    // 提取诗词信息
-    var title = poem.title || '';
-    var date = poem.date || '';
-    var body = poem.body || '';
+    var d = getDisplayPoem(poem);
+    var title = d.title || '';
+    var date = d.date || '';
+    var body = d.body || '';
     //var url = window.location.origin + '/poem/' + poemId + '?from=share';
     var url = window.location.href.split('?')[0] + '?poem=' + poemId + '?from=share';
     // 构建分享文案
@@ -1631,6 +1642,36 @@ function fetchLikesForPoems(poemIds) {{
             }}
         }})
         .catch(function(err) {{ /* 静默忽略网络错误 */ }});
+}}
+
+// ★★★ 分批加载点赞数（避免一次请求太多导致500错误） ★★★
+function fetchLikesBatch(ids) {{
+    if (!ids || ids.length === 0) return;
+    var batchSize = 50;
+    var index = 0;
+    function processBatch() {{
+        var end = Math.min(index + batchSize, ids.length);
+        var batch = ids.slice(index, end);
+        fetch('https://poem-ai-explanations.bingxue2026.com/api/likes?ids=' + batch.join(','))
+            .then(function(r) {{ return r.json(); }})
+            .then(function(data) {{
+                for (var id in data) {{
+                    var span = document.getElementById('like-count-' + id);
+                    if (span) span.textContent = data[id] || 0;
+                }}
+                index += batchSize;
+                if (index < ids.length) {{
+                    setTimeout(processBatch, 100);
+                }}
+            }})
+            .catch(function() {{
+                index += batchSize;
+                if (index < ids.length) {{
+                    setTimeout(processBatch, 100);
+                }}
+            }});
+    }}
+    processBatch();
 }}
 // ========== 点赞功能（修复：改为 POST + JSON Body） ==========
 function likePoem(poemId) {{
@@ -1969,8 +2010,9 @@ function recitePoem(poemId) {{
     const overlay = document.getElementById('recitePlayerOverlay');
     overlay.classList.add('active');
 
-    document.getElementById('reciteTitle').textContent = '🔊 AI朗诵 · ' + poem.title;
-    document.getElementById('recitePoemText').textContent = poem.body;
+     var d = getDisplayPoem(poem);
+    document.getElementById('reciteTitle').textContent = '🔊 AI朗诵 · ' + d.title;
+    document.getElementById('recitePoemText').textContent = d.body;
     document.getElementById('reciteAnalysisText').classList.remove('show');
     document.getElementById('reciteAnalysisText').textContent = '';
     document.getElementById('reciteStatus').textContent = '⏳ 加载正文音频...';
@@ -2146,7 +2188,8 @@ function showAnalysis(poemId) {{
     if (!poem) {{ alert('未找到诗词'); return; }}
 
     const modal = document.getElementById('analysisModal');
-    document.getElementById('analysisTitle').textContent = '📖 诗词解析 · ' + poem.title;
+    var d = getDisplayPoem(poem);
+    document.getElementById('analysisTitle').textContent = '📖 诗词解析 · ' + d.title;
     document.getElementById('analysisContent').textContent = '⏳ 加载中...';
     modal.classList.add('active');
 
@@ -2243,15 +2286,15 @@ function render(title, poems) {{
             // ★★★ 直接迭代真实文件名列表，不再硬编码 ★★★
             imgFiles.forEach(function(fileName) {{
                 const imgUrl = R2_BASE + '/images/' + pid + '/' + fileName;
-                h += '<img src="' + imgUrl + '" loading="lazy" onerror="this.style.display= none" alt="配图" onclick="window.open(this.src)">';
+                h += '<img src="' + imgUrl + '" loading="lazy" onerror="hideBrokenImg(this)" alt="配图" onclick="window.open(this.src)">';
             }});
             h += '</div>';
         }}
-        h += '<div class="poem-title">' + p.title + '</div>';
+        var d = getDisplayPoem(p);
+        h += '<div class="poem-title" id="title-' + pid + '">' + d.title + '</div>';
         h += '<div class="poem-author">冰雪</div>';
-        if (p.date) h += '<div class="poem-date">' + p.date + '</div>';
-        var displayBody = (editedPoems[pid] || p.body || '');
-        h += '<div class="poem-body" id="body-' + pid + '">' + displayBody.replace(/\\n/g, '<br>') + '</div>';
+        if (d.date) h += '<div class="poem-date" id="date-' + pid + '">' + d.date + '</div>';
+        h += '<div class="poem-body" id="body-' + pid + '">' + d.body.replace(/\\n/g, '<br>') + '</div>';
         if (imgFiles.length > 0) {{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\'' + pid + '\\')">查看配图(' + imgFiles.length + ')</button>';
         }} else {{
@@ -2275,7 +2318,18 @@ function render(title, poems) {{
     }});
     c.innerHTML = h;
     c.scrollTop = 0;
-    setTimeout(function() {{ loadLikeCounts(); }}, 300);
+    setTimeout(function() {{
+        var ids = poems.map(function(p) {{ return p.poem_id; }});
+        if (ids.length > 0) fetchLikesBatch(ids);
+    }}, 300);
+}}
+
+function hideBrokenImg(img) {{
+    img.style.display = 'none';
+}}
+
+function hideParent(el) {{
+    el.parentElement.style.display = 'none';
 }}
 
 function toggleImgs(btn, poemId) {{
@@ -2348,16 +2402,16 @@ function showTodayPoems() {{
             // ★★★ 直接迭代真实文件名列表，不再硬编码 ★★★
             imgFiles.forEach(function(fileName) {{
                 const imgUrl = R2_BASE + '/images/' + pid + '/' + fileName;
-                h += '<img src="' + imgUrl + '" loading="lazy" onerror="this.style.display= none" alt="配图" onclick="window.open(this.src)">';
+                h += '<img src="' + imgUrl + '" loading="lazy" onerror="hideBrokenImg(this)" alt="配图" onclick="window.open(this.src)">';
             }});
             h += '</div>';
         }}
-        h += '<div class="poem-title">' + p.title + '</div>';
+        var d = getDisplayPoem(p);
+        h += '<div class="poem-title" id="title-' + pid + '">' + d.title + '</div>';
         h += '<div class="poem-author">冰雪</div>';
-        if (p.date) h += '<div class="poem-date">' + p.date + '</div>';
-        var displayBody = (editedPoems[pid] || p.body || '');
-        h += '<div class="poem-body" id="body-' + pid + '">' + displayBody.replace(/\\n/g, '<br>') + '</div>';
-       if (imgFiles.length > 0) {{
+        if (d.date) h += '<div class="poem-date" id="date-' + pid + '">' + d.date + '</div>';
+        h += '<div class="poem-body" id="body-' + pid + '">' + d.body.replace(/\\n/g, '<br>') + '</div>';
+        if (imgFiles.length > 0) {{
             h += '<button class="img-toggle-btn" onclick="toggleImgs(this,\\'' + pid + '\\')">查看配图(' + imgFiles.length + ')</button>';
         }} else {{
             h += '<span style="display:inline-block;margin-top:8px;margin-right:8px;padding:5px 10px;background:#e0e0e0;color:#888;border-radius:4px;font-size:0.8em;letter-spacing:1px;">没有配图</span>';
@@ -2413,16 +2467,17 @@ function showJinRiHeJi() {{
 
     matched.forEach(function(p, index) {{
         h += '<div class="poem-card">';
-        h += '<div class="poem-title">' + p.title + '</div>';
+        var d = getDisplayPoem(p);
+        h += '<div class="poem-title">' + d.title + '</div>';
         h += '<br>';
         h += '<div class="poem-author">冰雪</div>';
-        if (p.date) h += '<div class="poem-date">' + p.date + '</div>';
+        if (d.date) h += '<div class="poem-date">' + d.date + '</div>';
         h += '<br>';
-        h += '<div class="poem-body">' + (p.body || '').replace(/\\n/g, '<br>') + '</div>';
+        h += '<div class="poem-body">' + d.body.replace(/\\n/g, '<br>') + '</div>';
         h += '</div>';
 
         // 构建纯文本内容用于复制
-        fullText += p.title + '\\n\\n冰雪\\n' + (p.date || '') + '\\n\\n' + (p.body || '');
+        fullText += d.title + '\\n\\n冰雪\\n' + (d.date || '') + '\\n\\n' + d.body;
         if (index < matched.length - 1) fullText += '\\n\\n';
     }});
 
@@ -2568,15 +2623,16 @@ function doSearchLiuCun() {{
 
     r.forEach(function(p, index) {{
         h += '<div class="poem-card">';
-        h += '<div class="poem-title">' + p.title + '</div>';
+        var d = getDisplayPoem(p);
+        h += '<div class="poem-title">' + d.title + '</div>';
         h += '<br>';
         h += '<div class="poem-author">冰雪</div>';
-        if (p.date) h += '<div class="poem-date">' + p.date + '</div>';
+        if (d.date) h += '<div class="poem-date">' + d.date + '</div>';
         h += '<br>';
-        h += '<div class="poem-body">' + (p.body || '').replace(/\\n/g, '<br>') + '</div>';
+        h += '<div class="poem-body">' + d.body.replace(/\\n/g, '<br>') + '</div>';
         h += '</div>';
 
-        fullText += p.title + '\\n\\n冰雪\\n' + (p.date || '') + '\\n\\n' + (p.body || '');
+        fullText += d.title + '\\n\\n冰雪\\n' + (d.date || '') + '\\n\\n' + d.body;
         if (index < r.length - 1) fullText += '\\n\\n';
     }});
 
@@ -2629,71 +2685,130 @@ function copyLiuCunText() {{
 // ============================================================
 // 诗词编辑
 // ============================================================
-function showCustomEditDialog(id, currentBody) {{
+function showCustomEditDialog(id, current) {{
     return new Promise((resolve) => {{
         const existing = document.querySelector('.custom-edit-modal');
         if (existing) existing.remove();
+
+        const escapeHtml = function(s) {{
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }};
+
         const modal = document.createElement('div');
         modal.className = 'custom-edit-modal';
         modal.innerHTML = `
-            <div class="custom-edit-content">
-                <textarea id="customEditTextarea">${{currentBody.replace(/</g, '&lt;').replace(/>/g, '&gt;')}}</textarea>
-                <div class="btn-group">
+            <div class="custom-edit-content" style="max-width:600px;">
+                <div style="margin-bottom:12px;padding:8px 12px;background:#f0f0f0;color:#666;border-radius:6px;font-size:0.9rem;letter-spacing:1px;">
+                    诗词${{escapeHtml(id)}}
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:0.85rem;color:#666;margin-bottom:4px;">标题</div>
+                    <input id="customEditTitle" type="text" value="${{escapeHtml(current.title)}}"
+                           style="width:100%;padding:8px 10px;font-size:1rem;border:1px solid #4caf50;border-radius:6px;background:#f0fff4;font-family:inherit;">
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:0.85rem;color:#666;margin-bottom:4px;">日期</div>
+                    <input id="customEditDate" type="text" value="${{escapeHtml(current.date)}}"
+                           style="width:100%;padding:8px 10px;font-size:1rem;border:1px solid #4caf50;border-radius:6px;background:#f0fff4;font-family:inherit;">
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:0.85rem;color:#666;margin-bottom:4px;">正文</div>
+                    <textarea id="customEditTextarea"
+                              style="width:100%;height:220px;padding:10px;font-size:1rem;line-height:1.7;font-family:'楷体',KaiTi,serif;border:1px solid #4caf50;border-radius:6px;background:#f0fff4;resize:vertical;">${{escapeHtml(current.body)}}</textarea>
+                </div>
+                <div class="btn-group" style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
                     <button class="cancel-btn">取消</button>
                     <button class="save-btn">保存</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
-        const textarea = modal.querySelector('#customEditTextarea');
-        const saveBtn = modal.querySelector('.save-btn');
-        const cancelBtn = modal.querySelector('.cancel-btn');
+
+        const titleInput = modal.querySelector('#customEditTitle');
+        const dateInput  = modal.querySelector('#customEditDate');
+        const textarea   = modal.querySelector('#customEditTextarea');
+        const saveBtn    = modal.querySelector('.save-btn');
+        const cancelBtn  = modal.querySelector('.cancel-btn');
+
         saveBtn.onclick = () => {{
-            const newBody = textarea.value;
+            const newTitle = titleInput.value;
+            const newDate  = dateInput.value;
+            const newBody  = textarea.value;
             modal.remove();
-            resolve(newBody);
+            resolve({{ title: newTitle, date: newDate, body: newBody }});
         }};
         cancelBtn.onclick = () => {{
             modal.remove();
             resolve(null);
         }};
-        textarea.focus();
+
+        titleInput.focus();
         setTimeout(() => {{
-            textarea.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
-        }}, 300);
+            modal.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+        }}, 200);
+    }});
+}}
+
+    function proceedEditPoem(id) {{
+    var poem = getPoemById(id);
+    if (!poem) {{ alert('未找到诗词'); return; }}
+
+    var currentTitle = (editedPoems[id] && editedPoems[id].title) ? editedPoems[id].title : poem.title;
+    var currentDate  = (editedPoems[id] && editedPoems[id].date)  ? editedPoems[id].date  : poem.date;
+    var currentBody  = (editedPoems[id] && editedPoems[id].body)  ? editedPoems[id].body  : poem.body;
+
+    showCustomEditDialog(id, {{
+        title: currentTitle,
+        date:  currentDate,
+        body:  currentBody
+    }}).then(function(result) {{
+        if (result === null) return;
+
+        var newTitle = result.title;
+        var newDate  = result.date;
+        var newBody  = result.body;
+
+        if (newTitle === currentTitle && newDate === currentDate && newBody === currentBody) return;
+
+        editedPoems[id] = {{
+            title: newTitle,
+            date:  newDate,
+            body:  newBody
+        }};
+
+        var titleEl = document.getElementById('title-' + id);
+        var dateEl  = document.getElementById('date-' + id);
+        var bodyEl  = document.getElementById('body-' + id);
+        if (titleEl && newTitle !== currentTitle) titleEl.innerText = newTitle;
+        if (dateEl  && newDate  !== currentDate)  dateEl.innerText  = newDate;
+        if (bodyEl  && newBody  !== currentBody)  bodyEl.innerHTML  = newBody.replace(/\\n/g, '<br>');
+
+        var payload = {{
+            poem_id: id,
+            edited_body: JSON.stringify({{
+                title: newTitle,
+                date:  newDate,
+                body:  newBody
+            }})
+        }};
+
+        fetch(POEM_EDIT_WORKER_URL + '/edit', {{
+            method: 'POST',
+            headers: {{ 'Content-Type': 'application/json' }},
+            body: JSON.stringify(payload)
+        }}).then(function(r) {{ return r.json(); }})
+        .then(function(data) {{
+            if (data.success) alert('✅ 修改已同步到云端');
+        }}).catch(function() {{
+            alert('⚠️ 云端同步失败，但本地缓存已更新');
+        }});
     }});
 }}
 
 function editPoem(id) {{
-    // 判断是否为手机端（简单宽高判定）
     var isMobile = window.innerWidth <= 1024;
-    
-    // 定义一个密码验证后调用的逻辑
-    function proceedEdit() {{
-        var currentBody = document.getElementById('body-' + id).innerText;
-        showCustomEditDialog(id, currentBody).then(function(newBody) {{
-            if (newBody !== null && newBody !== currentBody) {{
-                document.getElementById('body-' + id).innerHTML = newBody.replace(/\\n/g, '<br>');
-                // 更新本地缓存
-                editedPoems[id] = newBody;
-                // 同步到云端（完全保留原有逻辑）
-                fetch(POEM_EDIT_WORKER_URL + '/edit', {{
-                    method: 'POST',
-                    headers: {{ 'Content-Type': 'application/json' }},
-                    body: JSON.stringify({{ poem_id: id, edited_body: newBody }})
-                }}).then(function(response) {{ return response.json(); }})
-                .then(function(data) {{
-                    if (data.success) alert('✅ 修改已同步到云端');
-                }}).catch(function() {{
-                    alert('⚠️ 云端同步失败，但本地缓存已更新');
-                }});
-            }}
-        }});
-    }}
 
-    // 手机端处理逻辑
     if (isMobile) {{
-        // 避免重复生成弹窗
         var existingModal = document.getElementById('mobile-pwd-modal');
         if (existingModal) existingModal.remove();
 
@@ -2710,7 +2825,7 @@ function editPoem(id) {{
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
+
         var modal = document.getElementById('mobile-pwd-modal');
         var input = document.getElementById('mobile-pwd-input');
         var confirmBtn = document.getElementById('mobile-pwd-confirm');
@@ -2720,7 +2835,7 @@ function editPoem(id) {{
         var checkPwd = function() {{
             if (input.value === EDIT_PASSWORD) {{
                 closeModal();
-                proceedEdit();
+                proceedEditPoem(id);
             }} else {{
                 alert('密码错误，无法编辑。');
             }}
@@ -2728,17 +2843,15 @@ function editPoem(id) {{
 
         confirmBtn.onclick = checkPwd;
         cancelBtn.onclick = closeModal;
-        // 支持回车提交
         input.onkeydown = function(e) {{ if (e.key === 'Enter') checkPwd(); }};
         input.focus();
     }} else {{
-        // 电脑端保持原有 prompt 逻辑
         var pwd = prompt("请输入编辑密码：");
         if (pwd !== EDIT_PASSWORD) {{
             if (pwd !== null) alert("密码错误，无法编辑。");
             return;
         }}
-        proceedEdit();
+        proceedEditPoem(id);
     }}
 }}
 
@@ -3337,6 +3450,10 @@ function initDrag() {{
 // ============================================================
 // ★★★ 增强版 fetchWithRetry（针对手机端彻底禁用缓存） ★★★
 // ============================================================
+function hideParent(el) {{
+    el.parentElement.style.display = 'none';
+}}
+
 function fetchWithRetry(url, options, retries, timeout) {{
     retries = retries || 3;
     timeout = timeout || 5000;
@@ -3721,17 +3838,18 @@ function xianlaiPlayTrack(index) {{
     var poemUrl = R2_BASE + '/recite/' + poem.poem_id + '_poem.mp3';
     var analysisUrl = R2_BASE + '/recite/' + poem.poem_id + '_analysis.mp3';
 
-    document.getElementById('xianlaiCurrentTitle').textContent = poem.title + ' (' + (index + 1) + '/' + xianlaiPlaylist.length + ')';
+    
     document.getElementById('xianlaiTrackIndex').textContent = (index + 1) + ' / ' + xianlaiPlaylist.length;
     document.getElementById('xianlaiPlayBtn').textContent = '⏸ 暂停';
-
+    var d = getDisplayPoem(poem);
     document.getElementById('xianlaiTextDisplay').innerHTML =
         '<div><span class="label">📝 诗词正文</span></div>' +
-        '<div>' + poem.body + '</div>' +
+        '<div>' + d.body + '</div>' +
         '<div style="margin-top:6px; border-top:1px dashed #ccc; padding-top:6px;">' +
         '<span class="label">📖 AI解析（加载中...）</span></div>' +
         '<div id="xianlaiAnalysisLoading">⏳ 正在加载解析...</div>';
-
+    
+    document.getElementById('xianlaiCurrentTitle').textContent = d.title + ' (' + (index + 1) + '/' + xianlaiPlaylist.length + ')';
     var txtUrl = R2_BASE + '/recite/' + poem.poem_id + '_analysis.txt';
     fetch(txtUrl)
         .then(function(res) {{
@@ -3879,6 +3997,31 @@ function xianlaiPrev() {{
 // ============================================================
 // 导出/备份修改后的诗词数据
 // ============================================================
+// ★ 新增：从 D1 拉取全部编辑记录，填充 editedPoems
+function fetchEditedPoems() {{
+    return fetch(POEM_EDIT_WORKER_URL + '/')
+        .then(function(r) {{ return r.json(); }})
+        .then(function(data) {{
+            var edits = data.edits || [];
+            edits.forEach(function(item) {{
+                try {{
+                    var obj = JSON.parse(item.edited_body);
+                    editedPoems[item.poem_id] = {{
+                        title: obj.title || '',
+                        date:  obj.date  || '',
+                        body:  obj.body  || ''
+                    }};
+                }} catch (e) {{
+                    // 旧数据或格式异常，忽略
+                }}
+            }});
+            console.log('✅ 已加载 ' + Object.keys(editedPoems).length + ' 条云端编辑');
+        }})
+        .catch(function(err) {{
+            console.warn('⚠️ 加载云端编辑失败：', err);
+        }});
+}}
+
 function exportEditedData() {{
     var keys = Object.keys(editedPoems);
     if (keys.length === 0) {{
@@ -3924,8 +4067,6 @@ function init() {{
     initDrag();
     initMobileMenuToggle();
     initDesktopPanelToggle();
-    // 修改首页为“今日诗词”
-    showTodayPoems();
 
     const analysisContent = document.getElementById('analysisModalContent');
     if (analysisContent) {{
@@ -3936,13 +4077,316 @@ function init() {{
     if (recitePlayer) {{
         makeDraggable(recitePlayer);
     }}
-}}
 
+    // ★ 先拉 D1 编辑数据，再渲染首页
+    fetchEditedPoems().then(function() {{
+        showTodayPoems();
+    }});
+}}
 window.onclick = function(e) {{
     if (e.target.classList.contains('modal')) {{
         e.target.classList.remove('active');
     }}
 }};
+
+// ============================================================
+// ✨ 诗词优选（主窗口内嵌，四级导航）
+// ============================================================
+var YOUXUAN_DATA = null;
+var yxState = {{ genre: null, category: null, level: null, key: null }};
+var YX_TOP20 = [
+    '踏莎行', '鹧鸪天', '浣溪沙', '临江仙', '蝶恋花',
+    '清平乐', '西江月', '菩萨蛮', '虞美人', '南乡子',
+    '长相思', '卜算子', '采桑子', '减字木兰花', '沁园春',
+    '水调歌头', '念奴娇', '满江红', '苏幕遮', '定风波'
+];
+var YX_STANDARD = ['五绝', '五律', '七绝', '七律'];
+var YX_CATEGORIES = ['写景', '抒情', '其他'];
+
+function openYouXuan() {{
+    beforeCenterAction();
+    yxState = {{ genre: null, category: null, level: null, key: null }};
+    if (YOUXUAN_DATA) {{
+        yxShowLevel1();
+        return;
+    }}
+    var c = document.getElementById('content');
+    c.innerHTML = '<p style="text-align:center;color:#888;margin-top:100px;">✨ 正在加载优选榜单...</p>';
+    scrollToContent();
+    fetch('poem_rankings_final.json')
+        .then(function(r) {{ return r.json(); }})
+        .then(function(data) {{
+            YOUXUAN_DATA = data;
+            yxShowLevel1();
+        }})
+        .catch(function(err) {{
+            c.innerHTML = '<p style="text-align:center;color:#c33;margin-top:100px;">❌ 榜单数据加载失败：' + err.message + '</p>';
+        }});
+}}
+
+function yxBreadcrumb() {{
+    var parts = ['<span onclick="yxReset()" style="cursor:pointer;color:#2e7d32;text-decoration:underline;">诗词优选</span>'];
+    if (yxState.genre) {{
+        var gn = yxState.genre.indexOf('词牌|') === 0 ? yxState.genre.split('|')[1] : yxState.genre;
+        parts.push('<span onclick="yxBackToGenre()" style="cursor:pointer;color:#2e7d32;text-decoration:underline;">' + gn + '</span>');
+    }}
+    if (yxState.category) {{
+        parts.push('<span onclick="yxBackToCategory()" style="cursor:pointer;color:#2e7d32;text-decoration:underline;">' + yxState.category + '</span>');
+    }}
+    if (yxState.level) {{
+        var ln = yxState.level === 'premium' ? '精品榜单' : '优秀榜单';
+        parts.push('<span style="color:#a08030;font-weight:bold;">' + ln + '</span>');
+    }}
+    return '<div style="margin-bottom:16px;padding:10px 14px;background:#fef9e7;border-radius:8px;font-size:0.9em;letter-spacing:1px;">' + parts.join(' <span style="color:#ccc;">›</span> ') + '</div>';
+}}
+
+function yxShowLevel1() {{
+    var c = document.getElementById('content');
+    var s = YOUXUAN_DATA._statistics;
+    var h = yxBreadcrumb();
+    h += '<h3 style="margin-bottom:15px;color:#2e7d32;">✨ 诗词优选 · 第一步：选择体裁</h3>';
+    h += '<p style="color:#888;font-size:0.85em;margin-bottom:12px;">全站共 ' + s.total_poems + ' 首 · 精品 ' + s.premium_count + ' 首 · 优秀 ' + s.excellent_count + ' 首 · 合计约 ' + s.percentage + '</p>';
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));gap:10px;">';
+    var allGenres = YX_STANDARD.concat(YX_TOP20).concat(['其他词牌']);
+    allGenres.forEach(function(g) {{
+        var key, hasData = false;
+        if (YX_STANDARD.indexOf(g) >= 0) {{
+            key = g;
+            hasData = YX_CATEGORIES.some(function(cat) {{ return YOUXUAN_DATA[g + '|' + cat]; }});
+        }} else {{
+            key = '词牌|' + g;
+            hasData = !!YOUXUAN_DATA[key];
+        }}
+        if (!hasData) return;
+        h += '<button onclick="yxSelectGenre(\\'' + key + '\\')" style="padding:12px 8px;background:#fffef9;color:#2e7d32;border:1px solid #c8e6c9;border-radius:8px;cursor:pointer;font-size:0.9em;letter-spacing:1px;font-family:inherit;">' + g + '</button>';
+    }});
+    h += '</div>';
+    c.innerHTML = h;
+    c.scrollTop = 0;
+    scrollToContent();
+}}
+
+function yxSelectGenre(key) {{
+    yxState.genre = key;
+    yxState.category = null;
+    yxState.level = null;
+    yxState.key = null;
+    if (YX_STANDARD.indexOf(key) >= 0) {{
+        yxShowLevel2();
+    }} else {{
+        yxState.key = key;
+        yxShowLevel3();
+    }}
+}}
+
+function yxShowLevel2() {{
+    var c = document.getElementById('content');
+    var h = yxBreadcrumb();
+    h += '<h3 style="margin-bottom:15px;color:#2e7d32;">✨ 诗词优选 · 第二步：选择类别（' + yxState.genre + '）</h3>';
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));gap:10px;">';
+    YX_CATEGORIES.forEach(function(cat) {{
+        var key = yxState.genre + '|' + cat;
+        if (!YOUXUAN_DATA[key]) return;
+        h += '<button onclick="yxSelectCategory(\\'' + cat + '\\')" style="padding:12px 8px;background:#fffef9;color:#2e7d32;border:1px solid #c8e6c9;border-radius:8px;cursor:pointer;font-size:0.9em;letter-spacing:1px;font-family:inherit;">' + cat + '</button>';
+    }});
+    h += '</div>';
+    c.innerHTML = h;
+    c.scrollTop = 0;
+    scrollToContent();
+}}
+
+function yxSelectCategory(cat) {{
+    yxState.category = cat;
+    yxState.key = yxState.genre + '|' + cat;
+    yxState.level = null;
+    yxShowLevel3();
+}}
+
+function yxShowLevel3() {{
+    var c = document.getElementById('content');
+    var data = YOUXUAN_DATA[yxState.key];
+    var h = yxBreadcrumb();
+    h += '<h3 style="margin-bottom:15px;color:#2e7d32;">✨ 诗词优选 · 第三步：选择榜单</h3>';
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:10px;">';
+    if (data.premium && data.premium.length > 0) {{
+        h += '<button onclick="yxSelectLevel(\\'premium\\')" style="padding:14px 10px;background:#fff8e1;color:#a67c00;border:1px solid #ffc107;border-radius:8px;cursor:pointer;font-size:0.95em;letter-spacing:1px;font-family:inherit;">✨ 精品榜单（' + data.premium.length + '）</button>';
+    }}
+    if (data.excellent && data.excellent.length > 0) {{
+        h += '<button onclick="yxSelectLevel(\\'excellent\\')" style="padding:14px 10px;background:#f0f8ff;color:#1565c0;border:1px solid #64b5f6;border-radius:8px;cursor:pointer;font-size:0.95em;letter-spacing:1px;font-family:inherit;">🌟 优秀榜单（' + data.excellent.length + '）</button>';
+    }}
+    h += '</div>';
+    c.innerHTML = h;
+    c.scrollTop = 0;
+    scrollToContent();
+}}
+
+function yxSelectLevel(level) {{
+    yxState.level = level;
+    yxShowLevel4();
+}}
+
+function yxShowLevel4() {{
+    var c = document.getElementById('content');
+    var h = yxBreadcrumb();
+    h += '<h3 style="margin-bottom:15px;color:#2e7d32;">✨ 诗词优选 · 第四步：选择展示方式</h3>';
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:10px;">';
+    h += '<button onclick="yxShowEnjoy()" style="padding:14px 10px;background:#4caf50;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95em;letter-spacing:1px;font-family:inherit;">👁 欣赏</button>';
+    h += '<button onclick="yxShowCopy()" style="padding:14px 10px;background:#8bc34a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95em;letter-spacing:1px;font-family:inherit;">📋 复制保存</button>';
+    h += '</div>';
+    c.innerHTML = h;
+    c.scrollTop = 0;
+    scrollToContent();
+}}
+
+function yxGetTitleLine() {{
+    var gn = yxState.genre.indexOf('词牌|') === 0 ? yxState.genre.split('|')[1] : yxState.genre;
+    var cat = yxState.category ? ' · ' + yxState.category : '';
+    var lv = yxState.level === 'premium' ? '精品榜单' : '优秀榜单';
+    return '✨ ' + gn + cat + ' · ' + lv;
+}}
+
+function yxShowEnjoy() {{
+    var data = YOUXUAN_DATA[yxState.key];
+    var ids = data[yxState.level] || [];
+    var poems = [];
+    ids.forEach(function(pid) {{
+        for (var k in POEMS) {{
+            if (POEMS[k].poem_id === pid) {{
+                poems.push(POEMS[k]);
+                break;
+            }}
+        }}
+    }});
+    var title = yxGetTitleLine();
+    // render 内部会自动加"（共X首）"，此处不再重复
+    render(title, poems);
+    // 在内容区顶部插入比对提示词
+    var c = document.getElementById('content');
+    var tip = yxState.level === 'premium'
+        ? '✨ 精品榜单 · 由 DeepSeek 与 MiniMax 两大模型交叉比对得出，双模型共识优先。代表了本类诗词中最受两大 AI 共同推崇的作品。'
+        : '🌟 优秀榜单 · 由 DeepSeek 与 MiniMax 两大模型分别筛选，两方所选合并而成（已排除精品榜单中的作品）。代表了本类诗词中值得认真一读的佳作。';
+    var tipDiv = document.createElement('p');
+    tipDiv.style.cssText = 'color:#888;font-size:0.85em;margin-bottom:16px;padding:10px 14px;background:#fef9e7;border-radius:8px;line-height:1.6;';
+    tipDiv.textContent = tip;
+    c.insertBefore(tipDiv, c.firstChild);
+    scrollToContent();
+}}
+
+function yxShowCopy() {{
+    var data = YOUXUAN_DATA[yxState.key];
+    var ids = data[yxState.level] || [];
+    var c = document.getElementById('content');
+    var h = yxBreadcrumb();
+    var tip = yxState.level === 'premium'
+        ? '✨ 精品榜单 · 由 DeepSeek 与 MiniMax 两大模型交叉比对得出，双模型共识优先。代表了本类诗词中最受两大 AI 共同推崇的作品。'
+        : '🌟 优秀榜单 · 由 DeepSeek 与 MiniMax 两大模型分别筛选，两方所选合并而成（已排除精品榜单中的作品）。代表了本类诗词中值得认真一读的佳作。';
+    h += '<h3 style="margin-bottom:10px;color:#2e7d32;">' + yxGetTitleLine() + '（共' + ids.length + '首）</h3>';
+    h += '<p style="color:#888;font-size:0.85em;margin-bottom:16px;padding:10px 14px;background:#fef9e7;border-radius:8px;line-height:1.6;">' + tip + '</p>';
+    var fullText = '';
+    ids.forEach(function(pid, index) {{
+        var poem = null;
+        for (var k in POEMS) {{
+            if (POEMS[k].poem_id === pid) {{ poem = POEMS[k]; break; }}
+        }}
+        if (!poem) return;
+        h += '<div class="poem-card">';
+            var dp = getDisplayPoem(poem);
+            h += '<div class="poem-title">' + dp.title + '</div>';
+            h += '<br>';
+            h += '<div class="poem-author">冰雪</div>';
+            if (dp.date) h += '<div class="poem-date">' + dp.date + '</div>';
+            h += '<br>';
+            h += '<div class="poem-body">' + dp.body.replace(/\\n/g, '<br>') + '</div>';
+            h += '</div>';
+        fullText += dp.title + '\\n\\n冰雪\\n' + (dp.date || '') + '\\n\\n' + dp.body;
+        if (index < ids.length - 1) fullText += '\\n\\n';
+    }});
+    h += '<div style="text-align:center;margin-top:10px;">';
+    h += '<button onclick="yxCopyAll()" id="yxCopyBtn" style="background:#4caf50;color:#fff;border:none;padding:8px 24px;border-radius:20px;cursor:pointer;font-size:0.9rem;letter-spacing:1px;">📋 一键复制全部</button>';
+    h += '</div>';
+    window._yxText = fullText;
+    c.innerHTML = h;
+    c.scrollTop = 0;
+    scrollToContent();
+}}
+
+function yxCopyAll() {{
+    var text = window._yxText || '';
+    if (!text) return;
+    var btn = document.getElementById('yxCopyBtn');
+    var done = function() {{
+        if (btn) {{
+            btn.textContent = '✅ 已复制';
+            setTimeout(function() {{ btn.textContent = '📋 一键复制全部'; }}, 1500);
+        }}
+    }};
+    if (navigator.clipboard) {{
+        navigator.clipboard.writeText(text).then(done).catch(function() {{
+            var d = document.createElement('textarea');
+            document.body.appendChild(d);
+            d.value = text;
+            d.select();
+            document.execCommand('copy');
+            document.body.removeChild(d);
+            done();
+        }});
+    }} else {{
+        var d = document.createElement('textarea');
+        document.body.appendChild(d);
+        d.value = text;
+        d.select();
+        document.execCommand('copy');
+        document.body.removeChild(d);
+        done();
+    }}
+}}
+
+function yxReset() {{
+    yxState = {{ genre: null, category: null, level: null, key: null }};
+    yxShowLevel1();
+}}
+
+function yxBackToGenre() {{
+    yxState.category = null;
+    yxState.level = null;
+    yxState.key = null;
+    if (YX_STANDARD.indexOf(yxState.genre) >= 0) {{
+        yxShowLevel2();
+    }} else {{
+        yxShowLevel1();
+    }}
+}}
+
+function yxBackToCategory() {{
+    yxState.level = null;
+    yxState.key = yxState.genre + '|' + yxState.category;
+    yxShowLevel3();
+}}
+// ★★★ 资料整理入口（密码验证后打开独立页面） ★★★
+function openManage() {{
+    var pwd = prompt("请输入整理密码：");
+    if (!pwd) return;
+
+    fetch('https://clipbox.bingxue2026.com/verify', {{
+        method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{ password: pwd }})
+    }})
+    .then(function(r) {{ return r.json(); }})
+    .then(function(data) {{
+        if (data.valid) {{
+            // 保存密码到 sessionStorage，供 manage.html 使用
+            try {{ sessionStorage.setItem('manage_pwd', pwd); }} catch(e) {{}}
+            // 打开独立管理页面
+            window.open('manage.html', '_blank');
+        }} else {{
+            alert("密码错误，无法进入整理工作台。");
+        }}
+    }})
+    .catch(function() {{
+        alert("验证失败，请稍后重试。");
+    }});
+}}
 window.onload = init;
 </script>
 
@@ -4039,7 +4483,7 @@ document.getElementById('installTip').addEventListener('click', function() {{
     var tip = document.createElement('div');
     tip.id = 'browserTip';
     tip.style.cssText = 'position:fixed; top:0; left:0; width:100%; background:#fff3cd; color:#856404; padding:12px 16px; font-size:0.9rem; text-align:center; z-index:99999; border-bottom:2px solid #ffc107; letter-spacing:0.5px;';
-    tip.innerHTML = '📱 您正在' + platformName + '内浏览，安装到桌面请在右上角选择“在浏览器打开”，然后点击“添加到主屏幕” <span onclick="this.parentElement.style.display=\'none\'" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.4rem;">×</span>';
+    tip.innerHTML = '📱 您正在' + platformName + '内浏览，安装到桌面请在右上角选择“在浏览器打开”，然后点击“添加到主屏幕” <span onclick="hideParent(this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.4rem;">×</span>';
     document.body.insertBefore(tip, document.body.firstChild);
   }}
 }})();

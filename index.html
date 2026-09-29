@@ -45,7 +45,7 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 
 .center-buttons button { width: 105px; padding: 6px 4px; background: #4caf50; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75em; letter-spacing: 1px; transition: 0.2s; }
 .center-buttons button:hover { background: #388e3c; }
-.links-wrapper { position: relative; width: 105px; }
+.links-wrapper { position: relative; width: 105px; display: flex; flex-direction: column; gap: 5px; }
 .links-wrapper > button { width: 100%; }
 .links-submenu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #e8f5e9; border-radius: 0 0 4px 4px; position: absolute; top: 100%; left: 0; width: 100%; z-index: 10; }
 .links-submenu.open { max-height: 300px; }
@@ -249,7 +249,7 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
     .center-buttons { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 6px 8px; }
     .center-buttons button { width: auto; padding: 7px 10px; font-size: 0.78em; min-width: 60px; }
     .center-buttons { position: relative; }
-    .links-wrapper { position: static; width: auto; }
+    .links-wrapper { position: static; width: auto; display: contents; }
     .links-submenu { position: static; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px; max-height: 0; overflow: hidden; background: #e8f5e9; border-radius: 4px; margin-top: 4px; transition: max-height 0.3s ease; }
     .links-submenu.open { max-height: 200px; }
     .links-submenu a { display: inline-block; width: auto; padding: 4px 8px; font-size: 0.7em; border: none; background: #d4e0d0; margin: 2px; }
@@ -818,13 +818,12 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
     <button onclick="openAiPoem()">🤖 AI写诗</button>
     <button onclick="exportEditedData()">📤 导出修改</button>
     <button onclick="openGuestbook()">📝 访客留言</button>
+    <button onclick="showJinRiHeJi()">📋 往日今朝</button>
+    <button onclick="openJianSuoLiuCun()">📋 检索留存</button>
+    <button onclick="openManage()">📁 资料整理</button>
     <div class="links-wrapper">
       <button onclick="toggleLinks()">🔗 相关链接</button>
       <div class="links-submenu" id="linksSubmenu"></div>
-      <button onclick="showJinRiHeJi()">📋 往日今朝</button>
-      <button onclick="openJianSuoLiuCun()">📋 检索留存</button>
-      <button onclick="openManage()">📁 资料整理</button>
-
     </div>
   </div>
 </div>

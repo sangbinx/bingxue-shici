@@ -4518,7 +4518,7 @@ window.addEventListener('load', function() {{
     var platformName = isWechat ? '微信' : (isBaiduApp ? '百度' : '今日头条');
     var tip = document.createElement('div');
     tip.id = 'browserTip';
-    tip.style.cssText = 'position:fixed; top:0; left:0; width:100%; background:#fff3cd; color:#856404; padding:12px 16px; font-size:0.9rem; text-align:center; z-index:99999; border-bottom:2px solid #ffc107; letter-spacing:0.5px;';
+    tip.style.cssText = 'position:relative; background:#fff3cd; color:#856404; padding:12px 16px; font-size:0.9rem; text-align:center; border-bottom:2px solid #ffc107; letter-spacing:0.5px;';
     tip.innerHTML = '📱 您正在' + platformName + '内浏览，安装到桌面请在右上角选择“在浏览器打开”，然后点击“添加到主屏幕” <span onclick="hideParent(this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.4rem;">×</span>';
     document.body.insertBefore(tip, document.body.firstChild);
   }}

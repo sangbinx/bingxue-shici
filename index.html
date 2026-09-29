@@ -773,16 +773,20 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
 #fitnessModal .video-wrapper .placeholder {
     color: #888;
     font-size: 0.9em;
-}
+} 
 </style>
 </head>
 <body>
-
+<!--
 <div id="installTip" style="display:none; background:#2e7d32; color:#fff; text-align:center; padding:8px 16px; font-size:0.85rem; letter-spacing:1px; position:relative;">
   📱 点击这里安装冰雪诗词到桌面
   <span onclick="document.getElementById('installTip').style.display='none'" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1.2rem;">×</span>
 </div>
-
+-->
+<div id="installTip" style="display:none; background:#2e7d32; color:#fff; text-align:center; padding:8px 40px 8px 16px; font-size:0.85rem; letter-spacing:1px; position:relative;">
+  📱 点击这里安装冰雪诗词到桌面
+  <span onclick="document.getElementById('installTip').style.display='none'" style="position:absolute; right:10px; bottom:4px; cursor:pointer; font-size:1.2rem; line-height:1;">×</span>
+</div>
 <div class="header">
   <h1>冰雪诗词 · 数字图书馆</h1>
   <div class="header-info">
@@ -814,14 +818,14 @@ body { font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f0
     <button onclick="openAiPoem()">🤖 AI写诗</button>
     <button onclick="exportEditedData()">📤 导出修改</button>
     <button onclick="openGuestbook()">📝 访客留言</button>
-    <!--<div class="links-wrapper">-->
+    <div class="links-wrapper">
       <button onclick="toggleLinks()">🔗 相关链接</button>
       <div class="links-submenu" id="linksSubmenu"></div>
       <button onclick="showJinRiHeJi()">📋 往日今朝</button>
       <button onclick="openJianSuoLiuCun()">📋 检索留存</button>
       <button onclick="openManage()">📁 资料整理</button>
 
-    <!--</div>-->
+    </div>
   </div>
 </div>
 
@@ -4222,6 +4226,7 @@ window.onload = init;
 </script>
 
 <script>
+/*
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
@@ -4235,6 +4240,38 @@ document.getElementById('installTip').addEventListener('click', function() {
       deferredPrompt = null;
       document.getElementById('installTip').style.display = 'none';
     });
+  }
+});
+*/
+
+// ★ 新增：PWA 独立模式检测
+function isPwaStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  if (isPwaStandalone()) return;
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installTip').style.display = 'block';
+});
+document.getElementById('installTip').addEventListener('click', function() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choiceResult) {
+      deferredPrompt = null;
+      document.getElementById('installTip').style.display = 'none';
+    });
+  }
+});
+
+// ★ 页面加载时检查：PWA 模式直接隐藏提示
+window.addEventListener('load', function() {
+  if (isPwaStandalone()) {
+    var tip = document.getElementById('installTip');
+    if (tip) tip.style.display = 'none';
   }
 });
 </script>

@@ -1050,14 +1050,14 @@ body {{ font-family: "Microsoft YaHei", "楷体", KaiTi, serif; background: #e8f
     <button onclick="openAiPoem()">🤖 AI写诗</button>
     <button onclick="exportEditedData()">📤 导出修改</button>
     <button onclick="openGuestbook()">📝 访客留言</button>
-    <!--<div class="links-wrapper">-->
+    <div class="links-wrapper">
       <button onclick="toggleLinks()">🔗 相关链接</button>
       <div class="links-submenu" id="linksSubmenu"></div>
       <button onclick="showJinRiHeJi()">📋 往日今朝</button>
       <button onclick="openJianSuoLiuCun()">📋 检索留存</button>
       <button onclick="openManage()">📁 资料整理</button>
 
-    <!--</div>-->
+    </div>
   </div>
 </div>
 
